@@ -18,16 +18,18 @@
 /* CSS variables colors */
 :root {
   /* Brand */
-  --color-primary: 0 103 100;      /* #006764 */
-  --color-secondary: 105 216 211;  /* #69D8D3 */
+  --color-primary: #006764;      /* #006764 */
+  --color-secondary: #69D8D3;  /* #69D8D3 */
 
   /* Light surfaces */
   --color-surface-light: 245 250 249; /* #F5FAF9 */
   --color-text-light: 15 20 20;       /* #0F1414 */
 
   /* Dark surfaces */
-  --color-surface-dark: 15 20 20; /* #0F1414 */
+  --color-surface-dark: 15 20 20;
   --color-text-dark: 245 250 249;
+
+   --color-white: #FFF;
 
   --gradient-surface-dark:
     linear-gradient(

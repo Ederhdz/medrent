@@ -3,7 +3,10 @@ import "../styles/global.css";
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const { title } = Astro.props;
 
+import { SITE } from '@lib/site';
+const site = SITE;
 import Upperbar from "@components/layout/header/Upperbar.astro";
+import Footer from "@components/layout/footer/Footer.astro";
 ---
 
 <!doctype html>
@@ -24,5 +27,7 @@ import Upperbar from "@components/layout/header/Upperbar.astro";
     <div class="bg-red-500 text-white p-4">
       Tailwind is workingd
     </div>
+
+    <Footer site={site}/>
   </body>
 </html>
