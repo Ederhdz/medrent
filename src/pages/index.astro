@@ -1,6 +1,158 @@
 ---
 import Layout from '../layouts/Layout.astro';
+const dataHome = {}
 ---
 <Layout title="Med Rent - Distribuimos las mejores marcas de equipo médico" pageType="product">
-dfvfvd
+    <section class="max-w-7xl mx-auto grid md:grid-cols-2 gap-6 rounded-a-[24px] pt-6 pr-4 pb-0 pl-4 md:py-6 md:px-6 lg:px-[135px] lg:py-6">
+        <!-- Columna 1: Encabezado -->
+        <div class="space-y-2 p-0 md:pt-16 md:pb-16 md:px-0 lg:pt-[100px] lg:pb-6 lg:px-6 xl:px-6 2xl:px-6">
+        <h3 class="text-[var(--color-accent)] font-light text-[14px] md:text-[14px] uppercase font-kallisto"> SOMOS MEDRENT</h3>
+        <h1 class="font-normal md:text-[28px] text-[28px]  mb-6">
+            {dataHome.TituloContacto || 'La tecnología del futuro, hoy en tu consultorio gracias a MedRent. Financiamiento sin enganche.'}
+        </h1>
+        <p class="text-[#212121] md:text-[16px] text-[16px] text-[var(--color-green-dark)] mt-2 text-pretty">
+            
+            {dataHome.DescripcionContacto ? (
+                <BlocksRenderer content={dataHome.DescripcionContacto} />
+            ) : (
+                <>
+                    <span class="font-light">En MedRent no solo distribuimos equipos, impulsamos tu crecimiento profesional. Déjanos asesorarte para encontrar la solución tecnológica perfecta para transformar la vida de tus pacientes.</strong>
+                </>
+            )}
+        </p>
+        </div>
+    
+        <!-- Columna 2: Formulario -->
+        <form id="home-form" class="space-y-6 p-0 pt-8 pb-8 md:pt-16 md:pb-16 md:px-0 lg:pt-[100px] lg:pb-6 lg:px-6 xl:px-6 2xl:px-6 rounded">
+
+            <!-- Inputs visibles con label flotante -->
+            <div class="relative">
+                <label class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">Nombre completo*</label>
+                <input name="name" type="text" placeholder="Ej: Dra. Carolina Ávila" required class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#212121] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300" />
+            </div>
+
+            <div class="relative">
+                <label class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">Correo electrónico*</label>
+                <input name="email" type="email" placeholder="Ej: carolina.avila@hospitalcardio.mx" required class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#212121] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300" />
+            </div>
+
+            <div class="relative">
+                <label class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">Teléfono de contacto*</label>
+                <input
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="Ej: 55 1234 5678"
+                required
+                maxlength="16"
+                class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#212121] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300"
+                />
+            </div>
+
+            <div class="relative">
+                <label for="specialty" class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">
+                Especialidad médica*
+                </label>
+            
+                <select
+                    name="specialty"
+                    id="specialty"
+                    required
+                    class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 appearance-none rounded-[4px] px-4 py-3 text-[#A0A0A0] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)]  transition-colors duration-300 pr-10 cursor-pointer"
+                    onchange="this.classList.remove('text-[#A0A0A0]')"
+                >
+                <option value="">¿Cuál es tu especialidad médica?</option>
+                <option value="Alergología">Alergología</option>
+                <option value="">¿Cuál es tu especialidad médica?</option>
+                <option value="Alergología">Alergología</option>
+                <option value="Angiología">Angiología</option>
+                <option value="Cardiología">Cardiología</option>
+                <option value="Cardiología Intervencionista Pediátrica">Cardiología Intervencionista Pediátrica</option>
+                <option value="Cardiología clínica">Cardiología clínica</option>
+                <option value="Cardiología deportiva">Cardiología deportiva</option>
+                <option value="Cardiología intensivista">Cardiología intensivista</option>
+                <option value="Cardiología intervencionista">Cardiología intervencionista</option>
+                <option value="Cardiología pediátrica">Cardiología pediátrica</option>
+                <option value="Cardiólogo arritmología">Cardiólogo arritmología</option>
+                <option value="Cardioneumología">Cardioneumología</option>
+                <option value="Cirugía Cardiovascular Pediátrica">Cirugía Cardiovascular Pediátrica</option>
+                <option value="Cirugía cardiovascular">Cirugía cardiovascular</option>
+                <option value="Cirugía cardiotorácica">Cirugía cardiotorácica</option>
+                <option value="Ecocardiografía">Ecocardiografía</option>
+                <option value="Ecocardiografía pediátrica">Ecocardiografía pediátrica</option>
+                <option value="Electrofisiología cardiaca">Electrofisiología cardiaca</option>
+                <option value="Electrofisiología cardiaca pediátrica">Electrofisiología cardiaca pediátrica</option>
+                <option value="Medicina Familiar">Medicina Familiar</option>
+                <option value="Medicina de Urgencias">Medicina de Urgencias</option>
+                <option value="Medicina del Deporte">Medicina del Deporte</option>
+                <option value="Medicina del sueño/Somnología">Medicina del sueño/Somnología</option>
+                <option value="Medicina interna">Medicina interna</option>
+                <option value="Nefrología">Nefrología</option>
+                <option value="Neumología">Neumología</option>
+                <option value="Neumología Intervencionista">Neumología Intervencionista</option>
+                <option value="Neumología pediátrica">Neumología pediátrica</option>
+                <option value="Otorrinolaringología">Otorrinolaringología</option>
+                <option value="Paramedicina / Atención Prehospitalaria">Paramedicina / Atención Prehospitalaria</option>
+                <option value="Radiología Intervencionista">Radiología Intervencionista</option>
+                <option value="Rehabilitación cardiaca">Rehabilitación cardiaca</option>
+                <option value="Terapia intensiva cardiovascular">Terapia intensiva cardiovascular</option>
+                <option value="Otro">Otro</option>
+                </select>
+            
+                <!-- Flechita SVG -->
+                <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+                <svg class="w-4 h-4 text-[#5A3A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+                </div>
+            </div>
+
+            <style>
+                select::-webkit-inner-spin-button,
+                select::-webkit-outer-spin-button,
+                select::-webkit-search-cancel-button,
+                select::-webkit-search-decoration,
+                select::-webkit-search-results-button,
+                select::-webkit-search-results-decoration,
+                select::-ms-expand  {
+                    display: none;
+                }
+
+            </style>
+        
+            <!-- Inputs ocultos -->
+            <input type="hidden" name="unidades_de_negocios" value="MEDRENT" />
+            <input type="hidden" name="hs_all_assigned_business_unit_ids" value="2380506" />
+            <input type="hidden" name="utm_term" />
+            <input type="hidden" name="utm_medium" />
+            <input type="hidden" name="utm_source" />
+            <input type="hidden" name="utm_content" />
+            <input type="hidden" name="utm_campaign" />
+            <input type="hidden" name="definicion_de_necesidad" value="Compra Equipo Médico" />
+        
+            <!-- Checkbox -->
+            <div class="flex items-start gap-2">
+                <input
+                type="checkbox"
+                id="aviso"
+                required
+                class="mt-1 border-[#5A3A36] text-[#5A3A36] focus:ring-[#5A3A36]"
+                />
+                <label for="aviso" class="text-sm text-[#212121] cursor-pointer">
+                He leído y acepto el
+                <a href="/aviso-de-privacidad" target="_blank" class="text-[var(--color-accent)] underline">
+                    Aviso de Privacidad
+                </a>
+                </label>
+            </div>
+        
+            <!-- Botón -->
+            <button id="submit-btn" type="submit" class="bg-[var(--color-primary)] text-white p-[16px] m-0 rounded w-full font-bold transition font-kallisto cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed" aria-label="Recibir asesoría personalizada" disabled>
+                 Agenda una DEMO
+            </button>
+        
+            <div id="status" class="text-center mt-2 text-sm"></div>
+        </form>	
+    </section>
+
 </Layout>
