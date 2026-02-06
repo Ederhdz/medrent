@@ -1,3 +1,33 @@
+---
+const marcas = [
+    { name: "Abbott", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Astar", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell ApneaTrak", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell Sierra Summit", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell Arc Apollo", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell Easy Ambulatory", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell Arc Essentia", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell Cascadelmax", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Cadwell Easy", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Physiomed", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "PG", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "NE", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Rimed", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Esaote", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Ambu", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Rehacom", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Electrocap", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Weaver", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Hasomed", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Spes medica", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Syneika", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "tVNS Health", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Spine Guard", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Samsung Medison", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+    { name: "Luciole medical", slug: "/nuestras-marcas", logo: "/temp/logo.png" },
+];
+---
 <!-- Navbar -->
 <nav class="bg-white shadow">
     
@@ -5,7 +35,7 @@
         <!-- Logo -->
         <div>
             <a href="/">
-                <img src="/images/logo.svg" alt="logo empresa" width="134" height="39">
+                <img src="/temp/Logotipo_Medrent.png" alt="logo empresa" width="134" height="39">
             </a>
         </div>
 
@@ -21,13 +51,109 @@
 
         <!-- Links desktop -->
         <div id="LinksNavBar-Desktop" class="hidden lg:flex gap-6 items-center text-[14px]">
-            <a href="/acerca-de-nosotros" class="hover:underline text-center font-bold hover:text-[var(--color-primary)]">Acerca de nosotros</a>
-            <a href="/productos" class="hover:underline font-bold hover:text-[var(--color-primary)]">Productos</a>
-            <a href="/financiamiento" class="hover:underline font-bold hover:text-[var(--color-primary)]">Financiamiento</a>   
+            
+            <!-- Dropdown Nuestras marcas -->
+            <div id="MarcasDropdown" x-data="{ marcasOpen: false }" class="relative">
+              <button 
+                @click="marcasOpen = !marcasOpen" 
+                :class="['flex items-center font-light focus:outline-none cursor-pointer', marcasOpen ? 'text-[#a4133c]' : 'text-gray-700 hover:text-[#a4133c]']"
+              >
+                Nuestras marcas
+                <svg class="ml-1 w-4 h-4 transition-transform" :class="{ 'rotate-180': marcasOpen }" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                </svg>
+              </button>
+
+              <div 
+                x-show="marcasOpen"
+                @click.away="marcasOpen = false"
+                x-transition
+                @keydown.escape.window="marcasOpen = false"
+                  x-init="
+                    $watch('marcasOpen', value => {
+                      document.body.style.overflow = value ? 'hidden' : ''
+                    })
+                  "
+                :class="marcasOpen ? 'fixed left-0 w-full top-[100px] z-[100] bg-white border border-gray-200 shadow-lg flex justify-between' : 'fixed flex justify-between left-0 w-full bg-white border border-gray-200 shadow-lg py-6 px-8'"
+                style="max-width:100vw; border-bottom:2px solid #B91247;"
+                id="MarcasDropdownMenu"
+                >
+
+                <div class="flex w-full bg-white justify-between px-4 marcasContainer" 
+                  style="max-width: 1280px; max-height: 310px; overflow-y: auto; margin: 0 auto; padding: 24px 32px; justify-content: space-between; flex-direction: column;"
+                  @wheel="$event.stopPropagation(); $el.scrollTop += $event.deltaY"
+                >
+                    {marcas?.map((marca) => (
+                        <a 
+                        href={`/nuestras-marcas`} 
+                        class="p-2 cursor-pointer marcaLink group flex items-center justify-between gap-2 rounded transition-colors min-w-[140px] hover:text-[#A4133C]"
+                        style="margin-bottom: 16px;"
+                            >
+                            <span class="marcaName transition-colors">
+                                {marca.name}
+                            </span>
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="24" height="23" viewBox="0 0 24 23" fill="none" 
+                                class="marcaIcon transition-colors hover:text-[#A4133C] hover:bg-transparen">
+                                <path d="M17.9199 6.34417C17.8185 6.11 17.6243 5.92391 17.3799 5.82667C17.2597 5.77756 17.1306 5.75151 16.9999 5.75H6.99994C6.73472 5.75 6.48037 5.85097 6.29283 6.03069C6.1053 6.21041 5.99994 6.45417 5.99994 6.70833C5.99994 6.9625 6.1053 7.20625 6.29283 7.38598C6.48037 7.5657 6.73472 7.66667 6.99994 7.66667H14.5899L6.28994 15.6112C6.19621 15.7003 6.12182 15.8063 6.07105 15.9231C6.02028 16.0399 5.99414 16.1652 5.99414 16.2917C5.99414 16.4182 6.02028 16.5434 6.07105 16.6602C6.12182 16.777 6.19621 16.883 6.28994 16.9721C6.3829 17.0619 6.4935 17.1332 6.61536 17.1819C6.73722 17.2305 6.86793 17.2556 6.99994 17.2556C7.13195 17.2556 7.26266 17.2305 7.38452 17.1819C7.50638 17.1332 7.61698 17.0619 7.70994 16.9721L15.9999 9.01792V16.2917C15.9999 16.5458 16.1053 16.7896 16.2928 16.9693C16.4804 17.149 16.7347 17.25 16.9999 17.25C17.2652 17.25 17.5195 17.149 17.707 16.9693C17.8946 16.7896 17.9999 16.5458 17.9999 16.2917V6.70833C17.9984 6.5831 17.9712 6.45938 17.9199 6.34417Z" fill="currentColor"></path>
+                            </svg>
+                        </a>
+                    ))}
+
+                  {/* Ver más */}
+                  <a 
+                    href={`/nuestras-marcas`} 
+                    class="marcaLink group flex items-center justify-between gap-2 rounded transition-colors p-2 min-w-[140px] hover:text-[#A4133C]">
+                  
+                    <label class="transition-colors" :class="{'group-hover:text-[#A4133C]': true}">Ver más</label>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        class="transition-colors" :class="{'group-hover:text-[#A4133C]': true}">
+                      <path d="M17.9199 6.62C17.8185 6.37565 17.6243 6.18147 17.3799 6.08C17.2597 6.02876 17.1306 6.00158 16.9999 6H6.99994C6.73472 6 6.48037 6.10536 6.29283 6.29289C6.1053 6.48043 5.99994 6.73478 5.99994 7C5.99994 7.26522 6.1053 7.51957 6.29283 7.70711C6.48037 7.89464 6.73472 8 6.99994 8H14.5899L6.28994 16.29C6.19621 16.383 6.12182 16.4936 6.07105 16.6154C6.02028 16.7373 5.99414 16.868 5.99414 17C5.99414 17.132 6.02028 17.2627 6.07105 17.3846C6.12182 17.5064 6.19621 17.617 6.28994 17.71C6.3829 17.8037 6.4935 17.8781 6.61536 17.9289C6.73722 17.9797 6.86793 18.0058 6.99994 18.0058C7.13195 18.0058 7.26266 17.9797 7.38452 17.9289C7.50638 17.8781 7.61698 17.8037 7.70994 17.71L15.9999 9.41V17C15.9999 17.2652 16.1053 17.5196 16.2928 17.7071C16.4804 17.8946 16.7347 18 16.9999 18C17.2652 18 17.5195 17.8946 17.707 17.7071C17.8946 17.5196 17.9999 17.2652 17.9999 17V7C17.9984 6.86932 17.9712 6.74022 17.9199 6.62Z" fill="currentColor"/>
+                    </svg>
+                  </a>                  
+                </div>
+              </div>
+
+              <style>
+                .marcasContainer {
+                  scrollbar-width: thin;
+                  scrollbar-color: #a4133c #FFF8F7;
+                  overflow-y: auto;
+                  overscroll-behavior: contain;
+                }
+
+                .marcasContainer::-webkit-scrollbar {
+                  width: 8px;
+                }
+
+                .marcasContainer::-webkit-scrollbar-track {
+                  background: #FFF8F7;
+                }
+
+                .marcasContainer::-webkit-scrollbar-thumb {
+                  background-color: #a4133c;
+                  border-radius: 4px;
+                  border: 2px solid #FFF8F7;
+                }
+
+                .marcaLink.active,
+                .marcaLink:active,
+                .marcaLink:focus {
+                  background: #FFF8F7 !important;
+                  border-radius: 4px !important;
+                  color: #a4133c !important;
+                }
+              </style>
+            </div>
             <a href="/especialidades" class="hover:underline font-bold hover:text-[var(--color-primary)]">Especialidades</a>
             <a href="/especialidades" class="hover:underline font-bold hover:text-[var(--color-primary)]">Nuestras marcas</a>
+
+            <!-- <a href="/acerca-de-nosotros" class="hover:underline text-center font-bold hover:text-[var(--color-primary)]">Acerca de nosotros</a> -->
+            <!-- <a href="/productos" class="hover:underline font-bold hover:text-[var(--color-primary)]">Productos</a> -->
+            <a href="/financiamiento" class="hover:underline font-bold hover:text-[var(--color-primary)]">Financiamiento</a>   
             <a href="/eventos" class="hover:underline font-bold hover:text-[var(--color-primary)]">Eventos</a>
-            <a href="/blog" class="hover:underline font-bold hover:text-[var(--color-primary)]">Blog</a>
+            <!-- <a href="/blog" class="hover:underline font-bold hover:text-[var(--color-primary)]">Blog</a> -->
             <a href="/contacto" class="bg-[var(--color-primary)] text-white text-[14px] px-4 py-2 rounded">Contáctanos</a>
         </div>
     </div>
@@ -58,10 +184,10 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
                 <div class="font-bold text-base leading-6 tracking-[0.5px]" style="font-weight: 700;">
-                title
+                Hablemos de innovación médica
                 </div>
                 <div class="font-normal text-base leading-6 tracking-[0.5px]" style="font-weight: 200; font-size: 13px;">
-                Description
+                Estamos listos para asesorarte en equipo de alta especialidad.
                 </div>
             </div>
             <a href="/contacto" class="w-full md:w-auto bg-[var(--color-primary)] text-white text-center px-4 py-2 rounded font-semibold">
@@ -70,12 +196,13 @@
             </div>
         </div>
 
-        <a href="/acerca-de-nosotros" class="py-6 text-[#261819] border-b border-[#8E6F73]">Acerca de nosotros</a>
-        <a href="/productos" class="py-6 text-[#261819] border-b border-[#8E6F73]">Productos</a>
-        <a href="/financiamiento" class="py-6 text-[#261819] border-b border-[#8E6F73]">Financiamiento</a>
-        <a href="/servicio-tecnico" class="py-6 text-[#261819] border-b border-[#8E6F73]">Servicio Técnico</a>
-        <a href="/blog" class="py-6 text-[#261819] border-b border-[#8E6F73]">Blog</a>
-        <a href="/eventos" class="py-6 text-[#261819]">Eventos</a>
+         
+            <!-- <a href="/acerca-de-nosotros" class="py-6 text-[#261819] border-b border-[#8E6F73]">Acerca de nosotros</a> -->
+            <!-- <a href="/productos" class="py-6 text-[#261819] border-b border-[#8E6F73]">Productos</a> -->
+            <a href="/financiamiento" class="py-6 text-[#261819] border-b border-[#8E6F73]">Financiamiento</a>
+            <!-- <a href="/servicio-tecnico" class="py-6 text-[#261819] border-b border-[#8E6F73]">Servicio Técnico</a> -->
+            <!-- <a href="/blog" class="py-6 text-[#261819] border-b border-[#8E6F73]">Blog</a> -->
+            <a href="/eventos" class="py-6 text-[#261819]">Eventos</a>
         </div>
         
         <style>
