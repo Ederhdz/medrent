@@ -127,7 +127,7 @@ const { especialidad } = Astro.props;
                   {/* Imagen responsiva en tablet/desktop */}
                   {/* {getAplicacionImagenUrl(aplicacion) ? ( */}
                     <img
-                        src={ `http://localhost:4321/public/temp/especialidades/${especialidad.Slug}/${aplicacion.image}` }
+                        src={ `/temp/especialidades/${especialidad.Slug}/${aplicacion.image}` }
                         alt={aplicacion.AplicacionClinica}
                         class="object-cover hidden sm:block w-full h-full"
                     />
