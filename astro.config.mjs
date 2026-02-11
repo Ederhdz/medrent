@@ -2,9 +2,8 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@tailwindcss/vite';
 import alpinejs from "@astrojs/alpinejs";
-import vercel from '@astrojs/vercel';
+import vercel from '@astrojs/vercel/serverless';
 
-// https://astro.build/config
 export default defineConfig({
   site: 'https://medrent.mx',
   output: 'server',
