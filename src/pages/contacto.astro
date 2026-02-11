@@ -452,4 +452,189 @@ import Breadcrumb from '@components/navigation/Breadcrumb.astro';
             </div>
         </div>
     </section>
+
+
+    <script type="module">
+    // Validación de campos y habilitación de botón
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('contact-form');
+        const nameInput = form.querySelector('input[name="name"]');
+        const emailInput = form.querySelector('input[name="email"]');
+        const phoneInput = form.querySelector('input[name="phone"]');
+        const workplaceInput = form.querySelector('input[name="lugar_de_trabajo"]');
+        const specialtySelect = form.querySelector('select[name="specialty"]');
+        const stateSelect = form.querySelector('select[name="estado_mx"]');
+        const sourceInput = form.querySelector('input[name="por_qu_medio_nos_conociste"]');
+        const termsInput = form.querySelector('input[type="checkbox"]#aviso');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        // Obtener colores desde variables CSS
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
+        const greenDarkColor = getComputedStyle(document.documentElement).getPropertyValue('--color-green-dark').trim();
+        
+        function validateField(input, minLength = 2) {
+            const label = input.parentElement.querySelector('label');
+            const isValid = input.type === 'email' 
+                ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim())
+                : input.value.trim().length >= minLength;
+                
+            if (isValid) {
+                input.style.setProperty('border', `3px solid ${primaryColor}`, 'important');
+                if (label) label.style.background = primaryColor;
+                return true;
+            } else {
+                input.style.setProperty('border', `2px solid ${greenDarkColor}`, 'important');
+                if (label) label.style.background = greenDarkColor;
+                return false;
+            }
+        }
+        
+        function validateSelect(select) {
+            const label = select.parentElement.querySelector('label');
+            const isValid = select.value && select.value !== '';
+            
+            if (isValid) {
+                select.classList.remove('text-[#A0A0A0]');
+                select.style.setProperty('border', `3px solid ${primaryColor}`, 'important');
+                if (label) label.style.background = primaryColor;
+                return true;
+            } else {
+                select.style.setProperty('border', `2px solid ${greenDarkColor}`, 'important');
+                if (label) label.style.background = greenDarkColor;
+                return false;
+            }
+        }
+        
+        function validatePhone() {
+            const label = phoneInput.parentElement.querySelector('label');
+            const digits = phoneInput.value.replace(/\D/g, '');
+            if (digits.length >= 10) {
+                phoneInput.style.setProperty('border', `3px solid ${primaryColor}`, 'important');
+                if (label) label.style.background = primaryColor;
+                return true;
+            } else {
+                phoneInput.style.setProperty('border', `2px solid ${greenDarkColor}`, 'important');
+                if (label) label.style.background = greenDarkColor;
+                return false;
+            }
+        }
+        
+        function checkAll() {
+            const nameValid = validateField(nameInput, 3);
+            const emailValid = validateField(emailInput);
+            const phoneValid = validatePhone();
+            const workplaceValid = validateField(workplaceInput, 2);
+            const specialtyValid = validateSelect(specialtySelect);
+            const stateValid = validateSelect(stateSelect);
+            const sourceValid = validateField(sourceInput, 2);
+            const termsValid = termsInput.checked;
+            
+            const allValid = nameValid && emailValid && phoneValid && workplaceValid && specialtyValid && stateValid && sourceValid && termsValid;
+            
+            if (allValid) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+        }
+        
+        // Event listeners
+        nameInput.addEventListener('input', checkAll);
+        emailInput.addEventListener('input', checkAll);
+        phoneInput.addEventListener('input', checkAll);
+        workplaceInput.addEventListener('input', checkAll);
+        specialtySelect.addEventListener('change', function() {
+            this.classList.remove('text-[#A0A0A0]');
+            checkAll();
+        });
+        stateSelect.addEventListener('change', function() {
+            this.classList.remove('text-[#A0A0A0]');
+            checkAll();
+        });
+        sourceInput.addEventListener('input', checkAll);
+        termsInput.addEventListener('change', checkAll);
+        
+        // Inicializar estado
+        checkAll();
+    });
+
+    // Formato teléfono - Versión simplificada
+    const phoneInput = document.getElementById("phone");
+
+    phoneInput.addEventListener("input", () => {
+        // Obtener solo números del input
+        let numbers = phoneInput.value.replace(/\D/g, "");
+        
+        // Limitar a máximo 12 dígitos (52 + 10 dígitos del número mexicano)
+        if (numbers.length > 12) {
+            numbers = numbers.slice(0, 12);
+        }
+        
+        // Si no empieza con 52 y tiene 10+ dígitos, agregar código de país
+        if (!numbers.startsWith("52") && numbers.length >= 10) {
+            numbers = "52" + numbers;
+        }
+        
+        // Formatear con + al inicio
+        phoneInput.value = numbers.length > 0 ? "+" + numbers : "";
+    });
+
+	// Procesar formulario
+	const form = document.getElementById("contact-form");
+	const status = document.getElementById("status");
+
+	// Capturar UTM de la URL
+	const urlParams = new URLSearchParams(window.location.search);
+	const utmFields = [
+		"utm_term",
+		"utm_medium",
+		"utm_source",
+		"utm_content",
+		"utm_campaign",
+	];
+
+	utmFields.forEach((field) => {
+		const value = urlParams.get(field) || "";
+		const input = form.querySelector(`input[name="${field}"]`);
+		if (input) input.value = value;
+	});
+
+	form.addEventListener("submit", async (e) => {
+		e.preventDefault();
+
+		const formData = new FormData(form);
+		const data = Object.fromEntries(formData.entries());
+
+		try {
+			const response = await fetch("/api/contact", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+
+			if (response.ok) {
+				status.textContent = "✅ Tu solicitud se envió correctamente. Pronto nos pondremos en contacto.";
+				// sendFormEvent(); // Función no definida - comentada
+				form.reset();
+			} else {
+				const json = await response.json();
+				if (json.category === "CONFLICT") {
+					status.textContent = "✅ Tu solicitud se envió correctamente. Pronto nos pondremos en contacto.";
+					// sendFormEvent(); // Función no definida - comentada
+					form.reset();
+				} else {
+					status.textContent = "❌ Hubo un problema al enviar tu solicitud. Intenta nuevamente más tarde.";
+					console.error("Error response:", json);
+				}
+			}
+		} catch (error) {
+			console.error("Network error:", error);
+			status.textContent = "❌ Error de red. Por favor, verifica tu conexión e intenta nuevamente.";
+		}
+	});
+</script>
 </Layout>
