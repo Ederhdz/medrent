@@ -2,12 +2,10 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@tailwindcss/vite';
 import alpinejs from "@astrojs/alpinejs";
-import vercel from '@astrojs/vercel/serverless';
+import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   site: 'https://medrent.mx',
-  output: 'server',
-  adapter: vercel(),
   integrations: [alpinejs()],
   vite: {
     plugins: [tailwind()],
@@ -20,4 +18,6 @@ export default defineConfig({
       },
     },
   },
+  adapter: vercel(),
+
 });
