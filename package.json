@@ -9,8 +9,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@glidejs/glide": "^3.7.1",
     "@astrojs/alpinejs": "^0.4.9",
+    "@astrojs/vercel": "^9.0.4",
+    "@glidejs/glide": "^3.7.1",
     "astro": "^5.16.15"
   },
   "devDependencies": {
