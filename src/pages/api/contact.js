@@ -82,15 +82,23 @@ export async function ALL({ request }) {
       const value = input[key];
 
       if (key === 'specialty') {
-        properties['especialidad_medica__medrent_'] = String(value).trim();
+        properties['especialidad_medica'] = String(value).trim();
+        continue;
+      }
+
+      if (key === 'unidades_de_negocios') {
+        // Forzar el valor correcto para HubSpotF
+        properties['unidades_de_negocios'] = 'MED RENT';
         continue;
       }
 
       if (key === 'phone') {
-        let phone = String(value).trim();
-        if (!phone.startsWith('+')) {
-          phone = `+52${phone.replace(/[^0-9]/g, '')}`;
+        let rawPhone = String(value).replace(/[^0-9]/g, '');
+        // Validar que tenga exactamente 10 dígitos (número mexicano)
+        if (rawPhone.length !== 10) {
+          return new Response(JSON.stringify({ error: 'El número de teléfono debe tener exactamente 10 dígitos (México).' }), { status: 400, headers });
         }
+        let phone = `+52${rawPhone}`;
         properties.phone = phone;
         continue;
       }

@@ -461,21 +461,12 @@ const marcas = [
         const phoneInput = document.getElementById("phone");
 
         phoneInput.addEventListener("input", () => {
-            // Obtener solo números del input
+            // Permitir solo números, máximo 10 dígitos
             let numbers = phoneInput.value.replace(/\D/g, "");
-            
-            // Limitar a máximo 12 dígitos (52 + 10 dígitos del número mexicano)
-            if (numbers.length > 12) {
-                numbers = numbers.slice(0, 12);
+            if (numbers.length > 10) {
+                numbers = numbers.slice(0, 10);
             }
-            
-            // Si no empieza con 52 y tiene 10+ dígitos, agregar código de país
-            if (!numbers.startsWith("52") && numbers.length >= 10) {
-                numbers = "52" + numbers;
-            }
-            
-            // Formatear con + al inicio
-            phoneInput.value = numbers.length > 0 ? "+" + numbers : "";
+            phoneInput.value = numbers;
         });
 
         // Procesar formulario
@@ -505,8 +496,6 @@ const marcas = [
             if (typeof window.applyEquipos === "function") window.applyEquipos();
 
             const formData = new FormData(form);
-            // const data = Object.fromEntries(formData.entries());
-            
             // Construir el objeto manualmente para mayor control y evitar errores de JSON
             const data = {};
             formData.forEach((value, key) => {
@@ -520,11 +509,17 @@ const marcas = [
                 }
             });
 
+            // Validación de teléfono mexicano (10 dígitos)
+            const phoneRaw = String(data.phone || '').replace(/[^0-9]/g, '');
+            if (phoneRaw.length !== 10) {
+                status.textContent = "❌ El número de teléfono debe tener exactamente 10 dígitos (México).";
+                return;
+            }
 
             try {
                 const jsonBody = JSON.stringify(data);
                 console.log("Objeto de datos a enviar:", data);
-                console.log("JSON string enviado:", jsonBody);
+                // console.log("JSON string enviado:", jsonBody);
 
                 const response = await fetch("/api/contact", {
                     method: "POST",
@@ -537,15 +532,14 @@ const marcas = [
                     // sendFormEvent();
                     form.reset();
                 } else {
-
                     const resData = await response.json();
                     if (resData.category === 'CONFLICT') {
                         status.textContent = "✅ Tu solicitud ya está en proceso. ";
                         form.reset();
-                    } 
-
-                    // status.textContent = "❌ Hubo un problema al enviar tu solicitud. Intenta nuevamente más tarde.";
-                    // console.error("Error response:", await response.json());
+                    } else {
+                        status.textContent = "❌ Hubo un problema al enviar tu solicitud. Intenta nuevamente más tarde.";
+                    }
+                    console.error("Error response:", resData);
                 }
 
             } catch (error) {
