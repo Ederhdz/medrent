@@ -1,0 +1,61 @@
+import { strapiFetch } from "../strapiClient";
+import { mapStrapiProduct } from "@lib/domain/product/mapper";
+import type { Product } from "@lib/domain/product/types";
+
+const PLP_POPULATE = `
+    ?populate[gallery]=true
+`.replace(/\s+/g, '');
+
+export async function getProducts(filters?: {
+  brand?: string;
+  category?: string;
+  application?: string;
+}): Promise<Product[]> {
+  let filterQuery = "";
+
+  if (filters?.brand) {
+    filterQuery += `&filters[brand][slug][$eq]=${filters.brand}`;
+  }
+
+  if (filters?.category) {
+    filterQuery += `&filters[categories][slug][$eq]=${filters.category}`;
+  }
+
+  if (filters?.application) {
+    filterQuery += `&filters[applications][slug][$eq]=${filters.application}`;
+  }
+
+  const res = await strapiFetch(
+    `/products${PLP_POPULATE}${filterQuery}`
+  );
+
+//   return res.data;
+  return res.data.map(mapStrapiProduct);
+}
+
+
+const PDP_POPULATE = `
+    &populate[gallery]=true
+    &populate[documents]=true
+    &populate[benefit]=true
+    &populate[faqItem]=true
+    &populate[technicalSheet]=true
+    &populate[technicalSpecifications]=true
+    &populate[relatedConsumables]=true
+    &populate[relatedProducts]=true
+    &populate[variants]=true
+    &populate[subcategory]=true
+    &populate[brand]=true
+`.replace(/\s+/g, '');
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  const res = await strapiFetch(
+    `/products?filters[slug][$eq]=${slug}${PDP_POPULATE}`
+  );
+
+  if (!res.data.length) return null;
+
+//   return res.data[0];
+  return mapStrapiProduct(res.data[0]);
+}
+
