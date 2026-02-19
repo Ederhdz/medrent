@@ -9,7 +9,7 @@ const PLP_POPULATE = `
 export async function getProducts(filters?: {
   brand?: string;
   category?: string;
-  application?: string;
+  subcategory?: string;
 }): Promise<Product[]> {
   let filterQuery = "";
 
@@ -18,11 +18,11 @@ export async function getProducts(filters?: {
   }
 
   if (filters?.category) {
-    filterQuery += `&filters[categories][slug][$eq]=${filters.category}`;
+    filterQuery += `&filters[subcategory][category][slug][$eq]=${filters.category}`;
   }
 
-  if (filters?.application) {
-    filterQuery += `&filters[applications][slug][$eq]=${filters.application}`;
+  if (filters?.subcategory) {
+    filterQuery += `&filters[subcategory][slug][$eq]=${filters.subcategory}`;
   }
 
   const res = await strapiFetch(
