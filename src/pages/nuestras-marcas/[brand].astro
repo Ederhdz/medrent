@@ -1,48 +1,53 @@
 ---
+import { getBrands } from "@server/api/brands";
 import { getProducts } from "@server/api/products";
+import Layout from "@layouts/Layout.astro";
+import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
+import Breadcrumb from '@components/navigation/Breadcrumb.astro';
+import ProductGrid from "@components/product/ProductGrid.astro";
+import PLPLayout from "@components/product/PLPLayout.astro";
 
 export async function getStaticPaths() {
-  // Necesitamos lista de marcas
   const brands = await getBrands();
-
-  console.log("Brands for static paths:", brands);
-
-  return brands.map((brand) => ({
+  console.log("Brands:", brands); // Agrega este log para verificar los datos de las marcas
+  
+  return brands.map((brand:any) => ({
     params: { brand: brand.slug },
   }));
 }
 
-import { getBrands } from "@server/api/brands";
-
 const { brand } = Astro.params;
-
 const products = await getProducts({ brand });
+console.log("Products for brand:", products); // Agrega este log para verificar los productos obtenidos
 ---
 
-<section class="max-w-7xl mx-auto px-4 py-12">
-  <h1 class="text-3xl font-semibold mb-8">
-    Productos de {brand}
-  </h1>
 
-  {products.length === 0 ? (
-    <p>No products found.</p>
-  ) : (
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {products.map((product) => (
-        <a
-          href={`/productos/${product.slug}`}
-          class="border rounded-lg p-4 hover:shadow-md transition"
-        >
-          {product.coverImage && (
-            <img
-              src={product.coverImage}
-              alt={product.name}
-              class="mb-4 h-40 w-full object-contain"
-            />
-          )}
-          <h2 class="font-medium">{product.name}</h2>
-        </a>
-      ))}
-    </div>
-  )}
-</section>
+ <Layout title="Productos">
+    <Fragment slot="head">
+      <BreadcrumbSchema
+      items={[
+          { name: 'Inicio', url: 'https://www.medrent.mx' },
+          { name: 'Nuestras Marcas', url: 'https://www.medrent.mx/nuestras-marcas' },
+      ]}
+      />
+    </Fragment>
+
+
+  <section class="relative w-full h-[140px] max-w-7xl mx-auto overflow-hidden">    
+      <div class="absolute inset-0 heroproductos">
+          <Breadcrumb
+          textColor="text-white"
+          items={[
+              { name: "INICIO", href: "/" },
+              { name: "NUESTRAS MARCAS", href: "/nuestras-marcas" },
+              { name: brand.toUpperCase() }
+          ]}
+      />
+          <img src="/temp/HeroPLP.png" alt="Todos los productos" class="w-full h-full object-cover rounded-b-[24px]" />
+      </div>
+  </section>
+
+  <PLPLayout title={`Marca ${brand}`}>
+    <ProductGrid products={products} />
+  </PLPLayout>
+</Layout>
