@@ -94,3 +94,46 @@ select option:focus {
   text-decoration: underline;
   text-decoration-color: var(--color-primary) !important;
 }
+
+
+/* Scrollbar personalizado para SidebarFilters */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 18px;
+  background: var(--Schemes-On-Primary, #FFECED);
+  border-radius: 16px;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #FFECED;
+  border-radius: 16px;
+  border: 2px solid #e0e0e0;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #B91247 #FFECED;
+}
+
+
+/* Ancho de la barra */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Fondo del scrollbar */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #fde2e7 !important; /* rosa claro */
+  border-radius: 16px;
+}
+
+/* Barra que se mueve */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #b0124a; /* vino / magenta */
+  border-radius: 18px!important;
+}
+
+/* Hover (opcional, un poco más oscuro) */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #8f0f3d;
+}

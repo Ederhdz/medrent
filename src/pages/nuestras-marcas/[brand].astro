@@ -1,53 +1,95 @@
 ---
-import { getBrands } from "@server/api/brands";
-import { getProducts } from "@server/api/products";
-import Layout from "@layouts/Layout.astro";
-import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
-import Breadcrumb from '@components/navigation/Breadcrumb.astro';
-import ProductGrid from "@components/product/ProductGrid.astro";
-import PLPLayout from "@components/product/PLPLayout.astro";
+export const prerender = false;
 
-export async function getStaticPaths() {
-  const brands = await getBrands();
-  console.log("Brands:", brands); // Agrega este log para verificar los datos de las marcas
-  
-  return brands.map((brand:any) => ({
-    params: { brand: brand.slug },
-  }));
-}
+import Layout from "@layouts/Layout.astro";
+import BreadcrumbSchema from "@components/seo/BreadcrumbSchema.astro";
+import Breadcrumb from "@components/navigation/Breadcrumb.astro";
+import PLPLayout from "@components/product/PLPLayout.astro";
+import ProductGrid from "@components/product/ProductGrid.astro";
+import SidebarFilters from "@components/product/SidebarFilters.astro";
+
+
+import { getProducts } from "@server/api/products";
+import { getBrands } from "@server/api/brands";
+import { getCategories } from "@server/api/categories";
+import { getAllSubcategories } from "@server/api/subcategories";
+
+/* ---------------- ROUTE PARAM ---------------- */
 
 const { brand } = Astro.params;
-const products = await getProducts({ brand });
-console.log("Products for brand:", products); // Agrega este log para verificar los productos obtenidos
+
+/* ---------------- QUERY PARAMS ---------------- */
+
+const url = new URL(Astro.request.url);
+
+const brandQuery = url.searchParams.get("brand")?.split(",") || [];
+const categoryQuery = url.searchParams.get("category")?.split(",") || [];
+const subcategoryQuery =
+  url.searchParams.get("subcategory")?.split(",") || [];
+
+/* Siempre incluir marca base */
+if (brand && !brandQuery.includes(brand)) {
+  brandQuery.push(brand);
+}
+
+/* ---------------- FETCH DATA ---------------- */
+
+const products = await getProducts({
+  brands: brandQuery,
+  categories: categoryQuery,
+  subcategories: subcategoryQuery,
+});
+
+const brandsData = await getBrands();
+const categoriesData = await getCategories();
+const subcategoriesData = await getAllSubcategories();
+
+const pageTitle = `Marca ${brand}`;
 ---
 
-
- <Layout title="Productos">
-    <Fragment slot="head">
-      <BreadcrumbSchema
+<Layout title={pageTitle}>
+  <Fragment slot="head">
+    <BreadcrumbSchema
       items={[
-          { name: 'Inicio', url: 'https://www.medrent.mx' },
-          { name: 'Nuestras Marcas', url: 'https://www.medrent.mx/nuestras-marcas' },
+        { name: "Inicio", url: "https://www.medrent.mx" },
+        {
+          name: "Nuestras Marcas",
+          url: "https://www.medrent.mx/nuestras-marcas",
+        },
+        { name: brand }
       ]}
+    />
+  </Fragment>
+
+  <!-- HERO -->
+  <section class="relative w-full h-[140px] max-w-7xl mx-auto overflow-hidden">
+    <div class="absolute inset-0 heroproductos">
+      <Breadcrumb
+        textColor="text-white"
+        items={[
+          { name: "INICIO", href: "/" },
+          { name: "NUESTRAS MARCAS", href: "/nuestras-marcas" },
+          { name: brand.toUpperCase() }
+        ]}
+      />
+      <img
+        src="/temp/HeroPLP.png"
+        alt={`Marca ${brand}`}
+        class="w-full h-full object-cover rounded-b-[24px]"
+      />
+    </div>
+  </section>
+
+  <!-- PLP -->
+  <PLPLayout title={`Marca ${brand}`}>
+    <Fragment slot="filters">
+      <SidebarFilters
+        brands={brandsData}
+        categories={categoriesData}
+        subcategories={subcategoriesData}
       />
     </Fragment>
 
-
-  <section class="relative w-full h-[140px] max-w-7xl mx-auto overflow-hidden">    
-      <div class="absolute inset-0 heroproductos">
-          <Breadcrumb
-          textColor="text-white"
-          items={[
-              { name: "INICIO", href: "/" },
-              { name: "NUESTRAS MARCAS", href: "/nuestras-marcas" },
-              { name: brand.toUpperCase() }
-          ]}
-      />
-          <img src="/temp/HeroPLP.png" alt="Todos los productos" class="w-full h-full object-cover rounded-b-[24px]" />
-      </div>
-  </section>
-
-  <PLPLayout title={`Marca ${brand}`}>
     <ProductGrid products={products} />
   </PLPLayout>
 </Layout>

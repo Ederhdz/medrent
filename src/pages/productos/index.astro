@@ -1,38 +1,78 @@
 ---
-import { getProducts } from "@server/api/products";
-import Layout from "@layouts/Layout.astro";
-import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
-import Breadcrumb from '@components/navigation/Breadcrumb.astro';
-import ProductGrid from "@components/product/ProductGrid.astro";
-import PLPLayout from "@components/product/PLPLayout.astro";
+export const prerender = false;
 
-const products = await getProducts();
+import Layout from "@layouts/Layout.astro";
+import BreadcrumbSchema from "@components/seo/BreadcrumbSchema.astro";
+import Breadcrumb from "@components/navigation/Breadcrumb.astro";
+import PLPLayout from "@components/product/PLPLayout.astro";
+import ProductGrid from "@components/product/ProductGrid.astro";
+import SidebarFilters from "@components/product/SidebarFilters.astro";
+
+import { getProducts } from "@server/api/products";
+import { getBrands } from "@server/api/brands";
+import { getCategories } from "@server/api/categories";
+import { getAllSubcategories } from "@server/api/subcategories";
+
+/* ---------------- QUERY PARAMS ---------------- */
+
+const url = new URL(Astro.request.url);
+
+const brandQuery = url.searchParams.get("brand")?.split(",") || [];
+const categoryQuery = url.searchParams.get("category")?.split(",") || [];
+const subcategoryQuery =
+  url.searchParams.get("subcategory")?.split(",") || [];
+
+/* ---------------- FETCH DATA ---------------- */
+
+const products = await getProducts({
+  brands: brandQuery,
+  categories: categoryQuery,
+  subcategories: subcategoryQuery,
+});
+
+const brandsData = await getBrands();
+const categoriesData = await getCategories();
+const subcategoriesData = await getAllSubcategories();
 ---
-  <Layout title="Productos">
-    <Fragment slot="head">
-      <BreadcrumbSchema
+
+<Layout title="Productos">
+  <Fragment slot="head">
+    <BreadcrumbSchema
       items={[
-          { name: 'Inicio', url: 'https://www.medrent.mx' },
-          { name: 'Productos', url: 'https://www.medrent.mx/productos' },
+        { name: "Inicio", url: "https://www.medrent.mx" },
+        { name: "Productos", url: "https://www.medrent.mx/productos" },
       ]}
+    />
+  </Fragment>
+
+  <!-- HERO -->
+  <section class="relative w-full h-[140px] max-w-7xl mx-auto overflow-hidden">
+    <div class="absolute inset-0 heroproductos">
+      <Breadcrumb
+        textColor="text-white"
+        items={[
+          { name: "INICIO", href: "/" },
+          { name: "PRODUCTOS" },
+        ]}
+      />
+      <img
+        src="/temp/HeroPLP.png"
+        alt="Todos los productos"
+        class="w-full h-full object-cover rounded-b-[24px]"
+      />
+    </div>
+  </section>
+
+  <!-- PLP -->
+  <PLPLayout title="Productos">
+    <Fragment slot="filters">
+      <SidebarFilters
+        brands={brandsData}
+        categories={categoriesData}
+        subcategories={subcategoriesData}
       />
     </Fragment>
 
-
-  <section class="relative w-full h-[140px] max-w-7xl mx-auto overflow-hidden">    
-      <div class="absolute inset-0 heroproductos">
-          <Breadcrumb
-          textColor="text-white"
-          items={[
-              { name: "INICIO", href: "/" },
-              { name: "PRODUCTOS" }
-          ]}
-      />
-          <img src="/temp/HeroPLP.png" alt="Todos los productos" class="w-full h-full object-cover rounded-b-[24px]" />
-      </div>
-  </section>
-
-  <PLPLayout title="Productos">
     <ProductGrid products={products} />
   </PLPLayout>
 </Layout>

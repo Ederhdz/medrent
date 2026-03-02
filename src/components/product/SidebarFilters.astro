@@ -1,0 +1,251 @@
+---
+const {
+  brands = [],
+  categories = [],
+  subcategories = []
+} = Astro.props;
+
+  // console.log('categories----:', categories[0].subcategories);
+---
+
+<div class="sidebar-filters-container">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-[16px] font-bold text-[var(--color-primary)]">Filtros</h3>
+    <button id="clear-filters" class="text-[16px] text-[#6D7A78] underline cursor-pointer hover:text-[var(--color-primary)] transition-colors duration-300">
+      Limpiar
+    </button>
+  </div>
+
+  <!-- CATEGORY -->
+  <div class="mb-6">
+    <button class="filter-toggle flex justify-between w-full pb-2 border-b border-[var(--color-primary)] cursor-pointer" data-target="category">
+      <span class="text-[16px]">Especialidad</span>
+      <span class="arrow transition-transform duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M7.00005 14.83C7.18741 15.0162 7.44087 15.1208 7.70505 15.1208C7.96924 15.1208 8.22269 15.0162 8.41005 14.83L12.0001 11.29L15.5401 14.83C15.7274 15.0162 15.9809 15.1208 16.2451 15.1208C16.5092 15.1208 16.7627 15.0162 16.9501 14.83C17.0438 14.737 17.1182 14.6264 17.1689 14.5046C17.2197 14.3827 17.2458 14.252 17.2458 14.12C17.2458 13.988 17.2197 13.8573 17.1689 13.7354C17.1182 13.6136 17.0438 13.503 16.9501 13.41L12.7101 9.17C12.6171 9.07627 12.5065 9.00187 12.3846 8.9511C12.2628 8.90034 12.1321 8.8742 12.0001 8.8742C11.868 8.8742 11.7373 8.90034 11.6155 8.9511C11.4936 9.00187 11.383 9.07627 11.2901 9.17L7.00005 13.41C6.90632 13.503 6.83193 13.6136 6.78116 13.7354C6.73039 13.8573 6.70425 13.988 6.70425 14.12C6.70425 14.252 6.73039 14.3827 6.78116 14.5046C6.83193 14.6264 6.90632 14.737 7.00005 14.83Z" fill="#171D1C"/>
+        </svg>
+      </span>
+    </button>
+
+    <div class="filter-content mt-3 transition-all duration-300 ease-in-out overflow-hidden max-h-0" id="category">
+      {categories.map((cat) => (
+        <label class="flex items-center mt-2 cursor-pointer">
+          <input
+            type="checkbox"
+            data-filter="category"
+            value={cat.slug}
+            class="mr-2 accent-[var(--color-primary)]"
+          />
+          {cat.name}
+        </label>
+      ))}
+    </div>
+  </div>
+
+  <!-- SUBCATEGORY ANIDADO POR ESPECIALIDAD -->
+  <div class="mb-6">
+    <button class="filter-toggle flex justify-between w-full pb-2 border-b border-[var(--color-primary)] cursor-pointer" data-target="subcategory">
+      <span class="text-[16px]">Aplicación clínica</span>
+      <span class="arrow transition-transform duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M7.00005 14.83C7.18741 15.0162 7.44087 15.1208 7.70505 15.1208C7.96924 15.1208 8.22269 15.0162 8.41005 14.83L12.0001 11.29L15.5401 14.83C15.7274 15.0162 15.9809 15.1208 16.2451 15.1208C16.5092 15.1208 16.7627 15.0162 16.9501 14.83C17.0438 14.737 17.1182 14.6264 17.1689 14.5046C17.2197 14.3827 17.2458 14.252 17.2458 14.12C17.2458 13.988 17.2197 13.8573 17.1689 13.7354C17.1182 13.6136 17.0438 13.503 16.9501 13.41L12.7101 9.17C12.6171 9.07627 12.5065 9.00187 12.3846 8.9511C12.2628 8.90034 12.1321 8.8742 12.0001 8.8742C11.868 8.8742 11.7373 8.90034 11.6155 8.9511C11.4936 9.00187 11.383 9.07627 11.2901 9.17L7.00005 13.41C6.90632 13.503 6.83193 13.6136 6.78116 13.7354C6.73039 13.8573 6.70425 13.988 6.70425 14.12C6.70425 14.252 6.73039 14.3827 6.78116 14.5046C6.83193 14.6264 6.90632 14.737 7.00005 14.83Z" fill="#171D1C"/>
+        </svg>
+      </span>
+    </button>
+
+    <div class="filter-content mt-3 transition-all duration-300 ease-in-out overflow-hidden max-h-0" id="subcategory">
+      {categories.map((cat) => (
+        <div class="mb-2">
+          <button class="subcat-toggle flex justify-between w-full  cursor-pointer" data-target={ 'subcat-' + cat.slug } id={ 'btn-subcat-' + cat.slug }>
+            <span class="text-[16px] text-[var(--color-primary)]">{cat.name}</span>
+            <span class="arrow transition-transform duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M7.00005 14.83C7.18741 15.0162 7.44087 15.1208 7.70505 15.1208C7.96924 15.1208 8.22269 15.0162 8.41005 14.83L12.0001 11.29L15.5401 14.83C15.7274 15.0162 15.9809 15.1208 16.2451 15.1208C16.5092 15.1208 16.7627 15.0162 16.9501 14.83C17.0438 14.737 17.1182 14.6264 17.1689 14.5046C17.2197 14.3827 17.2458 14.252 17.2458 14.12C17.2458 13.988 17.2197 13.8573 17.1689 13.7354C17.1182 13.6136 17.0438 13.503 16.9501 13.41L12.7101 9.17C12.6171 9.07627 12.5065 9.00187 12.3846 8.9511C12.2628 8.90034 12.1321 8.8742 12.0001 8.8742C11.868 8.8742 11.7373 8.90034 11.6155 8.9511C11.4936 9.00187 11.383 9.07627 11.2901 9.17L7.00005 13.41C6.90632 13.503 6.83193 13.6136 6.78116 13.7354C6.73039 13.8573 6.70425 13.988 6.70425 14.12C6.70425 14.252 6.73039 14.3827 6.78116 14.5046C6.83193 14.6264 6.90632 14.737 7.00005 14.83Z" fill="#171D1C"/>
+              </svg>
+            </span>
+          </button>
+          <div class="subcat-content mt-2 transition-all duration-300 ease-in-out max-h-0 opacity-0 pointer-events-none" id={ 'subcat-' + cat.slug }>
+            {Array.isArray(cat.subcategories) && cat.subcategories.length > 0 ? (
+              cat.subcategories.map((sub) => (
+                <label class="flex items-center mt-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    data-filter="subcategory"
+                    value={sub.slug}
+                    class="mr-2 accent-[var(--color-primary)]"
+                  />
+                  {sub.name}
+                </label>
+              ))
+            ) : (
+              <span class="text-xs text-gray-400">Sin aplicaciones</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- BRAND -->
+  <div class="mb-6">
+    <button class="filter-toggle flex justify-between w-full pb-2 border-b border-[var(--color-primary)] cursor-pointer" data-target="brand">
+      <span class="text-[16px]">Marca</span>
+      <span class="arrow transition-transform duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M7.00005 14.83C7.18741 15.0162 7.44087 15.1208 7.70505 15.1208C7.96924 15.1208 8.22269 15.0162 8.41005 14.83L12.0001 11.29L15.5401 14.83C15.7274 15.0162 15.9809 15.1208 16.2451 15.1208C16.5092 15.1208 16.7627 15.0162 16.9501 14.83C17.0438 14.737 17.1182 14.6264 17.1689 14.5046C17.2197 14.3827 17.2458 14.252 17.2458 14.12C17.2458 13.988 17.2197 13.8573 17.1689 13.7354C17.1182 13.6136 17.0438 13.503 16.9501 13.41L12.7101 9.17C12.6171 9.07627 12.5065 9.00187 12.3846 8.9511C12.2628 8.90034 12.1321 8.8742 12.0001 8.8742C11.868 8.8742 11.7373 8.90034 11.6155 8.9511C11.4936 9.00187 11.383 9.07627 11.2901 9.17L7.00005 13.41C6.90632 13.503 6.83193 13.6136 6.78116 13.7354C6.73039 13.8573 6.70425 13.988 6.70425 14.12C6.70425 14.252 6.73039 14.3827 6.78116 14.5046C6.83193 14.6264 6.90632 14.737 7.00005 14.83Z" fill="#171D1C"/>
+        </svg>
+      </span>
+    </button>
+
+    <div class="filter-content mt-3 transition-all duration-300 ease-in-out overflow-hidden max-h-0" id="brand">
+      {brands.map((brand) => (
+        <label class="flex items-center mt-2 cursor-pointer">
+          <input
+            type="checkbox"
+            data-filter="brand"
+            value={brand.slug}
+            class="mr-2 accent-[var(--color-primary)]"
+          />
+          {brand.name}
+        </label>
+      ))}
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+
+  // Dropdown toggle
+  document.querySelectorAll(".filter-toggle").forEach(button => {
+    button.addEventListener("click", () => {
+      const target = document.getElementById(button.dataset.target);
+      const arrow = button.querySelector(".arrow");
+      if (!target.classList.contains("open")) {
+        target.classList.add("open");
+        target.style.maxHeight = target.scrollHeight + "px";
+        // Si es el de aplicación clínica, cambiar a auto después de la animación
+        if (target.id === "subcategory") {
+          setTimeout(() => {
+            target.style.maxHeight = "none";
+          }, 310);
+        }
+      } else {
+        target.style.maxHeight = target.scrollHeight + "px";
+        setTimeout(() => {
+          target.classList.remove("open");
+          target.style.maxHeight = "0px";
+        }, 10);
+      }
+      arrow.classList.toggle("rotate-180");
+    });
+  });
+
+  // Dropdown hijos de especialidad en Aplicación clínica (event delegation, ejecución directa)
+  document.addEventListener("click", function(e) {
+    const btn = e.target.closest('.subcat-toggle');
+    if (!btn) return;
+    const targetId = btn.dataset.target;
+    const target = document.getElementById(targetId);
+    const arrow = btn.querySelector('.arrow');
+    if (!target) return;
+    if (!target.classList.contains("open")) {
+      target.classList.add("open");
+      target.style.maxHeight = target.scrollHeight + "px";
+      target.style.overflow = "visible";
+      target.style.opacity = "1";
+      target.style.pointerEvents = "auto";
+    } else {
+      target.style.maxHeight = target.scrollHeight + "px";
+      setTimeout(() => {
+        target.classList.remove("open");
+        target.style.maxHeight = "0px";
+        target.style.overflow = "hidden";
+        target.style.opacity = "0";
+        target.style.pointerEvents = "none";
+      }, 300);
+    }
+    arrow?.classList.toggle("rotate-180");
+  });
+
+  // URL sync
+  function getParams() {
+    return new URLSearchParams(window.location.search);
+  }
+
+
+  function setInitialState() {
+    const params = getParams();
+
+    document.querySelectorAll("input[data-filter]").forEach(input => {
+      const key = input.dataset.filter;
+      const values = params.get(key)?.split(",") || [];
+      if (values.includes(input.value)) {
+        input.checked = true;
+      }
+    });
+
+    // En mobile, los dropdowns siempre deben aparecer cerrados al cargar
+    const isMobile = window.innerWidth <= 768;
+    ["category", "subcategory", "brand"].forEach(key => {
+      const container = document.getElementById(key);
+      const arrow = document.querySelector(`.filter-toggle[data-target="${key}"] .arrow`);
+      if (container) {
+        if (isMobile) {
+          container.classList.remove("open");
+          container.style.maxHeight = "0px";
+          arrow?.classList.remove("rotate-180");
+        } else {
+          const checked = container.querySelectorAll('input[type="checkbox"]:checked');
+          if (checked.length > 0) {
+            container.classList.add("open");
+            container.style.maxHeight = container.scrollHeight + "px";
+            arrow?.classList.add("rotate-180");
+          }
+        }
+      }
+    });
+
+    // Forzar todos los dropdowns hijos a estar cerrados y ocultos al cargar
+    document.querySelectorAll('.subcat-content').forEach(el => {
+      el.classList.remove('open');
+      el.style.maxHeight = '0px';
+      el.style.overflow = 'hidden';
+    });
+  }
+
+  function updateUrl() {
+    const params = new URLSearchParams();
+
+    ["brand", "category", "subcategory"].forEach(key => {
+      const checked = Array.from(
+        document.querySelectorAll(`input[data-filter="${key}"]:checked`)
+      ).map(el => el.value);
+
+      if (checked.length) {
+        params.set(key, checked.join(","));
+      }
+    });
+
+    const newUrl =
+      window.location.pathname +
+      (params.toString() ? `?${params.toString()}` : "");
+
+    window.location.href = newUrl;
+  }
+
+  document.addEventListener("change", e => {
+    if (e.target.matches("input[data-filter]")) {
+      updateUrl();
+    }
+  });
+
+  document.getElementById("clear-filters")?.addEventListener("click", () => {
+    window.location.href = window.location.pathname;
+  });
+
+  setInitialState();
+</script>
