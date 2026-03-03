@@ -375,6 +375,24 @@ if (phoneWrapper) {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
+    // UTM fields from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmFields = [
+      "utm_term",
+      "utm_medium",
+      "utm_source",
+      "utm_content",
+      "utm_campaign",
+    ];
+    utmFields.forEach((field) => {
+      data[field] = urlParams.get(field) || "";
+    });
+
+    // Static fields for HubSpot (add/update as needed)
+    data["unidades_de_negocios"] = "LATTITUDE";
+    data["hs_all_assigned_business_unit_ids"] = "0";
+    data["definicion_de_necesidad"] = "Compra Equipo Médico";
+
     // Tiempo mínimo de espera para mostrar el loader
     const minWait = ms => new Promise(res => setTimeout(res, ms));
     let responseOk = false;
@@ -385,21 +403,26 @@ if (phoneWrapper) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      }).then(response => {
-        responseOk = response.ok;
+      }).then(async response => {
+        // Manejo de status específicos
+        if (response.status === 400) {
+          setState("error");
+          console.log("Response 400:", response);
+        } else if (response.status === 409) {
+          form.reset();
+          setState("success");
+        } else if (response.ok) {
+          form.reset();
+          setState("success");
+        } else {
+          setState("error");
+        }
         return response;
       }).catch(error => {
         errorOccurred = true;
         throw error;
       });
       await Promise.all([fetchPromise, minWait(1200)]); // 1.2 segundos mínimo
-
-      if (responseOk) {
-        form.reset();
-        setState("success");
-      } else {
-        setState("error");
-      }
     } catch (error) {
       console.error(error);
       setState("error");
