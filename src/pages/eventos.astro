@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import Layout from "@layouts/Layout.astro";
 import { strapiFetch } from "@server/strapiClient";
+import PromotionSlider from '@components/sections/PromotionSlider.astro';
 
 // import { buildImageUrl } from '../lib/utils.js';
 // import SliderPromociones from '../components/sliderPromociones.astro';
@@ -347,7 +348,11 @@ const eventDays = [11, 14];
             
             </div>
         </div>
-    </section>    
+    </section>
+
+    <!-- Slider de promociones -->
+    <PromotionSlider />
+    
 </Layout>
 
 <!-- Definir datos del popup -->
