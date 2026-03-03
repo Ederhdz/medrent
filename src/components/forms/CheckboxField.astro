@@ -1,0 +1,20 @@
+---
+// src/components/forms/CheckboxField.astro
+const { id, label, link } = Astro.props;
+---
+
+<div class="flex items-start gap-2">
+  <input
+    type="checkbox"
+    id={id}
+    required
+    class="mt-1 border-[#5A3A36] text-[#5A3A36] focus:ring-[#5A3A36]"
+  />
+
+  <label for={id} class="text-sm text-[#212121] cursor-pointer">
+    {label}
+    <a href={link} target="_blank" class="text-[var(--color-accent)] underline">
+      Aviso de Privacidad
+    </a>
+  </label>
+</div>

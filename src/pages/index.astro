@@ -4,6 +4,15 @@ export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import BrandSlider from '@components/sections/BrandSlider.astro';
 import PromotionSlider from '@components/sections/PromotionSlider.astro';
+
+import BaseForm from "@components/forms/BaseForm.astro";
+import FormField from "@components/forms/FormField.astro";
+import PhoneField from "@components/forms/PhoneField.astro";
+import SelectField from "@components/forms/SelectField.astro";
+import CheckboxField from "@components/forms/CheckboxField.astro";
+import SubmitButton from "@components/forms/SubmitButton.astro";
+
+
 const dataHome = {}
 const marcas = [
     {
@@ -65,11 +74,58 @@ const marcas = [
                 )}
             </p>
         </div>
-    
-        <!-- Columna 2: Formulario -->
-        <form id="home-form" class="space-y-6 p-0 pt-8 pb-8 md:pt-16 md:pb-16 md:px-0 lg:pt-[100px] lg:pb-6 lg:px-6 xl:px-6 2xl:px-6 rounded">
 
-            <!-- Inputs visibles con label flotante -->
+        <div class="form-container px-0 py-8 md:pb-16 md:pt-[100px] md:px-0 lg:pt-[100px] lg:pb-6 lg:px-6 xl:px-6 2xl:px-6">
+            <BaseForm
+                id="home-form"
+                class="space-y-6 "
+                >
+                <FormField
+                    label="Nombre completo"
+                    name="name"
+                    placeholder="Ej: Dra. Carolina Ávila"
+                />
+
+                <FormField
+                    label="Correo electrónico"
+                    name="email"
+                    type="email"
+                    placeholder="Ej: carolina.avila@hospitalcardio.mx"
+                />
+                
+                <PhoneField />
+
+                <SelectField
+                    label="Especialidad médica"
+                    name="specialty"
+                    options={[
+                        "Neurocirugía",
+                        "Neurofisiología",
+                        "Neuromodulación",
+                        "Rehabilitación",
+                        "Neurovascular",
+                        "Otra"
+                    ]}
+                />
+
+                <CheckboxField
+                    id="aviso"
+                    label="He leído y acepto el"
+                    link="/aviso-de-privacidad"
+                />
+
+                <SubmitButton text="Agenda una DEMO" />
+            </BaseForm>
+        </div>
+        <script type="module">
+            import { initForm } from "/src/scripts/formValidator.js";
+
+            document.addEventListener("DOMContentLoaded", () => {
+                initForm("home-form");
+            });
+        </script>
+        
+        <!-- <form id="home-form" class="space-y-6 p-0 pt-8 pb-8 md:pt-16 md:pb-16 md:px-0 lg:pt-[100px] lg:pb-6 lg:px-6 xl:px-6 2xl:px-6 rounded">
             <div class="relative">
                 <label class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs" style="background: #3D4948!important;">Nombre completo*</label>
                 <input name="name" type="text" placeholder="Ej: Dra. Carolina Ávila" required class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#212121] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300" />
@@ -80,18 +136,82 @@ const marcas = [
                 <input name="email" type="email" placeholder="Ej: carolina.avila@hospitalcardio.mx" required class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#212121] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300" />
             </div>
 
-            <div class="relative">
-                <label class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">Teléfono de contacto*</label>
-                <input
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="Ej: 55 1234 5678"
-                required
-                maxlength="16"
-                class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#212121] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300"
-                />
-            </div>
+
+		<div class="relative">
+			<label class="absolute -top-3 left-3 bg-[#5A4043] px-2 text-sm text-[#FFF] rounded-xs z-[9999]">Teléfono de contacto*</label>
+			
+			<div style="position: relative;">
+				<input
+					id="phone"
+					name="phone"
+					type="tel"
+					placeholder="Ej. +52 55 1234 5678"
+					required
+					class="w-full border-[#5A3A36] border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#5A4043] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[#ECE0E0] focus:bg-[#FFECED] transition-colors duration-300"
+					inputmode="numeric"
+					autocomplete="off"
+				/>
+				
+				<div id="country-dropdown" class="absolute left-0 w-full hidden" style="top: 100%; z-index: 10000;">
+					<div class="border-2 border-[#8C0032] border-t-0 rounded-b-[4px] bg-white shadow-[0_12px_16px_-4px_rgba(49,48,48,0.10),0_4px_6px_-2px_rgba(49,48,48,0.05)]" 
+						style="max-height: 170px; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
+						
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+52">MX — México +52</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+1">US — Estados Unidos +1</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+57">CO — Colombia +57</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+56">CL — Chile +56</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+51">PE — Perú +51</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+34">ES — España +34</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+1">CA — Canadá +1</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+54">AR — Argentina +54</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+58">VE — Venezuela +58</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+593">EC — Ecuador +593</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+502">GT — Guatemala +502</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+506">CR — Costa Rica +506</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+507">PA — Panamá +507</div>
+						<div class="country-option px-4 py-2 hover:bg-[#FFECED] cursor-pointer" data-code="+503">SV — El Salvador +503</div>
+					</div>
+				</div>
+			</div>
+
+			<span id="phone-success-icon" style="display:none; position:absolute; right:10px; top:26%; transform:translateY(-50%);">
+				<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+				<path d="M9.99301 19.421L3.28601 12.58L4.71401 11.18L10.007 16.579L19.293 7.293L20.707 8.707L9.99301 19.421Z" fill="#261819"/>
+				</svg>
+			</span>
+		</div>
+        	<style>
+		    select::-webkit-inner-spin-button,
+			select::-webkit-outer-spin-button,
+			select::-webkit-search-cancel-button,
+			select::-webkit-search-decoration,
+			select::-webkit-search-results-button,
+			select::-webkit-search-results-decoration,
+			select::-ms-expand  {
+				display: none;
+			}
+
+			#country-dropdown > div {
+				max-height: 170px !important;
+				overflow-y: auto !important;
+				-webkit-overflow-scrolling: touch !important;
+				overscroll-behavior: contain !important;
+			}
+
+			#country-dropdown > div::-webkit-scrollbar {
+				width: 8px !important;
+				display: block !important;
+			}
+			#country-dropdown > div::-webkit-scrollbar-track {
+				background: #FFD9DD !important;
+			}
+			#country-dropdown > div::-webkit-scrollbar-thumb {
+				background: #B91247 !important;
+				border-radius: 4px !important;
+			}
+
+		</style>
+
 
             <div class="relative">
                 <label for="specialty" class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">
@@ -105,106 +225,15 @@ const marcas = [
                     class="w-full border border-[var(--color-green-dark)] border-2 focus:border-2 appearance-none rounded-[4px] px-4 py-3 text-[#A0A0A0] focus:outline-none outline-none focus:ring-0 bg-white hover:bg-[var(--color-secondary-light)]  transition-colors duration-300 pr-10 cursor-pointer"
                     onchange="this.classList.remove('text-[#A0A0A0]')"
                 >
-                        <option value="">¿Cuál es tu especialidad médica?</option>
-                        <option value="Anestesiología">Anestesiología</option>
-                        <option value="Audiología">Audiología</option>
-                        <option value="Belleza y Salud">Belleza y Salud</option>
-                        <option value="Biomédico de Autismo">Biomédico de Autismo</option>
-                        <option value="Cardiología">Cardiología</option>
-                        <option value="Cardiopediatría">Cardiopediatría</option>
-                        <option value="Clínica Especializada">Clínica Especializada</option>
-                        <option value="Comercializadora">Comercializadora</option>
-                        <option value="Consulta Externa">Consulta Externa</option>
-                        <option value="Director">Director</option>
-                        <option value="Distribuidor">Distribuidor</option>
-                        <option value="Ecocardiografista">Ecocardiografista</option>
-                        <option value="Electrodiagnóstico">Electrodiagnóstico</option>
-                        <option value="Electroencefalografia Digital y Mapeo">Electroencefalografia Digital y Mapeo</option>
-                        <option value="Endocrinólogo">Endocrinólogo</option>
-                        <option value="Enfermería">Enfermería</option>
-                        <option value="Epileptología">Epileptología</option>
-                        <option value="Espera de Primer Contacto">Espera de Primer Contacto</option>
-                        <option value="Farmacología Clínica">Farmacología Clínica</option>
-                        <option value="Fisioterapia y Rehabilitación">Fisioterapia y Rehabilitación</option>
-                        <option value="Gastroenterólogo">Gastroenterólogo</option>
-                        <option value="Gerente Comercial">Gerente Comercial</option>
-                        <option value="Gerente General">Gerente General</option>
-                        <option value="Geriatra">Geriatra</option>
-                        <option value="Ginecología y Obstetricia">Ginecología y Obstetricia</option>
-                        <option value="Imagenología">Imagenología</option>
-                        <option value="Inhaloterapia">Inhaloterapia</option>
-                        <option value="Kinesiología">Kinesiología</option>
-                        <option value="Laboratorio Clínico">Laboratorio Clínico</option>
-                        <option value="Masoterapeuta">Masoterapeuta</option>
-                        <option value="Medicina Crítica">Medicina Crítica</option>
-                        <option value="Medicina del deporte">Medicina del deporte</option>
-                        <option value="Medicina del Sueño">Medicina del Sueño</option>
-                        <option value="Medicina Estética">Medicina Estética</option>
-                        <option value="Medicina Física y Rehabilitación">Medicina Física y Rehabilitación</option>
-                        <option value="Medicina Integrativa">Medicina Integrativa</option>
-                        <option value="Medicina Interna">Medicina Interna</option>
-                        <option value="Medicina Regenerativa">Medicina Regenerativa</option>
-                        <option value="Medico Cirujano">Medico Cirujano</option>
-                        <option value="Médico de Urgencias">Médico de Urgencias</option>
-                        <option value="Médico General">Médico General</option>
-                        <option value="Nefrólogo">Nefrólogo</option>
-                        <option value="Neonatología">Neonatología</option>
-                        <option value="Neumólogo">Neumólogo</option>
-                        <option value="Neurociencias">Neurociencias</option>
+                        <option value="">¿Cuál es tu especialidad?</option>
                         <option value="Neurocirugía">Neurocirugía</option>
-                        <option value="Neurodesarrollo">Neurodesarrollo</option>
-                        <option value="Neurofisiatra">Neurofisiatra</option>
                         <option value="Neurofisiología">Neurofisiología</option>
-                        <option value="Neurología">Neurología</option>
-                        <option value="Neuronutrición">Neuronutrición</option>
-                        <option value="Neuropediatría">Neuropediatría</option>
-                        <option value="Neuropsicología">Neuropsicología</option>
-                        <option value="Neurorehabilitación">Neurorehabilitación</option>
-                        <option value="Neuroterapeuta">Neuroterapeuta</option>
-                        <option value="Nutrición">Nutrición</option>
-                        <option value="Oncólogo">Oncólogo</option>
-                        <option value="Ortodoncista">Ortodoncista</option>
-                        <option value="Ortopedia">Ortopedia</option>
-                        <option value="Otorrinolaringología">Otorrinolaringología</option>
-                        <option value="Paciente">Paciente</option>
-                        <option value="Pediatría">Pediatría</option>
-                        <option value="Psicología Clínica">Psicología Clínica</option>
-                        <option value="Psicoterapeuta">Psicoterapeuta</option>
-                        <option value="Psiquiatría">Psiquiatría</option>
-                        <option value="Quimico Farmaceutico Biologico">Quimico Farmaceutico Biologico</option>
-                        <option value="Quiropráctico">Quiropráctico</option>
-                        <option value="Radiología">Radiología</option>
-                        <option value="Rehabilitación cognitiva">Rehabilitación cognitiva</option>
-                        <option value="Rehabilitador Neurofisiológico">Rehabilitador Neurofisiológico</option>
-                        <option value="Representante Compras">Representante Compras</option>
-                        <option value="Representante Ventas">Representante Ventas</option>
-                        <option value="Residente">Residente</option>
-                        <option value="Reumatólogo">Reumatólogo</option>
-                        <option value="Sociología">Sociología</option>
-                        <option value="Somnologia">Somnologia</option>
-                        <option value="Sonografista">Sonografista</option>
-                        <option value="Telemática">Telemática</option>
-                        <option value="Terapeuta">Terapeuta</option>
-                        <option value="Terapeuta Clínico">Terapeuta Clínico</option>
-                        <option value="Terapeuta de Lenguaje">Terapeuta de Lenguaje</option>
-                        <option value="Terapeuta en Rehabilitación">Terapeuta en Rehabilitación</option>
-                        <option value="Terapeuta Holístico">Terapeuta Holístico</option>
-                        <option value="Terapeuta Ocupacional">Terapeuta Ocupacional</option>
-                        <option value="Trastorno del Sueño">Trastorno del Sueño</option>
-                        <option value="Traumatólogo">Traumatólogo</option>
-                        <option value="Ultrasonografía">Ultrasonografía</option>
-                        <option value="Urólogo">Urólogo</option>
-                        <option value="Intensivista">Intensivista</option>
-                        <option value="Fisiatra">Fisiatra</option>
-                        <option value="Técnico">Técnico</option>
-                        <option value="Paidopsiquiatría">Paidopsiquiatría</option>
                         <option value="Neuromodulación">Neuromodulación</option>
                         <option value="Rehabilitación">Rehabilitación</option>
                         <option value="Neurovascular">Neurovascular</option>
                         <option value="Otra">Otra</option>
                 </select>
-            
-                <!-- Flechita SVG -->
+   
                 <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
                 <svg class="w-4 h-4 text-[#5A3A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -225,7 +254,6 @@ const marcas = [
 
             </style>
         
-            <!-- Inputs ocultos -->
             <input type="hidden" name="unidades_de_negocios" value="MEDRENT" />
             <input type="hidden" name="hs_all_assigned_business_unit_ids" value="0" />
             <input type="hidden" name="utm_term" />
@@ -235,7 +263,6 @@ const marcas = [
             <input type="hidden" name="utm_campaign" />
             <input type="hidden" name="definicion_de_necesidad" value="Compra Equipo Médico" />
         
-            <!-- Checkbox -->
             <div class="flex items-start gap-2">
                 <input
                 type="checkbox"
@@ -251,13 +278,14 @@ const marcas = [
                 </label>
             </div>
         
-            <!-- Botón -->
             <button id="submit-btn" type="submit" class="bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-white m-0 rounded w-full font-bold transition  cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed py-3 px-4 " aria-label="Recibir asesoría personalizada" disabled>
                  Agenda una DEMO
             </button>
         
             <div id="status" class="text-center mt-2 text-sm"></div>
-        </form>	
+        </form>	 -->
+
+        
     </section>
 
 
@@ -344,13 +372,61 @@ const marcas = [
 
 
 
-	<script type="module">
+	<!-- <script type="module">
+        		// DROPDOWN
+		const phoneInput = document.querySelector('input[name="phone"]');
+
+		const dropdown = document.getElementById('country-dropdown');
+
+		function closeDropdown() {
+			dropdown.classList.add('hidden');
+			document.body.classList.remove('dropdown-open');
+		}
+
+		if (phoneInput && dropdown) {
+			phoneInput.addEventListener('click', (e) => {
+				e.stopPropagation();
+				dropdown.classList.remove('hidden');
+				document.body.classList.add('dropdown-open');
+			});
+			
+			document.querySelectorAll('.country-option').forEach(option => {
+				option.addEventListener('click', (e) => {
+					e.stopPropagation();
+					const code = option.dataset.code;
+					const currentNumber = phoneInput.value.replace(/^\+\d+\s*/, '');
+					phoneInput.value = code + ' ' + currentNumber;
+					phoneInput.focus();
+					closeDropdown();
+					validatePhone();
+					checkAll();
+				});
+			});
+			
+			document.addEventListener('click', (e) => {
+				if (!phoneInput.contains(e.target) && !dropdown.contains(e.target)) {
+					closeDropdown();
+				}
+			});
+			
+			dropdown.addEventListener('click', (e) => e.stopPropagation());
+			
+			// Prevenir que el scroll del dropdown afecte a la página
+			const scrollContainer = dropdown.querySelector('div');
+			if (scrollContainer) {
+				scrollContainer.addEventListener('wheel', (e) => {
+					e.stopPropagation();
+				}, { passive: false });
+			}
+		}
+
+
 		// Validación de campos y habilitación de botón
 		document.addEventListener('DOMContentLoaded', function() {
 			const form = document.getElementById('home-form');
 			const nameInput = form.querySelector('input[name="name"]');
 			const emailInput = form.querySelector('input[name="email"]');
-			const phoneInput = form.querySelector('input[name="phone"]');
+			// const phoneInput = form.querySelector('input[name="phone"]');
 			const selectInput = form.querySelector('select[name="specialty"]');
 			const termsInput = form.querySelector('input[type="checkbox"]#aviso');
 			const submitBtn = document.getElementById('submit-btn');
@@ -458,7 +534,7 @@ const marcas = [
 
 
         // Formato teléfono - Versión simplificada
-        const phoneInput = document.getElementById("phone");
+        // const phoneInput = document.getElementById("phone");
 
         phoneInput.addEventListener("input", () => {
             // Permitir solo números, máximo 10 dígitos
@@ -547,5 +623,5 @@ const marcas = [
                 status.textContent = "❌ Error de red. Por favor, verifica tu conexión e intenta nuevamente.";
             }
         });
-    </script>
+    </script> -->
 </Layout>

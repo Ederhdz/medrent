@@ -1,0 +1,21 @@
+---
+// src/components/forms/SelectField.astro
+const { label, name, options = [] } = Astro.props;
+---
+
+<div class="relative form-select">
+  <label class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">
+    {label}*
+  </label>
+
+  <select
+    name={name}
+    required
+    class="w-full border border-[var(--color-green-dark)] border-2 appearance-none rounded-[4px] px-4 py-3 text-[#A0A0A0] focus:outline-none bg-white hover:bg-[var(--color-secondary-light)] transition-colors duration-300 pr-10 cursor-pointer"
+  >
+    <option value="">¿Cuál es tu especialidad médica?</option>
+    {options.map(option => (
+      <option value={option}>{option}</option>
+    ))}
+  </select>
+</div>
