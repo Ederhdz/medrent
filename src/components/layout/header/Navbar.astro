@@ -33,9 +33,9 @@ let subcategoriasData: any[] = [];
   try {
     const response = await strapiFetch("/subcategories?populate=*");
     subcategoriasData = response?.data || [];
-    console.log('subcategorias', subcategoriasData);
+    //console.log('subcategorias', subcategoriasData);
   } catch (error) {
-    console.error('Error al cargar subcategorías:', error.message);
+    //console.error('Error al cargar subcategorías:', error.message);
     subcategoriasData = [];
   }
 
