@@ -103,7 +103,8 @@ export function initForm(formId) {
     }
     // Mensaje inicial para teléfono
     if (input === phoneInput && phoneHelper) {
-      phoneHelper.innerHTML = 'Incluye lada internacional. Ej.: +52 55 1234 5678';
+      // phoneHelper.innerHTML = 'Incluye lada internacional. Ej.: +52 55 1234 5678';
+      phoneHelper.innerHTML = '';
       phoneHelper.className = 'phone-helper text-[12px] mt-1 text-left text-[#171D1C]';
     }
   }
@@ -151,7 +152,7 @@ export function initForm(formId) {
     }
     // Mensaje error para teléfono
     if (input === phoneInput && phoneHelper) {
-      phoneHelper.innerHTML = '<strong>El número ingresado no tiene la cantidad correcta de dígitos.</strong><br>Verifica la lada internacional y el número.';
+      phoneHelper.innerHTML = '<strong>El número ingresado no tiene la cantidad correcta de dígitos.</strong><br>10 dígitos.';
       phoneHelper.className = 'phone-helper text-[12px] mt-1 text-left text-[#171D1C]';
     }
   }
@@ -225,7 +226,8 @@ export function initForm(formId) {
       return false;
     }
     const digits = extractDigits(value);
-    if (digits.length >= 10) {
+    if (digits.length == 10) {
+    // if (digits.length >= 10) {
       setValid(phoneInput);
       return true;
     }
@@ -290,37 +292,37 @@ if (phoneWrapper) {
   const phoneInput = phoneWrapper.querySelector('.phone-input');
   const dropdown = phoneWrapper.querySelector('.country-dropdown');
 
-  if (phoneInput && dropdown) {
+  // if (phoneInput && dropdown) {
 
-    const openDropdown = () => dropdown.classList.remove('hidden');
-    const closeDropdown = () => dropdown.classList.add('hidden');
+  //   const openDropdown = () => dropdown.classList.remove('hidden');
+  //   const closeDropdown = () => dropdown.classList.add('hidden');
 
-    phoneInput.addEventListener('focus', openDropdown);
-    phoneInput.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openDropdown();
-    });
+  //   phoneInput.addEventListener('focus', openDropdown);
+  //   phoneInput.addEventListener('click', (e) => {
+  //     e.stopPropagation();
+  //     openDropdown();
+  //   });
 
-    dropdown.querySelectorAll('.country-option').forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.stopPropagation();
+  //   dropdown.querySelectorAll('.country-option').forEach(option => {
+  //     option.addEventListener('click', (e) => {
+  //       e.stopPropagation();
 
-        const code = option.dataset.code;
-        const current = phoneInput.value.replace(/^\+\d+\s*/, '');
+  //       const code = option.dataset.code;
+  //       const current = phoneInput.value.replace(/^\+\d+\s*/, '');
 
-        phoneInput.value = code + ' ' + current;
-        phoneInput.focus();
-        closeDropdown();
-        validateAll();
-      });
-    });
+  //       phoneInput.value = code + ' ' + current;
+  //       phoneInput.focus();
+  //       closeDropdown();
+  //       validateAll();
+  //     });
+  //   });
 
-    document.addEventListener('click', (e) => {
-      if (!phoneWrapper.contains(e.target)) {
-        closeDropdown();
-      }
-    });
-  }
+  //   document.addEventListener('click', (e) => {
+  //     if (!phoneWrapper.contains(e.target)) {
+  //       closeDropdown();
+  //     }
+  //   });
+  // }
 }
 
   /* =============================
