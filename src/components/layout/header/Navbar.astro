@@ -42,7 +42,7 @@ let subcategoriasData: any[] = [];
 ---
 
 <!-- Navbar -->
-<nav class="bg-white shadow" x-data="{ open: false }">
+<nav class="bg-white shadow sticky" x-data="{ open: false }">
   <div class="max-w-7xl mx-auto flex items-center justify-between px-8 py-3 md:py-3">
     <!-- Logo -->
     <div>
@@ -144,7 +144,7 @@ let subcategoriasData: any[] = [];
         x-init="
           if ($el.dataset.especialidades) { 
             especialidades = JSON.parse($el.dataset.especialidades); 
-            console.log('Especialidades parseadas:', especialidades);
+            <!-- console.log('Especialidades parseadas:', especialidades); -->
             
             // Obtener el path actual y extraer la especialidad
             const currentPath = window.location.pathname;
