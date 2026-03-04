@@ -79,11 +79,16 @@ import StickyCta from "@components/layout/overlays/StickyCta.astro";
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
     
-    <div class="sticky top-0 left-0 w-full z-[100]">
+    <!-- Header fixed -->
+    <div class="fixed top-0 left-0 w-full z-[100]">
       <Upperbar site={site} />
       <Navbar site={site}/>
     </div>
 
+    <!-- ESPACIADOR MENU FIXED -->
+    <div class="h-[50px] lg:h-[100px]"></div> 
+
+    <!-- Contenido principal -->
     <slot />
 
     <StickyCta />
