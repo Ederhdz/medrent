@@ -19,6 +19,8 @@ export function initForm(formId) {
   const selectInput = form.querySelector('select[name="specialty"]');
   const checkbox = form.querySelector('input[type="checkbox"]');
   const submitBtn = form.querySelector('.submit-btn');
+  // Guardar el texto original del botón para restaurarlo después
+  const originalSubmitText = submitBtn ? submitBtn.textContent : 'Enviar';
   const status = form.querySelector('.status');
 
   const primaryColor = getComputedStyle(document.documentElement)
@@ -401,7 +403,6 @@ if (phoneWrapper) {
     let errorOccurred = false;
 
     console.log("Submitting form with data:", data);
-    return;
 
     try {
       const fetchPromise = fetch("/api/contact", {
@@ -438,10 +439,10 @@ if (phoneWrapper) {
       console.error(error);
       setState("error");
     } finally {
-      // Restaurar texto del botón
+      // Restaurar texto original del botón
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Enviar';
+        submitBtn.innerHTML = originalSubmitText;
       }
     }
   });
