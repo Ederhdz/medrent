@@ -165,19 +165,19 @@ let subcategoriasData: any[] = [];
               activeItem = especialidadEncontrada.id;
               
               // También buscar si hay una aplicación específica en la URL
-              if (pathSegments.length >= 3 && especialidadEncontrada.CatalogoAplicaciones) {
+              if (pathSegments.length >= 3 && especialidadEncontrada.subcategories) {
                 const slugAplicacion = pathSegments[2]; // 'ultrasonido-vascular' en tu ejemplo
-                const aplicacionEncontrada = especialidadEncontrada.CatalogoAplicaciones.find(a => a.Slug === slugAplicacion);
+                const aplicacionEncontrada = especialidadEncontrada.subcategories.find(a => a.Slug === slugAplicacion);
                 
                 if (aplicacionEncontrada) {
                   activeAplicacion = aplicacionEncontrada.id;
-                } else if (especialidadEncontrada.CatalogoAplicaciones.length > 0) {
+                } else if (especialidadEncontrada.subcategories.length > 0) {
                   // Si no encuentra la aplicación específica, seleccionar la primera
-                  activeAplicacion = especialidadEncontrada.CatalogoAplicaciones[0].id;
+                  activeAplicacion = especialidadEncontrada.subcategories[0].id;
                 }
-              } else if (especialidadEncontrada.CatalogoAplicaciones && especialidadEncontrada.CatalogoAplicaciones.length > 0) {
+              } else if (especialidadEncontrada.subcategories && especialidadEncontrada.subcategories.length > 0) {
                 // Si solo está la especialidad, seleccionar la primera aplicación
-                activeAplicacion = especialidadEncontrada.CatalogoAplicaciones[0].id;
+                activeAplicacion = especialidadEncontrada.subcategories[0].id;
               }
             } else {
               // No seleccionar ninguna especialidad por defecto cuando la URL no coincide.
@@ -258,7 +258,7 @@ let subcategoriasData: any[] = [];
                   </div>
                 </div>
           
-                  <!-- Columna derecha - CatalogoAplicaciones -->
+                  <!-- Columna derecha - subcategories -->
                   <div class="w-1/2">
                     <div x-show="activeItem && activeItem !== 'vermas'" x-transition class="pt-2">
                       <template x-if="activeItem">
@@ -269,7 +269,7 @@ let subcategoriasData: any[] = [];
                               <template x-for="aplicacion in especialidades.find(e => e.id === activeItem)?.subcategories || []" 
                                         :key="aplicacion.id">
                                 <li>
-                                  <a :href="`/especialidades/${especialidades.find(e => e.id === activeItem)?.Path}/${aplicacion.slug}`" 
+                                  <a :href="`/especialidades/${especialidades.find(e => e.id === activeItem)?.slug}/${aplicacion.slug}`" 
                                     @click="activeAplicacion = aplicacion.id"
                                       :class="[
                                         'transition-colors flex items-center justify-between gap-2 p-2 rounded cursor-pointer',
@@ -517,17 +517,17 @@ let subcategoriasData: any[] = [];
               <!-- Contenedor dinámico para aplicaciones -->
               <div>
                 <!-- Mostrar si hay aplicaciones -->
-                <div x-show="activeItem && especialidadesData.find(e => e.id == activeItem)?.CatalogoAplicaciones?.length > 0">
+                <div x-show="activeItem && especialidadesData.find(e => e.id == activeItem)?.subcategories?.length > 0">
                   <div class="space-y-3">
-                    <template x-for="aplicacion in especialidadesData.find(e => e.id == activeItem)?.CatalogoAplicaciones || []" :key="aplicacion.id">
-                      <a :href="`/especialidades/${especialidadesData.find(e => e.id == activeItem)?.Path || ''}/${aplicacion.Slug}`"
+                    <template x-for="aplicacion in especialidadesData.find(e => e.id == activeItem)?.subcategories || []" :key="aplicacion.id">
+                      <a :href="`/especialidades/${especialidadesData.find(e => e.id == activeItem)?.slug || ''}/${aplicacion.slug}`"
                           @click="activeAplicacion = aplicacion.id"
                           :class="
                           activeAplicacion == aplicacion.id 
                             ? 'flex items-center justify-between p-3 rounded-lg bg-[#FFF8F7] text-[var(--color-primary)]' 
                             : 'flex items-center justify-between p-3 rounded-lg text-[#261819]'
                           ">
-                        <div x-text="aplicacion.AplicacionClinica || 'Aplicación'"></div>
+                        <div x-text="aplicacion.name || aplicacion.AplicacionClinica || 'Aplicación'"></div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
                           <path d="M8 19V5L19 12L8 19Z" fill="currentColor"/>
                         </svg>
@@ -536,7 +536,7 @@ let subcategoriasData: any[] = [];
                   </div>
                   
                   <!-- Enlace para ver más -->
-                  <a :href="`/especialidades/${especialidadesData.find(e => e.id == activeItem)?.Path || ''}`" 
+                  <a :href="`/especialidades/${especialidadesData.find(e => e.id == activeItem)?.slug || ''}`" 
                       class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 text-[#261819] mt-4">
                     <div class="font-medium">Ver todas las aplicaciones</div>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -546,10 +546,10 @@ let subcategoriasData: any[] = [];
                 </div>
                 
                 <!-- Mostrar si NO hay aplicaciones -->
-                <div x-show="activeItem && (!especialidadesData.find(e => e.id == activeItem)?.CatalogoAplicaciones || especialidadesData.find(e => e.id == activeItem)?.CatalogoAplicaciones?.length === 0)">
+                <div x-show="activeItem && (!especialidadesData.find(e => e.id == activeItem)?.subcategories || especialidadesData.find(e => e.id == activeItem)?.subcategories?.length === 0)">
                   <div class="text-center py-8 text-gray-500">
                     <p>No hay aplicaciones disponibles para esta especialidad.</p>
-                      <a :href="`/especialidades/${especialidadesData.find(e => e.id == activeItem)?.Path || ''}`" 
+                      <a :href="`/especialidades/${especialidadesData.find(e => e.id == activeItem)?.slug || ''}`" 
                         class="inline-block mt-4 text-[var(--color-primary)] font-medium hover:underline">
                       Ver especialidad
                     </a>
@@ -562,7 +562,7 @@ let subcategoriasData: any[] = [];
       </div>
       
 
-      <a href="/especialidades" class="py-6 text-[#261819] border-b border-[#8E6F73]">Especialidades</a>
+      <!-- <a href="/especialidades" class="py-6 text-[#261819] border-b border-[#8E6F73]">Especialidades</a> -->
       <a href="/acerca-de-nosotros" class="py-6 text-[#261819] border-b border-[#8E6F73]">Acerca de nosotros</a>
       <a href="/productos" class="py-6 text-[#261819] border-b border-[#8E6F73]">Productos</a>
       <a href="/financiamiento" class="py-6 text-[#261819] border-b border-[#8E6F73]">Financiamiento</a>
