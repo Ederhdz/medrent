@@ -19,6 +19,8 @@ export function initForm(formId) {
   const selectInput = form.querySelector('select[name="specialty"]');
   const checkbox = form.querySelector('input[type="checkbox"]');
   const submitBtn = form.querySelector('.submit-btn');
+  // Guardar el texto original del botón para restaurarlo después
+  const originalSubmitText = submitBtn ? submitBtn.textContent : 'Enviar';
   const status = form.querySelector('.status');
 
   const primaryColor = getComputedStyle(document.documentElement)
@@ -103,7 +105,8 @@ export function initForm(formId) {
     }
     // Mensaje inicial para teléfono
     if (input === phoneInput && phoneHelper) {
-      phoneHelper.innerHTML = 'Incluye lada internacional. Ej.: +52 55 1234 5678';
+      // phoneHelper.innerHTML = 'Incluye lada internacional. Ej.: +52 55 1234 5678';
+      phoneHelper.innerHTML = '';
       phoneHelper.className = 'phone-helper text-[12px] mt-1 text-left text-[#171D1C]';
     }
   }
@@ -151,7 +154,7 @@ export function initForm(formId) {
     }
     // Mensaje error para teléfono
     if (input === phoneInput && phoneHelper) {
-      phoneHelper.innerHTML = '<strong>El número ingresado no tiene la cantidad correcta de dígitos.</strong><br>Verifica la lada internacional y el número.';
+      phoneHelper.innerHTML = '<strong>El número ingresado no tiene la cantidad correcta de dígitos.</strong><br>10 dígitos.';
       phoneHelper.className = 'phone-helper text-[12px] mt-1 text-left text-[#171D1C]';
     }
   }
@@ -225,7 +228,8 @@ export function initForm(formId) {
       return false;
     }
     const digits = extractDigits(value);
-    if (digits.length >= 10) {
+    if (digits.length == 10) {
+    // if (digits.length >= 10) {
       setValid(phoneInput);
       return true;
     }
@@ -290,37 +294,37 @@ if (phoneWrapper) {
   const phoneInput = phoneWrapper.querySelector('.phone-input');
   const dropdown = phoneWrapper.querySelector('.country-dropdown');
 
-  if (phoneInput && dropdown) {
+  // if (phoneInput && dropdown) {
 
-    const openDropdown = () => dropdown.classList.remove('hidden');
-    const closeDropdown = () => dropdown.classList.add('hidden');
+  //   const openDropdown = () => dropdown.classList.remove('hidden');
+  //   const closeDropdown = () => dropdown.classList.add('hidden');
 
-    phoneInput.addEventListener('focus', openDropdown);
-    phoneInput.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openDropdown();
-    });
+  //   phoneInput.addEventListener('focus', openDropdown);
+  //   phoneInput.addEventListener('click', (e) => {
+  //     e.stopPropagation();
+  //     openDropdown();
+  //   });
 
-    dropdown.querySelectorAll('.country-option').forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.stopPropagation();
+  //   dropdown.querySelectorAll('.country-option').forEach(option => {
+  //     option.addEventListener('click', (e) => {
+  //       e.stopPropagation();
 
-        const code = option.dataset.code;
-        const current = phoneInput.value.replace(/^\+\d+\s*/, '');
+  //       const code = option.dataset.code;
+  //       const current = phoneInput.value.replace(/^\+\d+\s*/, '');
 
-        phoneInput.value = code + ' ' + current;
-        phoneInput.focus();
-        closeDropdown();
-        validateAll();
-      });
-    });
+  //       phoneInput.value = code + ' ' + current;
+  //       phoneInput.focus();
+  //       closeDropdown();
+  //       validateAll();
+  //     });
+  //   });
 
-    document.addEventListener('click', (e) => {
-      if (!phoneWrapper.contains(e.target)) {
-        closeDropdown();
-      }
-    });
-  }
+  //   document.addEventListener('click', (e) => {
+  //     if (!phoneWrapper.contains(e.target)) {
+  //       closeDropdown();
+  //     }
+  //   });
+  // }
 }
 
   /* =============================
@@ -389,7 +393,7 @@ if (phoneWrapper) {
     });
 
     // Static fields for HubSpot (add/update as needed)
-    data["unidades_de_negocios"] = "LATTITUDE";
+    data["unidades_de_negocios"] = "MEDRENT";
     data["hs_all_assigned_business_unit_ids"] = "0";
     data["definicion_de_necesidad"] = "Compra Equipo Médico";
 
@@ -397,6 +401,8 @@ if (phoneWrapper) {
     const minWait = ms => new Promise(res => setTimeout(res, ms));
     let responseOk = false;
     let errorOccurred = false;
+
+    console.log("Submitting form with data:", data);
 
     try {
       const fetchPromise = fetch("/api/contact", {
@@ -409,28 +415,34 @@ if (phoneWrapper) {
           setState("error");
           console.log("Response 400:", response);
         } else if (response.status === 409) {
+          console.log("Response 409:", response);
+
           form.reset();
           setState("success");
         } else if (response.ok) {
+          console.log("Response 200:", response);
+
           form.reset();
           setState("success");
         } else {
+          console.log("Response error:", response);
+
           setState("error");
         }
         return response;
       }).catch(error => {
         errorOccurred = true;
-        throw error;
+        console.error("Fetch error:", error);
       });
       await Promise.all([fetchPromise, minWait(1200)]); // 1.2 segundos mínimo
     } catch (error) {
       console.error(error);
       setState("error");
     } finally {
-      // Restaurar texto del botón
+      // Restaurar texto original del botón
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Enviar';
+        submitBtn.innerHTML = originalSubmitText;
       }
     }
   });
