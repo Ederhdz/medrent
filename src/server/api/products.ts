@@ -7,49 +7,63 @@ export async function getProducts(filters?: {
   categories?: string[];
   subcategories?: string[];
 }): Promise<Product[]> {
+  const allProducts: Product[] = [];
+  let page = 1;
+  let pageSize = 25;
+  let total = 0;
+  let fetched = 0;
 
-  const params = new URLSearchParams();
+  do {
+    const params = new URLSearchParams();
 
-  /* ---------------- POPULATE ---------------- */
+    /* ---------------- POPULATE ---------------- */
 
-  params.append("populate[gallery]", "true");
-  params.append("populate[brand]", "true");
-  params.append("populate[subcategory][populate][category]", "true");
+    params.append("populate[gallery]", "true");
+    params.append("populate[brand]", "true");
+    params.append("populate[subcategory][populate][category]", "true");
 
-  /* ---------------- FILTERS ---------------- */
+    /* ---------------- FILTERS ---------------- */
 
-  filters?.brands?.forEach((brand, index) => {
-    params.append(
-      `filters[brand][slug][$in][${index}]`,
-      brand
-    );
-  });
+    filters?.brands?.forEach((brand, index) => {
+      params.append(
+        `filters[brand][slug][$in][${index}]`,
+        brand
+      );
+    });
 
-  filters?.categories?.forEach((category, index) => {
-    params.append(
-      `filters[subcategory][category][slug][$in][${index}]`,
-      category
-    );
-  });
+    filters?.categories?.forEach((category, index) => {
+      params.append(
+        `filters[subcategory][category][slug][$in][${index}]`,
+        category
+      );
+    });
 
-  filters?.subcategories?.forEach((subcategory, index) => {
-    params.append(
-      `filters[subcategory][slug][$in][${index}]`,
-      subcategory
-    );
-  });
+    filters?.subcategories?.forEach((subcategory, index) => {
+      params.append(
+        `filters[subcategory][slug][$in][${index}]`,
+        subcategory
+      );
+    });
 
-  /* ---------------- OPTIONAL: ONLY ACTIVE ---------------- */
+    /* ---------------- OPTIONAL: ONLY ACTIVE ---------------- */
 
-  params.append("filters[isActive][$eq]", "true");
+    params.append("filters[isActive][$eq]", "true");
 
-  /* ---------------- BUILD URL ---------------- */
+    /* ---------------- BUILD URL ---------------- */
 
-  const url = `/products?${params.toString()}`;
+    params.append("pagination[page]", String(page));
+    params.append("pagination[pageSize]", String(pageSize));
+    const url = `/products?${params.toString()}`;
 
-  const res = await strapiFetch(url);
-
-  return res.data.map(mapStrapiProduct);
+    const res = await strapiFetch(url);
+    const products = res.data.map(mapStrapiProduct);
+    allProducts.push(...products);
+    // Actualizar meta
+    total = res.meta?.pagination?.total || products.length;
+    fetched += products.length;
+    page++;
+  } while (fetched < total);
+  return allProducts;
 }
 
 const PDP_POPULATE = `
