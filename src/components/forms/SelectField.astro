@@ -19,3 +19,36 @@ const { label, name, options = [] } = Astro.props;
     ))}
   </select>
 </div>
+
+
+<div class="relative form-field hidden"  id="otraEspecialidad">
+  <label class="absolute -top-3 left-3 bg-[var(--color-green-dark)] px-2 text-sm text-[#FFF] rounded-xs">
+    ¿Otra especialidad? Escribe aquí
+  </label>
+
+  <input
+    name="otras_especialidades"
+    type="text"
+    placeholder="Escribe aquí tu especialidad"
+    class="w-full border border-[var(--color-green-dark)] border-2 rounded-[4px] px-4 py-3 placeholder:text-[#A0A0A0] text-[#212121] focus:outline-none bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300"
+  />
+</div>
+
+<script>
+  const select = document.querySelector('.form-select select');
+  const otraEspecialidad = document.querySelector('#otraEspecialidad');
+  const otraEspecialidadInput = otraEspecialidad.querySelector('input');
+
+  select.addEventListener('change', () => {
+    if (select.value === 'Otra') {
+      otraEspecialidad.classList.remove('hidden');
+      otraEspecialidadInput.required = true;
+    } else {
+      otraEspecialidad.classList.add('hidden');
+      otraEspecialidadInput.required = false;
+      otraEspecialidadInput.value = '';
+      // Disparar un evento de input para que formValidator.js re-evalúe
+      otraEspecialidadInput.dispatchEvent(new Event('input'));
+    }
+  });
+</script>

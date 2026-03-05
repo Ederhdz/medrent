@@ -19,6 +19,8 @@ export function initForm(formId) {
   const selectInput = form.querySelector('select[name="specialty"]');
   const checkbox = form.querySelector('input[type="checkbox"]');
   const submitBtn = form.querySelector('.submit-btn');
+  const otraEspecialidadInput = form.querySelector('[name="otras_especialidades"]');
+
   // Guardar el texto original del botón para restaurarlo después
   const originalSubmitText = submitBtn ? submitBtn.textContent : 'Enviar';
   const status = form.querySelector('.status');
@@ -63,6 +65,8 @@ export function initForm(formId) {
     if (phoneInput) setInitial(phoneInput);
     if (selectInput) setInitial(selectInput);
     if (checkbox) checkbox.checked = false;
+    if (otraEspecialidadInput) setInitial(otraEspecialidadInput);
+
   }
 
   // Asegura que el formulario se muestre correctamente al dar click en el botón de reintentar
@@ -248,6 +252,24 @@ export function initForm(formId) {
     return true;
   }
 
+  function validateOtraEspecialidad() {
+    if (!otraEspecialidadInput || !otraEspecialidadInput.required) {
+      return true; // No validar si no existe o no es requerido
+    }
+    if (otraEspecialidadInput.value.trim() === '') {
+      setInitial(otraEspecialidadInput);
+      return false;
+    }
+    if (otraEspecialidadInput.value.trim().length >= 4) {
+      setValid(otraEspecialidadInput);
+      return true;
+    }
+    setInvalid(otraEspecialidadInput);
+    return false;
+  }
+
+
+
   // Validación visual en onchange para select
   if (selectInput) {
     selectInput.addEventListener('change', () => {
@@ -271,6 +293,7 @@ export function initForm(formId) {
       validateEmail() &&
       validatePhone() &&
       validateSelect() &&
+      validateOtraEspecialidad() &&
       validateCheckbox();
 
     if (submitBtn) {
@@ -353,6 +376,8 @@ if (phoneWrapper) {
   emailInput?.addEventListener('input', validateEmail);
   phoneInput?.addEventListener('input', validatePhone);
   selectInput?.addEventListener('change', validateSelect);
+  otraEspecialidadInput?.addEventListener('input', validateOtraEspecialidad);
+
   checkbox?.addEventListener('change', validateCheckbox);
 
   // Detectar autofill/autocomplete y disparar validación global
@@ -500,6 +525,7 @@ if (phoneWrapper) {
 function sendFormEvent({ formId, status }) {
   const pathname = window.location.pathname;
   const pageTitle = document.title;
+  let eventName;
   formId == 'events-form'  && document.querySelector('#event-popup-title') ? eventName = document.querySelector('#event-popup-title').textContent : eventName = '';
 
   // Valores de formulario
@@ -508,7 +534,7 @@ function sendFormEvent({ formId, status }) {
   const phone = document.querySelector('input[name="phone"]')?.value || '';
   const institution = document.querySelector('input[name="lugar_de_trabajo"]')?.value || '';
   const medical_specialty = document.querySelector('select[name="specialty"]')?.value || '';
-  const state = document.querySelector('input[name="estado_mx"]')?.value || '';
+  const state = document.querySelector('select[name="estado_mx"]')?.value || '';
   const discovery_channel = document.querySelector('input[name="por_qu_medio_nos_conociste"]')?.value || '';
   const product_interest = document.querySelector('input[name="multi_equipo__lattitude_"]')?.value || '';
   const message = document.querySelector('textarea[name="message"]')?.value || '';
