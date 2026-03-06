@@ -9,13 +9,12 @@ import BaseForm from "@components/forms/BaseForm.astro";
 import FormField from "@components/forms/FormField.astro";
 import CheckboxField from "@components/forms/CheckboxField.astro";
 import SubmitButton from "@components/forms/SubmitButton.astro";
+import NewBreadcrumb from '@components/newBreadcrumb.astro';
 
 
-// import { buildImageUrl } from '../lib/utils.js';
 // import SliderPromociones from '../components/sliderPromociones.astro';
 // import Code from '@components/js.astro';
 // import SlideArticulos from '@components/slideArticulos.astro';
-// import NewBreadcrumb from '@components/newBreadcrumb.astro';
 
 const breadcrumbData = [
   { name: 'INICIO', url: '/' },
@@ -58,7 +57,6 @@ dayjs.locale('es');
 
 // Obtener fecha actual
 const now = dayjs();
-// Formatear el mes en Title Case (solo la primera letra en mayúscula)
 const currentMonth = now.format('MMMM YYYY');
 const currentMonthTitleCase = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1).toLowerCase();
 
@@ -115,7 +113,7 @@ const eventDays = [11, 14];
     <section class="w-full" style="background: linear-gradient(180deg, #D8E5E3 0%, #FFF 50%);">
         <!-- Breadcrumb -->
         <div class="pt-2 px-0 max-w-[1320px] mx-auto">
-            <!-- <NewBreadcrumb data={breadcrumbData} /> -->
+            <NewBreadcrumb data={breadcrumbData} />
         </div>
         
         <div class="max-w-[1320px] mx-auto px-4 py-4 md:px-6 md:py-6 lg:px-8 lg:py-8">
