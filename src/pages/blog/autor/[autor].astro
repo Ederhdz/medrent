@@ -2,29 +2,54 @@
 import Layout from '@layouts/Layout.astro';
 import { strapiFetch } from "@server/strapiClient";
 import ArticleCard from '@components/blog/ArticleCard.astro';
+import { BlocksRenderer } from '@strapi/blocks-react-renderer';
+import NewBreadcrumb from '@components/newBreadcrumb.astro';
+
 
 // import { formatDate } from '@lib/utils.js';
 // import SocialMedia from '@components/blog/SocialMedia.astro';
 
+const breadcrumbData = [
+  { name: 'INICIO', url: '/' },
+  { name: 'BLOG', url: '/blog' },
+  { name: 'ARTÍCULO', url: '' }
+];
+
 export async function getStaticPaths() {
-  const authors = await strapiFetch('/writers-api?populate[articles][populate][heroImage]=true&populate[heroImage]=true');
+    const authors = await strapiFetch(
+    '/writers?populate[articles][populate][heroImage]=true&populate[articles][populate][fullName]=*&populate[heroImage]=*'
+  );
   
-  return authors.data.map((page) => ({
-    params: { autor: page.slug },
+  console.log('Autores obtenidos:', authors.data.map(a => ({ 
+    nombre: a.fullName, 
+    slug: a.slug,
+    articulos: a.articles?.length || 0 
+  })));
+  
+  return authors.data.map((author) => ({
+    params: { autor: author.slug },
     props: { 
       author: {
-        ...page,
-        articles: Array.isArray(page.articles) ? page.articles : [],
+        ...author,
+        articles: Array.isArray(author.articles) ? author.articles : [],
       },
     }
   }));
 }
+  
+
+//   return authors.data.map((page) => ({
+//     params: { autor: page.slug },
+//     props: { 
+//       author: {
+//         ...page,
+//         articles: Array.isArray(page.articles) ? page.articles : [],
+//       },
+//     }
+//   }));
+// }
 const { author } = Astro.props as { author: any };
-
-
 ---
-
-
 
 <Layout title="jkhvghjv" pageType="blog">
   <Fragment slot="metas">
@@ -40,10 +65,9 @@ const { author } = Astro.props as { author: any };
   </Fragment>
 
  <section class="heroAutor max-w-[1280px] w-full flex flex-col items-center justify-center bg-[var(--color-secondary-light)] min-h-[260px] mx-auto" style="border-radius:0 0 24px 24px;">
-
     <div class="containerHero w-full flex flex-col md:flex-row items-center gap-6 pt-16 px-4 sm:px-6 md:px-8 pb-4 md:pb-6 lg:py-16 lg:px-8">
       <div class="breadcrumb-fixed-wrapper max-w-7xl px-4" style="position:absolute;top:0;left:0;width:100%;z-index:30;pointer-events:auto;">
-        <!-- <NewBreadcrumb data={breadcrumbData} /> -->
+        <NewBreadcrumb data={breadcrumbData} />
       </div>
 
       <style>
@@ -55,12 +79,12 @@ const { author } = Astro.props as { author: any };
         <span class="text-sm font-medium text-[var(--color-primary)] tracking-widest mb-2 uppercase font-kallisto">{author?.specialty || ''}</span>
         <h1 class="text-[#261819] font-kallisto text-[32px] font-light">{author?.fullName || 'Autor Desconocido'}</h1>
         <p class="text-[#261819] font-lato text-[16px] font-light">
-          <!-- <BlocksRenderer content={author?.DescripcionLarga || []} /> -->
+          <BlocksRenderer content={author?.longDescription || []} />
         </p>
       </div>
       {/* Columna imagen */}
       <div class="w-full md:w-1/2 flex justify-center items-center mt-6 md:mt-0">
-        <img src={author?.heroImage?.url || ''} alt="Team Lattitude" class=" w-full rounded-xl shadow-md" loading="lazy" />
+        <img src={author?.heroImage?.url || ''} alt="Team Medrent" class=" w-full rounded-xl shadow-md" loading="lazy" />
       </div>
     </div>
   </section>
@@ -86,7 +110,7 @@ const { author } = Astro.props as { author: any };
           </svg>
           <div class="text-[#261819] text-center font-lato text-[24px] font-bold leading-8 mb-2">Aún no hay artículos publicados :</div>
           <div class="text-[#261819] text-center font-lato text-[14px] font-normal leading-5 tracking-[0.25px] ">
-            Este autor forma parte del ecosistema Lattitude y pronto compartirá contenido especializado.<br/>
+            Este autor forma parte del ecosistema Medrent y pronto compartirá contenido especializado.<br/>
             Te invitamos a explorar otros artículos o conocer a nuestros expertos.
           </div>
         </div>
