@@ -5,6 +5,7 @@ import { getCategories } from "@server/api/categories";
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
 
+
 export async function getStaticPaths() {
   const categories = await getCategories();
 
@@ -21,6 +22,9 @@ const especialidad = Array.isArray(categories)
   ? categories.find(item => item.slug === category)
   : null;
 const canonical = `https://www.medrent.mx/especialidades/${especialidad?.slug ?? ""}`;
+
+// console.log('Datos de especialidad:', especialidad);
+// console.log('Subcategorías:', especialidad?.subcategories);
 ---
 
 <Layout>
@@ -29,6 +33,7 @@ const canonical = `https://www.medrent.mx/especialidades/${especialidad?.slug ??
       background: #F5FAF9;
     }
   </style>
+
   <!-- Breadcrumb Schema dinámico -->
   <BreadcrumbSchema
     slot="head"
@@ -39,9 +44,8 @@ const canonical = `https://www.medrent.mx/especialidades/${especialidad?.slug ??
     ]}
   />
 
-
   <div class="w-full max-w-7xl mx-auto flex flex-col ">
-      <!-- Hero Section de la Categoría -->
+    <!-- Hero Section de la Categoría -->
     <section class="relative w-full h-auto rounded-b-[24px] md:rounded-none relative">
           
       <!-- Breadcrumb sobre la imagen -->
@@ -102,7 +106,6 @@ const canonical = `https://www.medrent.mx/especialidades/${especialidad?.slug ??
         </div>
       </div>
 
-
       {especialidad?.subcategories && especialidad.subcategories.filter((aplicacion: any) => aplicacion.slug).length > 0 && (
         <section class="mb-16 bg-[#F5FAF9]">
           <div class="space-y-[25px]">
@@ -124,13 +127,28 @@ const canonical = `https://www.medrent.mx/especialidades/${especialidad?.slug ??
                     </p>
                     
                                         
-                    {/* <div>
-                      <h4 class="font-medium text-[#212121] text-base">Equipos disponibles:</h4>
-                      <p class="text-[var(--color-primary)] text-[16px] italic font-normal leading-relaxed">
-                       {aplicacion.Equipos}
-                      </p>
-                    </div> */}
-                    
+                    <div>
+                      <h4 class="font-medium text-[#212121] text-base">Equipos:</h4>
+                      <div class="flex flex-wrap gap-1">
+                        {aplicacion.products && aplicacion.products.length > 0 ? (
+                          aplicacion.products.map((product, index) => (
+                            <span>
+                              <a 
+                                href={`/productos/${product.slug}`}
+                                class="text-[var(--color-primary)] font-lato text-[16px] italic underline font-normal leading-relaxed hover:underline hover:text-[var(--color-accent)] transition-colors"
+                              >
+                                {product.name}
+                              </a>
+                              {index < aplicacion.products.length - 1 && <span class="text-[var(--color-primary)]">, </span>}
+                            </span>
+                          ))
+                        ) : (
+                          <p class="text-[var(--color-primary)] text-[16px] italic font-normal leading-relaxed">
+                            No hay equipos disponibles
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   
                   <a 
@@ -170,7 +188,6 @@ const canonical = `https://www.medrent.mx/especialidades/${especialidad?.slug ??
                     />
                   )} */}
                 </div>
-
               </div>
               {/* Columna de Boton solo para mobile */}
                 {/* <div class="btnMobile block sm:hidden px-4">
@@ -189,11 +206,10 @@ const canonical = `https://www.medrent.mx/especialidades/${especialidad?.slug ??
           </div>
         </section>
       )}
+    </section>
+  </div>
 
-
-
-
-
+  
   <!-- <h1>{category}</h1>
   ddddd
   <ul>
