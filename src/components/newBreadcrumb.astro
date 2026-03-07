@@ -12,11 +12,11 @@
                         {!isLast ? (
                             <>
                                 {color === 'white' ? (
-                                    <a href={item.href} class={`font-kallisto text-[12px] text-[#FFF] opacity-70 font-medium hover:opacity-90 transition-colors uppercase flex items-center cursor-pointer`}>
+                                    <a href={item.href} class={`font-lato text-[12px] text-[#FFF] opacity-70 font-medium hover:opacity-90 transition-colors uppercase flex items-center cursor-pointer`}>
                                         {item.name}
                                     </a>
                                 ) : (
-                                    <a href={item.href} class={`font-kallisto text-[12px] font-medium hover:text-[--color-text-default:] transition-colors uppercase flex items-center opacity-60 cursor-pointer`}>
+                                    <a href={item.href} class={`font-lato text-[12px] font-medium hover:text-[--color-text-default:] transition-colors uppercase flex items-center opacity-60 cursor-pointer`}>
                                         {item.name}
                                     </a>
                                 )}
@@ -28,7 +28,7 @@
                                 </span>
                             </>
                         ) : (
-                            <span class={`font-kallisto text-[12px] font-normal uppercase flex items-center z-0 ${color === 'white' ? 'text-[#FFF]' : 'text-[--color-text-default:]'}`}>
+                            <span class={`font-lato text-[12px] font-normal uppercase flex items-center z-0 ${color === 'white' ? 'text-[#FFF]' : 'text-[--color-text-default:]'}`}>
                                 {item.name}
                             </span>
                         )}
