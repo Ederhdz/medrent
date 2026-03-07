@@ -160,17 +160,17 @@ const eventDays = [11, 14];
                             EVENTOS MedRent {now.year()}
                         </h2>
 
-                        <div class="bg-white rounded-2xl p-6 border border-gray-200" id="calendario-dinamico">
-                            <div class={`flex justify-between items-center${typeof window !== 'undefined' && (window.innerWidth >= 1024 || !(document.getElementById('calendario-dias')?.classList.contains('hidden'))) ? ' mb-6' : ''}`}>
-                                <button class="text-gray-400 hover:text-gray-600 hidden md:block">&lt;</button>
-                                <span
-                                    id="mes-actual"
-                                    class="text-center font-lato text-[16px] font-normal text-[#5A4043] cursor-pointer md:cursor-default"
-                                    onclick="if(window.innerWidth<1024){document.getElementById('calendario-dias').classList.toggle('hidden');}"
-                                >
+                        <div class="bg-[var(--color-secondary-light)] rounded-2xl p-6" id="calendario-dinamico">
+                            <div class="flex justify-between items-center...">
+                                <span id="mes-actual" class="...">
                                     {currentMonthTitleCase}
                                 </span>
-                                <button class="text-gray-400 hover:text-gray-600 hidden md:block">&gt;</button>
+                                
+                                <!-- Agrupa los botones aquí -->
+                                <div class="flex gap-8">
+                                    <button class="text-gray-400 color-[#6D7A78] hover:text-gray-600 hidden md:block">&lt;</button>
+                                    <button class="text-gray-400 color-[#6D7A78] hover:text-gray-600 hidden md:block">&gt;</button>
+                                </div>
                             </div>
                             <div id="calendario-dias" class="md:block hidden mt-4">
                                 <!-- Headers de días -->
@@ -378,7 +378,8 @@ const eventDays = [11, 14];
         id="event-blurred-background" 
         class="absolute inset-0 transition-all duration-300"
         style="background: linear-gradient(0deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%); filter: blur(8px);"
-    ></div>
+    >
+    </div>
     
     <!-- Popup Content -->
     <div id="PopupContent" class="relative z-10 flex items-center justify-center min-h-screen p-4 h-[85%] md:h-[85%] lg:h-auto md:mt-12 overflow-y-auto">
