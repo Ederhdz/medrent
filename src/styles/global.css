@@ -97,19 +97,19 @@ select option:focus {
 /* Scrollbar personalizado para SidebarFilters */
 .custom-scrollbar::-webkit-scrollbar {
   width: 18px;
-  background: var(--Schemes-On-Primary, #ffeced);
+  background: var(--Schemes-On-Primary, #69d8d3);
   border-radius: 16px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #ffeced;
+  background: #69d8d3;
   border-radius: 16px;
   border: 2px solid #e0e0e0;
 }
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #b91247 #ffeced;
+  scrollbar-color: #69d8d3 #006764;
 }
 
 /* Ancho de la barra */
@@ -132,4 +132,79 @@ select option:focus {
 /* Hover (opcional, un poco más oscuro) */
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #8f0f3d;
+}
+
+/* Articulos del blog */
+.dinamicContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.blogSubtitle,
+.dinamicContent h2 {
+  font-family: Lato;
+  color: #261819;
+  font-size: 28px;
+  font-weight: 300;
+}
+.dinamicContent li strong,
+.dinamicContent p {
+  color: #261819;
+  font-family: Lato;
+  font-size: 16px;
+}
+.dinamicContent ol,
+.dinamicContent ul {
+  padding-left: 24px;
+  color: #261819;
+}
+.dinamicContent ul > li {
+  list-style-type: circle;
+  color: #261819;
+}
+.dinamicContent ol > li {
+  list-style-type: decimal;
+  margin-bottom: 16px;
+  color: #261819;
+}
+.dinamicContent div.citaBlog {
+  border-left: 6px solid #b91247;
+  padding: 24px;
+}
+div.citaBlogAuthor span,
+div.citaBlog p {
+  color: #8e6f73;
+  font-family: Lato;
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 28px;
+}
+
+@media (max-width: 1023px) {
+  /* Contenedores del blog */
+  .SocialMediaMobile,
+  .contentBlogContainer {
+    display: flex;
+  }
+  .articulosRelacionadosDesktop,
+  .SocialMediaDesktop,
+  .contentBlogAside {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .SocialMediaDesktop {
+    display: flex;
+  }
+  .SocialMediaMobile {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .blogSubtitle {
+    font-size: 20px;
+  }
 }
