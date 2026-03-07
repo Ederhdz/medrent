@@ -77,25 +77,16 @@ try {
                 
                 
                 
-                
-                
-                
-                <div class="flex items-end justify-between mt-auto">
-                  <span class="text-xs text-[var(--color-gray-dark)] font-lato w-full flex">
-                      Por:&nbsp;
-                      <a href={`/blog/autor/${articulosActivos[0]?.writer?.slug}`} 
-                        class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato">
-                          {articulosActivos[0]?.writer?.fullName || 'Medrent'}
-                      </a>&nbsp;• {formatDate(articulosActivos[0]?.createdAt)}
-                  </span>
-              </div>
 
-
-
-
-
-
-
+                  <div class="flex items-end justify-between mt-auto">
+                    <span class="text-xs text-[var(--color-gray-dark)] font-lato w-full flex">
+                        Por:&nbsp;
+                        <a href={`/blog/autor/${articulosActivos[0]?.writer?.slug}`} 
+                          class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato">
+                            {articulosActivos[0]?.writer?.fullName}
+                        </a>&nbsp;• {formatDate(articulosActivos[0]?.createdAt)}
+                    </span>
+                </div>
               </div>
             </div>
             
@@ -108,9 +99,17 @@ try {
                       <h3 class="text-[22px] font-light text-lg text-[#261819] font-lato mb-2 line-clamp-2 hover:text-[var(--color-primary)] hover:underline decoration-[var(--color-primary)]">{articulo?.title}</h3>
                     </a>
                     <p class="text-[var(--color-gray-dark)] text-[16px] font-normal mb-4 line-clamp-3 flex-grow max-h-[68px]" style="font-family: Lato;">{articulo?.shortDescription}</p>
+                    
+                    
                     <div class="flex items-end justify-between mt-auto">
                       <span class="text-xs text-[var(--color-gray-dark)] font-lato w-full flex">
-                        Por:&nbsp;<a href={`/blog/autor/${articulo?.fullName?.slug}`} class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato ">{articulo?.fullName}</a>&nbsp;• {formatDate(articulo?.createdAt)}</span>
+                        Por:&nbsp;
+                        <a href={`/blog/autor/${articulo?.writer?.slug}`} 
+                        class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato ">
+                          {articulo?.writer?.fullName}
+                        </a>
+                        &nbsp;• {formatDate(articulo?.createdAt)}
+                      </span>
                     </div>
                   </div>
                 </div>
