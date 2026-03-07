@@ -16,7 +16,7 @@ const breadcrumbData = [
 ];
 
 export async function getStaticPaths() {
-  const authors = await strapiFetch('/writers?populate[articles][populate][heroImage]=true&populate[heroImage]=true');
+  const authors = await strapiFetch('/writers?populate[articles][populate][heroImage]=true&populate[heroImage]=true&populate[articles][populate][writer]=true');
   
 
   return authors.data.map((page) => ({
@@ -57,7 +57,7 @@ const { author } = Astro.props as { author: any };
       </style>
       {/* Columna texto */}
       <div class="w-full md:w-1/2 flex flex-col items-start text-left md:px-8 md:py-6">
-        <span class="text-sm font-medium text-[var(--color-primary)] tracking-widest mb-2 uppercase font-lato">{author?.specialty || ''}</span>
+        <span class="text-sm font-medium text-[var(--color-primary)] tracking-widest mb-2 uppercase font-lato">{author?.speciality || ''}</span>
         <h1 class="text-[#261819] font-lato text-[32px] font-light">{author?.fullName || 'Autor Desconocido'}</h1>
         <p class="text-[#261819] font-lato text-[16px] font-light">
           <BlocksRenderer content={author?.longDescription || []} />
