@@ -4,11 +4,11 @@ const { data, archivoPDF } = Astro.props;
 
 <!-- Ficha Técnica -->
 {data && data.length > 0 && (
-    <section id="DesktopFichaTecnica" class="hidden md:block max-w-7xl mx-auto py-8">
+    <section id="fichaTecnica" class="max-w-7xl mx-auto py-8">
         <p class="text-[var(--color-primary)]  text-[14px] font-medium m-0">
             FICHA TÉCNICA
         </p>
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-3">
             <h2 class="text-[24px] md:text-[28px] font-bold text-[#212121] ">
                 Características de producto
             </h2>
@@ -17,7 +17,7 @@ const { data, archivoPDF } = Astro.props;
                     href={archivoPDF}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="border-2 border-[var(--color-primary)] text-[var(--color-primary)] font-bold rounded transition-colors flex items-center gap-2 cursor-pointer group px-4 py-2 hover:bg-[var(--color-primary)] hover:text-white"
+                    class="border-2 border-[var(--color-primary)] text-[var(--color-primary)] font-bold rounded transition-colors flex items-center justify-center gap-2 cursor-pointer group px-4 py-2 w-full md:w-auto hover:bg-[var(--color-primary)] hover:text-white"
                     style="border-radius: 4px;"
                     download
                 >
@@ -48,10 +48,11 @@ const { data, archivoPDF } = Astro.props;
                                 <tbody>
                                     {category.technicalFeature.map((feature: any, idx: number) => (
                                     <tr class={idx % 2 === 0 ? 'bg-[#EDF2F0]' : 'bg-white'}>
-                                        <td class="px-6 py-4 text-[var(--color-text-default)] font-medium text-sm w-1/2">
+                                        <td class="px-4 md:px-6 py-4 text-[var(--color-text-default)] font-medium text-sm w-[35%] md:w-1/2">
                                             {feature.feature}:
-                                        </td>
-                                        <td class="px-6 py-4 text-[var(--color-text-default)] text-sm w-1/2">
+                                            </td>
+
+                                            <td class="px-4 md:px-6 py-4 text-[var(--color-text-default)] text-sm w-[65%] md:w-1/2 break-words">
                                             {feature.description}
                                         </td>
                                     </tr>
