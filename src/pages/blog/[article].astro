@@ -71,13 +71,13 @@ try {
       </h1>
       
       {article?.shortDescription && (
-        <p class="text-[#8E6F73] text-[16px] font-normal">
+        <p class="text-[var(--color-primary)] text-[16px] font-normal">
           {article.shortDescription}
         </p>
       )}
 
       <div class="w-full my-6">
-        <p class="text-[#8E6F73] text-sm font-normal italic">
+        <p class="text-[var(--color-primary)] text-sm font-normal italic">
           • {formatDate(article?.createdAt)}
         </p>
       </div>
@@ -128,7 +128,7 @@ try {
                       <p>"{item.quoteText}"</p>
                       {item.authorName && (
                         <div class="citaBlogAuthor">
-                          <span>{item.authorName}</span>
+                          <span>- {item.authorName}</span>
                         </div>
                       )}
                     </div>
@@ -141,7 +141,7 @@ try {
           : <p>No hay contenido disponible</p>
         }
         
-        <section class="acreditadoPor flex items-center gap-4 p-4 pt-6" style="border-top: 0.5px dashed #8E6F73;">
+        <section class="acreditadoPor flex items-center gap-4 p-4 pt-6" style="border-top: 0.5px dashed var(--color-gray-dark);">
           {article?.writer?.avatar?.url && (
             <img
               src={article.writer.avatar.url}
@@ -159,7 +159,7 @@ try {
             >
               {article?.writer?.fullName || 'Backoffice | Team Medrent'}
             </a>
-              <span class="text-[#8E6F73] font-medium italic">
+              <span class="text-[var(--color-primary)] font-medium italic">
                 {" — "}{Array.isArray(articulosRelacionados) ? articulosRelacionados.length + 1 : 1} Artículo{Array.isArray(articulosRelacionados) && articulosRelacionados.length + 1 !== 1 ? 's' : ''}
               </span>
             <p class="text-[#5A4043] text-sm font-normal leading-5 tracking-[0.25px] mt-1">
@@ -176,7 +176,7 @@ try {
 
         <section class="flex-col gap-2 flex max-w-7xl mx-auto mb-6"> 
           <h2 class="text-lg font-bold text-[#261819] blogSubtitle">Suscríbete al blog</h2>
-          <p class="text-[14px] text-[#8E6F73] max-w-xl mx-auto m-0">
+          <p class="text-[14px] text-[var(--color-primary)] max-w-xl mx-auto m-0">
             Recibe en tu correo las últimas novedades en tecnología médica, consejos especializados y actualizaciones exclusivas sobre nuestras soluciones.
           </p> 
           <form class="justify-center max-w-xl w-full mx-auto flex flex-col gap-4 pt-4"> 
@@ -217,14 +217,14 @@ try {
                           {rel.title}
                         </h3>
                       </a>
-                      <p class="mb-1 text-[14px] text-[#8E6F73] line-clamp-3">{rel.shortDescription}</p>
+                      <p class="mb-1 text-[14px] text-[var(--color-primary)] line-clamp-3">{rel.shortDescription}</p>
                     </div>
                     <div class="flex">
                       <span class="block text-xs text-[#261819] font-lato mt-2">Por: &nbsp;</span>
                       <a href={`/blog/autor/${rel.writer?.slug}`} class="block text-xs text-[#text-[var(--color-primary)]] underline decoration-[#text-[var(--color-primary)]] cursor-pointer font-lato mt-2">
                         {rel.writer?.fullName || 'Medrent'}
                       </a>
-                      <span class="block text-xs text-[#8E6F73] font-lato mt-2">
+                      <span class="block text-xs text-[var(--color-primary)] font-lato mt-2">
                         &nbsp;• {formatDate(rel.createdAt)}
                       </span>
                     </div>
@@ -232,7 +232,7 @@ try {
                 </div>
               ))
             ) : (
-              <p class="text-[#8E6F73]">Por el momento no hay artículos relacionados.</p>
+              <p class="text-[var(--color-primary)]]">Por el momento no hay artículos relacionados.</p>
             )}
           </div>
 
