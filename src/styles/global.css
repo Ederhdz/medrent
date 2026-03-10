@@ -168,17 +168,29 @@ select option:focus {
   color: #261819;
 }
 .dinamicContent div.citaBlog {
-  border-left: 6px solid #b91247;
+  border-left: 6px solid var(--color-primary);
   padding: 24px;
 }
-div.citaBlogAuthor span,
 div.citaBlog p {
-  color: #8e6f73;
+  color: var(--color-primary);
   font-family: Lato;
   font-size: 22px;
   font-style: italic;
   font-weight: 400;
   line-height: 28px;
+  text-align: justify;
+}
+div.citaBlogAuthor span {
+  color: #171d1c;
+  text-align: right;
+  font-family: Lato;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  justify-content: flex-end;
+  display: flex;
 }
 .sliderArticulosRelacionados .glider-slide {
   padding: 12px;
