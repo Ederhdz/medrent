@@ -26,6 +26,11 @@ export const GET: APIRoute = async ({ params, request }) => {
       },
     });
   } catch (error) {
+    // Log detallado para depurar el origen del 500 (DNS/red/config),
+    // sin incluir el token.
+    console.log("Strapi proxy failed:", {
+      message: error instanceof Error ? error.message : String(error),
+    });
     return new Response(
       JSON.stringify({ error: "Strapi proxy failed" }),
       { status: 500 }
