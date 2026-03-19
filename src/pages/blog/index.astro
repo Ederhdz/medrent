@@ -20,9 +20,19 @@ try {
 } catch (error) {
   articulosActivos = [];
 }
+
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
 ---
 
-<Layout title="Blog | Medrent – Tecnología médica">
+<Layout
+  title="Blog MedRent | Innovación, neurodiagnóstico y tecnología médica"
+  description="Artículos y tendencias sobre tecnología médica, neurodiagnóstico y práctica clínica para especialistas."
+  keywords="blog MedRent; tecnología médica; neurodiagnóstico; innovación médica"
+  ogImage={logoUrl}
+>
   <!-- <Fragment slot="metas"> -->
     <!-- <title>Blog | Medrent – Tecnología médica</title>
     <meta name="description" content="Descubre artículos, novedades y tendencias en tecnología médica. Información confiable para potenciar tu práctica y optimizar el cuidado de tus pacientes." />
@@ -44,10 +54,72 @@ try {
     <Fragment slot="head">
         <BreadcrumbSchema
         items={[
-            { name: 'Inicio', url: 'https://www.medrent.mx' },
-            { name: 'Blog', url: 'https://www.medrent.mx/blog' },
+            { name: 'Inicio', url: `${baseUrl}/` },
+            { name: 'Blog', url: `${baseUrl}/blog` },
         ]}
+        id={breadcrumbId}
         />
+        <script type="application/ld+json">
+          {(() => {
+            const posts = Array.isArray(articulosActivos) ? articulosActivos.slice(0, 12) : [];
+            const postlistId = `${canonicalUrl}#postlist`;
+            const itemListElement = posts.map((p: any, index: number) => {
+              const postUrl = p?.slug ? `${baseUrl}/blog/${p.slug}` : canonicalUrl;
+              return {
+                "@type": "ListItem",
+                position: index + 1,
+                url: postUrl,
+                item: {
+                  "@type": "BlogPosting",
+                  "@id": `${postUrl}#post`,
+                  headline: p?.title || "Blog MedRent",
+                },
+              };
+            });
+
+            return JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebPage",
+                  "@id": `${canonicalUrl}#webpage`,
+                  url: canonicalUrl,
+                  name: "Blog MedRent | Innovación, neurodiagnóstico y tecnología médica",
+                  description:
+                    "Artículos y tendencias sobre tecnología médica, neurodiagnóstico y práctica clínica para especialistas.",
+                  isPartOf: { "@id": `${baseUrl}/#website` },
+                  about: { "@id": `${baseUrl}/#organization` },
+                  inLanguage: "es-MX",
+                  breadcrumb: { "@id": breadcrumbId },
+                  mainEntity: { "@id": postlistId },
+                  primaryImageOfPage: {
+                    "@type": "ImageObject",
+                    url: logoUrl,
+                  },
+                },
+                {
+                  "@type": ["Blog", "CollectionPage"],
+                  "@id": `${canonicalUrl}#blog`,
+                  url: canonicalUrl,
+                  name: "Blog MedRent",
+                  description:
+                    "Artículos y tendencias sobre tecnología médica, neurodiagnóstico y práctica clínica para especialistas.",
+                  isPartOf: { "@id": `${baseUrl}/#website` },
+                  publisher: { "@id": `${baseUrl}/#organization` },
+                  inLanguage: "es-MX",
+                  mainEntity: { "@id": postlistId },
+                },
+                {
+                  "@type": "ItemList",
+                  "@id": postlistId,
+                  name: "Artículos del blog MedRent",
+                  itemListOrder: "https://schema.org/ItemListOrderDescending",
+                  itemListElement,
+                },
+              ],
+            });
+          })()}
+        </script>
     </Fragment>
 
     <div class="absolute w-full z-2">

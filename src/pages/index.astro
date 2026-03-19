@@ -11,6 +11,7 @@ import PhoneField from "@components/forms/PhoneField.astro";
 import SelectField from "@components/forms/SelectField.astro";
 import CheckboxField from "@components/forms/CheckboxField.astro";
 import SubmitButton from "@components/forms/SubmitButton.astro";
+import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 
 
 let articulosRelacionados = null;
@@ -66,17 +67,60 @@ const marcas = [
         iconImage: '/temp/categorias/img - especialidad-5.png',
     },
 ];
+
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
 ---
-<Layout title="Med Rent - Distribuimos las mejores marcas de equipo médico">
+<Layout
+  title="MedRent México | Tecnología médica y financiamiento sin enganche"
+  description="Equipos médicos para neurodiagnóstico, neuromodulación, rehabilitación y ultrasonido con soporte y asesoría. Agenda tu demo."
+  keywords="equipo médico México; financiamiento equipo médico; neurodiagnóstico; neuromodulación; rehabilitación; ultrasonido"
+  ogImage={logoUrl}
+>
+
+    <Fragment slot="head">
+        <BreadcrumbSchema
+            id={breadcrumbId}
+            items={[
+                { name: "Inicio", url: `${baseUrl}/` },
+            ]}
+        />
+        <script type="application/ld+json">
+            {JSON.stringify({
+                "@context": "https://schema.org",
+                "@graph": [
+                    {
+                        "@type": "WebPage",
+                        "@id": `${canonicalUrl}#webpage`,
+                        url: canonicalUrl,
+                        name:
+                            "MedRent México | Tecnología médica y financiamiento sin enganche",
+                        description:
+                            "Equipos médicos para neurodiagnóstico, neuromodulación, rehabilitación y ultrasonido con soporte y asesoría. Agenda tu demo.",
+                        isPartOf: { "@id": `${baseUrl}/#website` },
+                        about: { "@id": `${baseUrl}/#organization` },
+                        inLanguage: "es-MX",
+                        breadcrumb: { "@id": breadcrumbId },
+                        primaryImageOfPage: {
+                            "@type": "ImageObject",
+                            url: logoUrl,
+                        },
+                    },
+                ],
+            })}
+        </script>
+    </Fragment>
 
     <!-- Sección de contacto -->
     <section class="max-w-7xl mx-auto grid md:grid-cols-2 gap-6 rounded-a-[24px] pt-6 pr-4 pb-0 pl-4 md:py-6 md:px-6 lg:px-[135px] lg:py-6">
         <!-- Columna 1: Encabezado -->
         <div class="space-y-2 p-0 md:pt-16 md:pb-16 md:px-0 lg:pt-[100px] lg:pb-6 lg:px-6 xl:px-6 2xl:px-6">
-            <h3 class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase "> SOMOS MEDRENT</h3>
-            <h1 class="font-normal md:text-[28px] text-[28px]  mb-6">
+            <h1 class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase "> SOMOS MEDRENT</h1>
+            <h2 class="font-normal md:text-[28px] text-[28px]  mb-6">
                 {dataHome.TituloContacto || 'La tecnología del futuro, hoy en tu consultorio gracias a MedRent. Financiamiento sin enganche.'}
-            </h1>
+            </h2>
             <p class="text-[#212121] md:text-[16px] text-[16px] text-[var(--color-green-dark)] mt-2 text-pretty">
                 
                 {dataHome.DescripcionContacto ? (

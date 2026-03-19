@@ -8,16 +8,90 @@ import Breadcrumb from '@components/navigation/Breadcrumb.astro';
 
 import { strapiFetch } from "@server/strapiClient";
 const brands = await strapiFetch("/brands?populate=*");
+
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
 ---
 
-<Layout title="MedRent - Nuestras marcas">
+<Layout
+  title="Marcas de equipo médico | Partners globales | MedRent México"
+  description="Conoce nuestros aliados globales en tecnología médica. Marcas líderes con soporte y acompañamiento para clínicas, hospitales y especialistas."
+  keywords="marcas equipo médico; Cadwell; Deymed; Esaote; Neuroelectrics; MedRent"
+  ogImage={logoUrl}
+>
     <Fragment slot="head">
         <BreadcrumbSchema
         items={[
-            { name: 'Inicio', url: 'https://www.medrent.mx' },
-            { name: 'Nuestras marcas', url: 'https://www.medrent.mx/nuestras-marcas' },
+            { name: 'Inicio', url: `${baseUrl}/` },
+            { name: 'Nuestras marcas', url: `${baseUrl}/nuestras-marcas` },
         ]}
+        id={breadcrumbId}
         />
+        <script type="application/ld+json">
+          {(() => {
+            const list = Array.isArray(brands?.data) ? brands.data.slice(0, 12) : [];
+            const itemListElement = list.map((b: any, index: number) => {
+              const brandUrl = `${baseUrl}/nuestras-marcas/${b?.slug || ""}`;
+              const brandId = `${brandUrl}#brand`;
+              const imageUrl = b?.logo?.url;
+              return {
+                "@type": "ListItem",
+                position: index + 1,
+                item: {
+                  "@type": "Brand",
+                  "@id": brandId,
+                  name: b?.name || "Marca",
+                  url: brandUrl,
+                  image: imageUrl ? [imageUrl] : undefined,
+                },
+                url: brandUrl,
+              };
+            });
+
+            return JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebPage",
+                  "@id": `${canonicalUrl}#webpage`,
+                  url: canonicalUrl,
+                  name: "Nuestras marcas - MedRent",
+                  description:
+                    "Listado de marcas globales de tecnología médica representadas por MedRent con soporte y acompañamiento.",
+                  isPartOf: { "@id": `${baseUrl}/#website` },
+                  about: { "@id": `${baseUrl}/#organization` },
+                  inLanguage: "es-MX",
+                  breadcrumb: { "@id": breadcrumbId },
+                  mainEntity: { "@id": `${canonicalUrl}#brandlist` },
+                  primaryImageOfPage: {
+                    "@type": "ImageObject",
+                    url: logoUrl,
+                  },
+                },
+                {
+                  "@type": "CollectionPage",
+                  "@id": `${canonicalUrl}#brandlist`,
+                  url: canonicalUrl,
+                  name: "Nuestras marcas - MedRent",
+                  description:
+                    "Listado de marcas globales de tecnología médica representadas por MedRent en neurofisiología, neuromodulación, neurocirugía, neurovascular y rehabilitación.",
+                  isPartOf: { "@id": `${baseUrl}/#website` },
+                  about: { "@id": `${baseUrl}/#organization` },
+                  inLanguage: "es-MX",
+                },
+                {
+                  "@type": "ItemList",
+                  "@id": `${canonicalUrl}#brandlist-itemlist`,
+                  name: "Marcas — listado",
+                  itemListOrder: "https://schema.org/ItemListOrderAscending",
+                  itemListElement,
+                },
+              ],
+            });
+          })()}
+        </script>
     </Fragment>
 
     <div class="absolute w-full z-2">

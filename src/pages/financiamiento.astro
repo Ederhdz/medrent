@@ -2,16 +2,63 @@
 import Layout from "@layouts/Layout.astro"
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
+
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
 ---
 
-<Layout title="Financiamiento" description="Conoce las opciones de financiamiento que Medrent tiene para ti. Facilidades de pago, créditos y más para adquirir tu equipo médico.">
+<Layout
+  title="Financiamiento Korum Capital | Equipos médicos sin enganche | MedRent"
+  description="Adquiere tecnología médica con planes flexibles, tasas preferenciales y aprobación ágil. Acompañamiento biomédico e instalación."
+  keywords="financiamiento equipo médico; Korum Capital; sin enganche; renta equipo médico"
+  ogImage={logoUrl}
+>
     <Fragment slot="head">
         <BreadcrumbSchema
         items={[
-            { name: 'Inicio', url: 'https://www.medrent.mx' },
-            { name: 'Financiamiento', url: 'https://www.medrent.mx/financiamiento' },
+            { name: 'Inicio', url: `${baseUrl}/` },
+            { name: 'Financiamiento', url: `${baseUrl}/financiamiento` },
         ]}
+        id={breadcrumbId}
         />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebPage",
+                "@id": `${canonicalUrl}#webpage`,
+                "url": canonicalUrl,
+                "name": "Financiamiento Korum Capital | Equipos médicos sin enganche | MedRent",
+                "description":
+                  "Adquiere tecnología médica con planes flexibles, tasas preferenciales y aprobación ágil. Acompañamiento biomédico e instalación.",
+                "isPartOf": { "@id": `${baseUrl}/#website` },
+                "about": { "@id": `${baseUrl}/#organization` },
+                "inLanguage": "es-MX",
+                "breadcrumb": { "@id": breadcrumbId },
+                "primaryImageOfPage": {
+                  "@type": "ImageObject",
+                  "url": logoUrl,
+                },
+                "mainEntity": { "@id": `${canonicalUrl}#service` },
+              },
+              {
+                "@type": ["Service", "FinancialService"],
+                "@id": `${canonicalUrl}#service`,
+                "name": "Financiamiento para tecnología médica",
+                "description":
+                  "Adquiere tecnología médica con planes flexibles, tasas preferenciales y aprobación ágil. Acompañamiento biomédico e instalación.",
+                "provider": { "@id": `${baseUrl}/#organization` },
+                "areaServed": { "@type": "Country", "identifier": "MX" },
+                "serviceType":
+                  "Financiamiento, arrendamiento y planes de pago para tecnología médica (según aprobación)",
+                "termsOfService": `${baseUrl}/condiciones-de-uso`,
+              },
+            ],
+          })}
+        </script>
     </Fragment>
 
     <div class="absolute w-full z-2">

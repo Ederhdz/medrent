@@ -31,17 +31,107 @@ if (!product) {
   return Astro.redirect("/404");
 }
 
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
+const heroImageUrl =
+  Array.isArray(product.gallery) && product.gallery.length > 0
+    ? product.gallery[0]
+    : logoUrl;
+
+const productId = `${baseUrl}/entity/product/${product.slug}#id`;
+const offerId = `${baseUrl}/entity/offer/${product.slug}#offer`;
+
+const firstVariant = Array.isArray((product as any)?.variants)
+  ? (product as any).variants[0]
+  : undefined;
+const ratingValue =
+  firstVariant?.ratingValue ??
+  firstVariant?.rating ??
+  firstVariant?.aggregateRating?.ratingValue;
+const reviewCount =
+  firstVariant?.reviewCount ??
+  firstVariant?.reviews ??
+  firstVariant?.aggregateRating?.reviewCount;
+
 console.log("Product data:", product);
 
 ---
-<Layout title={product.name} pageType="product">
+<Layout
+  title={`${product.name} | Equipo médico especializado | MedRent`}
+  description={product.description || `${product.name} | Equipo médico especializado de MedRent.`}
+  keywords={`${product.name}; equipo médico; MedRent`}
+  ogType="product"
+  pageType="product"
+  ogImage={heroImageUrl}
+>
   <Fragment slot="head">
       <BreadcrumbSchema
       items={[
-          { name: 'Inicio', url: 'https://www.medrent.mx' },
-          { name: 'Productos', url: 'https://www.medrent.mx/productos' },
+          { name: 'Inicio', url: `${baseUrl}/` },
+          { name: 'Productos', url: `${baseUrl}/productos` },
       ]}
+      id={breadcrumbId}
       />
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebPage",
+              "@id": `${canonicalUrl}#webpage`,
+              url: canonicalUrl,
+              name: `${product.name} | Equipo médico especializado | MedRent`,
+              description:
+                product.description ||
+                `${product.name} | Equipo médico especializado de MedRent.`,
+              isPartOf: { "@id": `${baseUrl}/#website` },
+              about: { "@id": `${baseUrl}/#organization` },
+              inLanguage: "es-MX",
+              breadcrumb: { "@id": breadcrumbId },
+              mainEntity: { "@id": productId },
+              primaryImageOfPage: {
+                "@type": "ImageObject",
+                url: heroImageUrl,
+              },
+            },
+            {
+              "@type": ["Product", "MedicalDevice"],
+              "@id": productId,
+              name: product.name,
+              description: product.description,
+              image: heroImageUrl ? [heroImageUrl] : undefined,
+              category: ["Medical Device"],
+              brand: product.brand?.slug
+                ? { "@type": "Brand", "@id": `${baseUrl}/nuestras-marcas/${product.brand.slug}#brand` }
+                : undefined,
+              datePublished: product.createdAt,
+              offers: { "@id": offerId },
+            },
+            {
+              "@type": "Offer",
+              "@id": offerId,
+              url: canonicalUrl,
+              availability: "https://schema.org/InStock",
+              description: "Cotizacion disponible bajo solicitud a traves de contacto comercial.",
+              businessFunction: "https://schema.org/Sell",
+              eligibleCustomerType: "https://schema.org/BusinessCustomer",
+              seller: { "@id": `${baseUrl}/#organization` },
+            },
+            ...(ratingValue && reviewCount
+              ? [
+                  {
+                    "@type": "AggregateRating",
+                    "@id": `${productId}#aggregateRating`,
+                    ratingValue,
+                    reviewCount,
+                  },
+                ]
+              : []),
+          ],
+        })}
+      </script>
   </Fragment>
   <Breadcrumb
     textColor="text-black"

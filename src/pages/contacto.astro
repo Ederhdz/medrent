@@ -14,17 +14,51 @@ import SelectField from "@components/forms/SelectField.astro";
 import SubmitButton from "@components/forms/SubmitButton.astro";
 import CheckboxField from "@components/forms/CheckboxField.astro";
 
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
+
 ---
 
 
-<Layout title="Med Rent - Contacto">
+<Layout
+  title="Contacto MedRent | Agenda una demo y solicita cotización"
+  description="Agenda una demo con especialistas de producto. Atención personalizada para elegir equipo, financiamiento y soporte. Respuesta rápida."
+  keywords="contacto MedRent; demo equipo médico; cotización; soporte técnico"
+  ogImage={logoUrl}
+>
     <Fragment slot="head">
         <BreadcrumbSchema
         items={[
-            { name: 'Inicio', url: 'https://www.medrent.mx' },
-            { name: 'Contacto', url: 'https://www.medrent.mx/contacto' },
+            { name: 'Inicio', url: `${baseUrl}/` },
+            { name: 'Contacto', url: `${baseUrl}/contacto` },
         ]}
+        id={breadcrumbId}
         />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": ["WebPage", "ContactPage"],
+                "@id": `${canonicalUrl}#webpage`,
+                "url": canonicalUrl,
+                "name": "Contacto MedRent | Agenda una demo y solicita cotización",
+                "description":
+                  "Agenda una demo con especialistas de producto. Atención personalizada para elegir equipo, financiamiento y soporte. Respuesta rápida.",
+                "isPartOf": { "@id": `${baseUrl}/#website` },
+                "about": { "@id": `${baseUrl}/#organization` },
+                "inLanguage": "es-MX",
+                "breadcrumb": { "@id": breadcrumbId },
+                "primaryImageOfPage": {
+                  "@type": "ImageObject",
+                  "url": logoUrl,
+                },
+              },
+            ],
+          })}
+        </script>
     </Fragment>
 
     <Breadcrumb

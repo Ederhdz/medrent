@@ -86,8 +86,19 @@ for (let i = 0; i < 42; i++) {
 
 // Días con eventos (puedes personalizar esto)
 const eventDays = [11, 14];
+
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
+const heroImageUrl = data?.heroImage?.url ?? logoUrl;
 ---
-<Layout title="Eventos | MedRent – Eventos médicos y de tecnología"> 
+<Layout
+  title="Eventos MedRent | Congresos, talleres y presentaciones médicas"
+  description="Explora congresos, talleres y presentaciones donde MedRent comparte innovación y equipos líderes. Filtra por especialidad y fecha."
+  keywords="eventos médicos; congresos; talleres; MedRent; tecnología médica"
+  ogImage={heroImageUrl}
+>
     <!-- <Fragment slot="metas">
         <title>Eventos | MedRent – Eventos médicos y de tecnología</title> -->
         <!-- <meta name="description" content="Mantente actualizado con los últimos avances en tecnología médica. Participamos en congresos, seminarios y eventos especializados donde compartimos conocimientos sobre equipos de diagnóstico cardiovascular y respiratorio." /> --> 
@@ -112,10 +123,95 @@ const eventDays = [11, 14];
         <Fragment slot="head">
             <BreadcrumbSchema
             items={[
-                { name: 'Inicio', url: 'https://www.medrent.mx' },
-                { name: 'Eventos', url: 'https://www.medrent.mx/eventos' },
+                { name: 'Inicio', url: `${baseUrl}/` },
+                { name: 'Eventos', url: `${baseUrl}/eventos` },
             ]}
+            id={breadcrumbId}
             />
+            <script type="application/ld+json">
+              {(() => {
+                const eventosList = Array.isArray(data?.events) ? data.events : [];
+                const slice = eventosList.slice(0, 12);
+                const itemListElement = slice.map((evento: any, index: number) => {
+                  const startDate = evento?.startDate;
+                  const endDate = evento?.endDate;
+                  const title =
+                    evento?.title || evento?.eventType || `Evento ${index + 1}`;
+                  const description = evento?.subtitle || evento?.description || "";
+                  const imageUrl = evento?.image?.url;
+                  const locationName = evento?.locationLabel || "";
+                  return {
+                    "@type": "ListItem",
+                    position: index + 1,
+                    item: {
+                      "@type": "Event",
+                      "@id": `${canonicalUrl}#event-${index + 1}`,
+                      name: title,
+                      description,
+                      startDate,
+                      endDate,
+                      eventAttendanceMode:
+                        "https://schema.org/OfflineEventAttendanceMode",
+                      eventStatus: "https://schema.org/EventScheduled",
+                      image: imageUrl ? [imageUrl] : undefined,
+                      location: locationName
+                        ? {
+                            "@type": "Place",
+                            name: locationName,
+                            url: evento?.locationUrlMaps,
+                          }
+                        : undefined,
+                      organizer: { "@id": `${baseUrl}/#organization` },
+                    },
+                  };
+                });
+
+                return JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@graph": [
+                    {
+                      "@type": "WebPage",
+                      "@id": `${canonicalUrl}#webpage`,
+                      url: canonicalUrl,
+                      name:
+                        "Eventos MedRent | Congresos, talleres y presentaciones médicas",
+                      description:
+                        "Explora congresos, talleres y presentaciones donde MedRent comparte innovación y equipos líderes. Filtra por especialidad y fecha.",
+                      isPartOf: { "@id": `${baseUrl}/#website` },
+                      about: { "@id": `${baseUrl}/#organization` },
+                      inLanguage: "es-MX",
+                      breadcrumb: { "@id": breadcrumbId },
+                      mainEntity: { "@id": `${canonicalUrl}#event-list` },
+                      primaryImageOfPage: {
+                        "@type": "ImageObject",
+                        url: heroImageUrl,
+                      },
+                    },
+                    {
+                      "@type": "CollectionPage",
+                      "@id": `${canonicalUrl}#event-collection`,
+                      url: canonicalUrl,
+                      name: "Eventos médicos y de tecnología | MedRent",
+                      description:
+                        data?.description ||
+                        "Eventos médicos, congresos, talleres y presentaciones donde MedRent comparte innovación y equipos líderes.",
+                      isPartOf: { "@id": `${baseUrl}/#website` },
+                      about: { "@id": `${baseUrl}/#organization` },
+                      inLanguage: "es-MX",
+                      mainEntity: { "@id": `${canonicalUrl}#event-list` },
+                    },
+                    {
+                      "@type": "ItemList",
+                      "@id": `${canonicalUrl}#event-list`,
+                      name: "Eventos médicos y de tecnología MedRent",
+                      itemListOrder:
+                        "https://schema.org/ItemListUnordered",
+                      itemListElement,
+                    },
+                  ],
+                });
+              })()}
+            </script>
         </Fragment>
 
     <div class="absolute w-full z-2">

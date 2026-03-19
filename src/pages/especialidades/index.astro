@@ -6,16 +6,93 @@ import { ESPECIALTIES } from "@lib/site.ts";
 const especialidades = ESPECIALTIES;
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
+
+const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const logoUrl = `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
 ---
 
-<Layout title="Especialidades">
+<Layout
+  title="Especialidades | Neurofisiología, Neurocirugía, Neuromodulación y más | MedRent"
+  description="Explora especialidades y aplicaciones clínicas. Soluciones para diagnóstico, terapia y rehabilitación con soporte y financiamiento."
+  keywords="especialidades médicas; neurofisiología; neuromodulación; rehabilitación; neurovascular"
+  ogImage={logoUrl}
+>
     <Fragment slot="head">
         <BreadcrumbSchema
         items={[
-            { name: 'Inicio', url: 'https://www.medrent.mx' },
-            { name: 'Especialidades', url: 'https://www.medrent.mx/especialidades' },
+            { name: 'Inicio', url: `${baseUrl}/` },
+            { name: 'Especialidades', url: `${baseUrl}/especialidades` },
         ]}
+        id={breadcrumbId}
         />
+        <script type="application/ld+json">
+          {(() => {
+            const list = Array.isArray(especialidades) ? especialidades : [];
+            const itemListElement = list.map((c: any, index: number) => {
+              const specSlug = c?.Slug || c?.slug || "";
+              const specUrl = specSlug
+                ? `${baseUrl}/especialidades/${specSlug}`
+                : canonicalUrl;
+              const imageUrl = c?.ImageHero
+                ? `${baseUrl}/temp/especialidades/${c.ImageHero}`
+                : undefined;
+              return {
+                "@type": "ListItem",
+                position: index + 1,
+                item: {
+                  "@type": "MedicalSpecialty",
+                  "@id": `${specUrl}#specialty`,
+                  name: c?.Nombre || "Especialidad",
+                  url: specUrl,
+                  image: imageUrl ? [imageUrl] : undefined,
+                  description: c?.Descripcion,
+                },
+                url: specUrl,
+              };
+            });
+
+            return JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebPage",
+                  "@id": `${canonicalUrl}#webpage`,
+                  url: canonicalUrl,
+                  name: "Especialidades | Tecnología médica para diagnóstico, terapia y rehabilitación",
+                  description:
+                    "Explora especialidades y aplicaciones clínicas atendidas por MedRent: Neurofisiología, Neurocirugía, Neuromodulación, Neurovascular y Rehabilitación.",
+                  isPartOf: { "@id": `${baseUrl}/#website` },
+                  about: { "@id": `${baseUrl}/#organization` },
+                  inLanguage: "es-MX",
+                  breadcrumb: { "@id": breadcrumbId },
+                  mainEntity: { "@id": `${canonicalUrl}#specialtylist` },
+                  primaryImageOfPage: { "@type": "ImageObject", url: logoUrl },
+                },
+                {
+                  "@type": "CollectionPage",
+                  "@id": `${canonicalUrl}#specialtylist`,
+                  url: canonicalUrl,
+                  name: "Especialidades — listado",
+                  description:
+                    "Listado de especialidades médicas atendidas por MedRent con tecnología médica y soporte especializado.",
+                  isPartOf: { "@id": `${baseUrl}/#website` },
+                  about: { "@id": `${baseUrl}/#organization` },
+                  inLanguage: "es-MX",
+                  mainEntity: { "@id": `${canonicalUrl}#specialtylist-itemlist` },
+                },
+                {
+                  "@type": "ItemList",
+                  "@id": `${canonicalUrl}#specialtylist-itemlist`,
+                  name: "Especialidades médicas atendidas por MedRent",
+                  itemListOrder: "https://schema.org/ItemListOrderAscending",
+                  itemListElement,
+                },
+              ],
+            });
+          })()}
+        </script>
     </Fragment>
 
 

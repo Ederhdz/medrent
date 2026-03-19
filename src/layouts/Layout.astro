@@ -1,7 +1,35 @@
 ---
 import "../styles/global.css"; 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const { title } = Astro.props;
+const {
+  title,
+  description,
+  keywords,
+  robots = "index,follow",
+  ogTitle,
+  ogDescription,
+  ogType = "website",
+  ogUrl,
+  ogImage,
+  ogSiteName = "MedRent",
+  ogLocale = "es_MX",
+  twitterCard = "summary_large_image",
+  twitterTitle,
+  twitterDescription,
+  twitterImage,
+} = Astro.props;
+const siteOrigin = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
+const resolvedTitle = title ?? "MedRent México | Tecnología médica y financiamiento sin enganche";
+const resolvedDescription =
+  description ??
+  "Equipos médicos para neurodiagnóstico, neuromodulación, rehabilitación y ultrasonido con soporte y asesoría. Agenda tu demo.";
+const resolvedOgTitle = ogTitle ?? resolvedTitle;
+const resolvedOgDescription = ogDescription ?? resolvedDescription;
+const resolvedOgUrl = ogUrl ?? canonical;
+const resolvedOgImage = ogImage ?? `${siteOrigin}/wp-content/uploads/2023/07/MedRent-Logo.jpg`;
+const resolvedTwitterTitle = twitterTitle ?? resolvedOgTitle;
+const resolvedTwitterDescription = twitterDescription ?? resolvedOgDescription;
+const resolvedTwitterImage = twitterImage ?? resolvedOgImage;
 
 import { SITE } from '@lib/site';
 const site = SITE;
@@ -16,7 +44,7 @@ import StickyCta from "@components/layout/overlays/StickyCta.astro";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es-MX">
   <head>
     <!-- 1. Meta esenciales -->
     <meta charset="UTF-8" />
@@ -24,7 +52,7 @@ import StickyCta from "@components/layout/overlays/StickyCta.astro";
     <meta name="google-site-verification" content="bfDcp6cDny991Jfo6sn0-XdBnk7ZsE_uMlqxZuBNDBY" />
 
     <!-- 2. Title -->
-    <title>{title ?? 'Mi sitio'}</title>
+    <title>{resolvedTitle}</title>
 
     <!-- 3. Canonical -->
     <link rel="canonical" href={canonical} />
@@ -36,6 +64,22 @@ import StickyCta from "@components/layout/overlays/StickyCta.astro";
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <!-- 5. Metas dinámicos (OG, description, etc.) -->
+    <meta name="description" content={resolvedDescription} />
+    {keywords && <meta name="keywords" content={keywords} />}
+    <meta name="robots" content={robots} />
+
+    <meta property="og:title" content={resolvedOgTitle} />
+    <meta property="og:description" content={resolvedOgDescription} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={resolvedOgUrl} />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:site_name" content={ogSiteName} />
+    <meta property="og:locale" content={ogLocale} />
+
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={resolvedTwitterTitle} />
+    <meta name="twitter:description" content={resolvedTwitterDescription} />
+    <meta name="twitter:image" content={resolvedTwitterImage} />
     <slot name="metas" /> 
 
     <!-- 6. Schemas globales -->
