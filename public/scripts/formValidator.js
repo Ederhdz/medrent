@@ -15,6 +15,12 @@ export function initForm(formId) {
   const selectInput = form.querySelector('select[name="specialty"]');
   const checkbox = form.querySelector('input[type="checkbox"]');
   const submitBtn = form.querySelector(".submit-btn");
+  const estadoInput = form.querySelector('[name="estado_mx"]');
+  const messageInput = form.querySelector('[name="message"]');
+  const institutionInput = form.querySelector('[name="lugar_de_trabajo"]');
+  const discoveryChannelInput = form.querySelector(
+    '[name="por_qu_medio_nos_conociste"]',
+  );
   const otraEspecialidadInput = form.querySelector(
     '[name="otras_especialidades"]',
   );
@@ -40,6 +46,66 @@ export function initForm(formId) {
   const errorBox = wrapper?.querySelector(".form-error");
   const errorRetryBtn = errorBox?.querySelector("button.retry-btn");
 
+  function validateEstado() {
+    if (!estadoInput) return true;
+    if (estadoInput.value === "") {
+      setInitial(estadoInput);
+      return false;
+    }
+    setValid(estadoInput);
+    return true;
+  }
+
+  function validateDiscoveryChannel() {
+    if (!discoveryChannelInput) return true;
+    const value = discoveryChannelInput.value.trim();
+
+    if (value === "") {
+      setInitial(discoveryChannelInput);
+      return false; // Es requerido
+    }
+
+    if (value.length >= 3) {
+      setValid(discoveryChannelInput);
+      return true;
+    }
+
+    setInvalid(discoveryChannelInput);
+    return false;
+  }
+
+  function validateInstitution() {
+    if (!institutionInput) return true;
+    const value = institutionInput.value.trim();
+
+    if (value === "") {
+      setInitial(institutionInput);
+      return false; // Es requerido, por eso retorna false
+    }
+
+    if (value.length >= 3) {
+      setValid(institutionInput);
+      return true;
+    }
+
+    setInvalid(institutionInput);
+    return false;
+  }
+
+  function validateMessage() {
+    if (!messageInput) return true;
+    // Si el mensaje tiene al menos 3 caracteres, es válido (opcional)
+    if (messageInput.value.trim().length >= 3) {
+      setValid(messageInput);
+      return true;
+    }
+    // Si está vacío, no es obligatorio (lo dejas como initial)
+    if (messageInput.value.trim() === "") {
+      setInitial(messageInput);
+      return true; // No es obligatorio, por eso retorna true
+    }
+  }
+
   function setState(state) {
     formContainer?.classList.add("hidden");
     successBox?.classList.add("hidden");
@@ -58,12 +124,21 @@ export function initForm(formId) {
     }
   }
 
+  estadoInput?.addEventListener("change", validateEstado);
+  messageInput?.addEventListener("input", validateMessage);
+  institutionInput?.addEventListener("input", validateInstitution);
+  discoveryChannelInput?.addEventListener("input", validateDiscoveryChannel);
+
   // Utilidad para restaurar estado visual de los inputs
   function resetInputsVisual() {
     if (nameInput) setInitial(nameInput);
     if (emailInput) setInitial(emailInput);
     if (phoneInput) setInitial(phoneInput);
     if (selectInput) setInitial(selectInput);
+    if (estadoInput) setInitial(estadoInput);
+    if (messageInput) setInitial(messageInput);
+    if (institutionInput) setInitial(institutionInput);
+    if (discoveryChannelInput) setInitial(discoveryChannelInput);
     if (checkbox) checkbox.checked = false;
     if (otraEspecialidadInput) setInitial(otraEspecialidadInput);
   }
@@ -129,7 +204,12 @@ export function initForm(formId) {
       `1px solid ${primaryColor}`,
       "important",
     );
-    input.style.setProperty("background", "#fff", "important");
+    // Todos los inputs usan el mismo color de fondo
+    input.style.setProperty(
+      "background",
+      "var(--color-secondary-light)",
+      "important",
+    );
     input.style.setProperty("border", `1px solid ${primaryColor}`, "important");
     if (label) label.style.background = primaryColor;
     if (input.tagName === "SELECT") {
@@ -300,13 +380,17 @@ export function initForm(formId) {
       validatePhone() &&
       validateSelect() &&
       validateOtraEspecialidad() &&
+      validateEstado() &&
+      validateMessage() &&
+      validateInstitution() &&
+      validateDiscoveryChannel() &&
       validateCheckbox();
 
     if (submitBtn) {
       submitBtn.disabled = !valid;
 
       if (valid) {
-        submitBtn.classList.add("hover:bg-[#00827F]"); // color-accent
+        submitBtn.classList.add("hover:bg-[#00827F]");
       } else {
         submitBtn.classList.remove("hover:bg-[#00827F]");
       }
