@@ -100,6 +100,10 @@
 body {
   font-family: "Lato", sans-serif;
 }
+
+.text-on-surface-variant {
+  color: var(--Schemes-On-Surface-Variant, #3d4948);
+}
 html,
 body {
   height: 100%;

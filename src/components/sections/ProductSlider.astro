@@ -101,16 +101,37 @@ const initProductSliders = async () => {
             breakpoints: {
                 1024: { perView: 4 },
                 920: { perView: 3 },
-                640: { perView: 2 },
-                400: { perView: 1 }
+                768: { perView: 2 },
+                480: { perView: 1 }
             }
         });
+
+        function equalizeCardHeights() {
+            const cards = Array.from(el.querySelectorAll('.productCard'));
+            if (!cards.length) return;
+
+            cards.forEach((card) => {
+                if (card instanceof HTMLElement) card.style.minHeight = '';
+            });
+
+            let maxHeight = 0;
+            cards.forEach((card) => {
+                if (card instanceof HTMLElement) {
+                    maxHeight = Math.max(maxHeight, card.offsetHeight);
+                }
+            });
+
+            if (!maxHeight) return;
+            cards.forEach((card) => {
+                if (card instanceof HTMLElement) card.style.minHeight = `${maxHeight}px`;
+            });
+        }
 
         // Función para obtener el número de cards visibles según el ancho de pantalla
         function getSlidesToShow() {
             const width = window.innerWidth;
-            if (width <= 400) return 1;
-            if (width <= 640) return 2;
+            if (width <= 480) return 1;
+            if (width <= 768) return 2;
             if (width <= 920) return 3;
             return 4;
         }
@@ -165,8 +186,12 @@ const initProductSliders = async () => {
         // Glide emits run/mount events; keep counter synced.
         glider.on('run.after', updateContador);
         glider.on('mount.after', updateContador);
+        glider.on('run.after', equalizeCardHeights);
+        glider.on('mount.after', equalizeCardHeights);
         window.addEventListener('resize', updateContador);
         window.addEventListener('orientationchange', updateContador);
+        window.addEventListener('resize', equalizeCardHeights);
+        window.addEventListener('orientationchange', equalizeCardHeights);
 
         const prevBtn = document.querySelector(`.prev-btn-${prefixId}`);
         const nextBtn = document.querySelector(`.next-btn-${prefixId}`);
@@ -193,6 +218,7 @@ const initProductSliders = async () => {
         
         glider.mount();
         updateContador();
+        equalizeCardHeights();
 
         if (isDesktop) {
             el.addEventListener('dragstart', (event) => {
