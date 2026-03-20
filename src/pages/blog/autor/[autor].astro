@@ -6,30 +6,47 @@ import { BlocksRenderer } from '@strapi/blocks-react-renderer';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 
-
 // import { formatDate } from '@lib/utils.js';
 // import SocialMedia from '@components/blog/SocialMedia.astro';
 
-const breadcrumbData = [
+const breadcrumbItems = [
   { name: "INICIO", href: "/" },
   { name: "BLOG", href: "/blog" },
-  { name: "ARTICULO" },
+  { name: "AUTOR" },
 ];
 
-
 export async function getStaticPaths() {
-  const authors = await strapiFetch(
-    "/writers?populate[articles][populate][heroImage]=true&populate[heroImage]=true&populate[articles][populate][writer]=true",
-  );
+  /** Los autores vienen como relación en `blog-articles` (no hay colección REST `/writers` expuesta). */
+  let articlesResponse;
+  try {
+    articlesResponse = await strapiFetch(
+      "/blog-articles?populate[heroImage]=true&populate[speciality]=true&populate[writer][populate]=*&sort=publishedAt:desc&pagination[pageSize]=1000",
+    );
+  } catch {
+    return [];
+  }
 
-  return authors.data.map((page: any) => ({
-    params: { autor: page.slug },
-    props: {
-      author: {
-        ...page,
-        articles: Array.isArray(page.articles) ? page.articles : [],
-      },
-    },
+  const raw = articlesResponse.data || [];
+  const articles = raw.filter((a: { isActive?: boolean }) => a.isActive === true);
+  const bySlug = new Map<
+    string,
+    { articles: typeof articles; [key: string]: unknown }
+  >();
+
+  for (const article of articles) {
+    const w = article.writer as { slug?: string } | undefined;
+    if (!w?.slug) continue;
+    const existing = bySlug.get(w.slug);
+    if (!existing) {
+      bySlug.set(w.slug, { ...w, articles: [article] });
+    } else {
+      existing.articles.push(article);
+    }
+  }
+
+  return Array.from(bySlug.entries()).map(([slug, author]) => ({
+    params: { autor: slug },
+    props: { author },
   }));
 }
 const { author } = Astro.props as { author: any };
@@ -156,7 +173,7 @@ const postlistId = `${canonicalUrl}#postlist`;
  <section class="heroAutor max-w-[1280px] w-full flex flex-col items-center justify-center bg-[var(--color-secondary-light)] min-h-[260px] mx-auto" style="border-radius:0 0 24px 24px;">
     <div class="containerHero w-full flex flex-col md:flex-row items-center gap-6 pt-16 px-4 sm:px-6 md:px-8 pb-4 md:pb-6 lg:py-16 lg:px-8">
       <div class="breadcrumb-fixed-wrapper max-w-7xl px-4" style="position:absolute;top:0;left:0;width:100%;z-index:30;pointer-events:auto;">
-        <Breadcrumb items={breadcrumbData} textColor="text-white" />
+        <Breadcrumb textColor="text-dark" items={breadcrumbItems} />
       </div>
 
       <style>
