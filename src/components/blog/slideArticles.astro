@@ -1,6 +1,10 @@
 ---
-const { articulos } = Astro.props;
 import ArticleCard from '@components/blog/articleCard.astro';
+
+const { articulos, tagByArticleKey } = Astro.props as {
+  articulos: any[] | null;
+  tagByArticleKey?: Map<string, string> | null;
+};
 //console.log('Artículos cargados:', articulos);
 ---
 
@@ -11,7 +15,7 @@ import ArticleCard from '@components/blog/articleCard.astro';
         {articulos && articulos.map((articulo: any) => (
           <li class="glide__slide h-full">
             <div class="group rounded-[16px] overflow-hidden relative h-full min-h-[340px] flex flex-col">
-              <ArticleCard article={articulo} />
+              <ArticleCard article={articulo} tagByArticleKey={tagByArticleKey} />
             </div>
           </li>
         ))}

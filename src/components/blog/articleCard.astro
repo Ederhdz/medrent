@@ -1,7 +1,14 @@
 ---
-const { article } = Astro.props;
 import { formatDate } from '@lib/utils.js';
 import ImageResponsive from '@components/media/ImageResponsive.astro';
+import { getClassificationTag } from '@lib/blog/classification';
+
+const { article, tagByArticleKey } = Astro.props as {
+  article: any;
+  tagByArticleKey?: Map<string, string> | null;
+};
+
+const classificationLabel = getClassificationTag(article as Record<string, unknown>, tagByArticleKey);
 ---
 
 <div class="bg-[var(--color-secondary-light)] rounded-[16px]  hover:bg-[var(--color-secondary-light)] hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full relative min-h-[500px]">
@@ -16,7 +23,11 @@ import ImageResponsive from '@components/media/ImageResponsive.astro';
         />
     </div>
     <div class="p-6 flex flex-col flex-grow">
-        <span class="mb-2 uppercase font-lato text-[12px] font-medium leading-[20px] tracking-[0.1px] text-[var(--color-primary)]">{article?.speciality?.speciality}</span>
+        {classificationLabel && (
+          <span class="mb-2 uppercase font-lato text-[14px] font-medium leading-5 tracking-[0.1px] text-[#006764]">
+            {classificationLabel}
+          </span>
+        )}
         <a href={`/blog/${article?.slug}`}>
         <h3 class="text-[22px] font-bold text-[#261819] mb-2 font-lato line-clamp-2 leading-7 hover:text-[var(--color-primary)] hover:underline decoration-[var(--color-primary)]">{article?.title}</h3>
         </a>
