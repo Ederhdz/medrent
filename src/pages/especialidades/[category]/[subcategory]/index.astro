@@ -12,6 +12,7 @@ import { getProducts } from "@server/api/products";
 import { getBrands } from "@server/api/brands";
 import { getCategories } from "@server/api/categories";
 import { getAllSubcategories, getSubcategoryBySlug } from "@server/api/subcategories";
+import { formatSlugAsTitle } from "@lib/utils.js";
 
 /* ---------------- ROUTE PARAMS ---------------- */
 
@@ -59,6 +60,14 @@ const subcategoryData = subcategory
   : null;
 const categoryName = category ?? "";
 const subcategoryName = subcategory ?? "";
+const plpHeadingTitle =
+  subcategoryData?.name || formatSlugAsTitle(subcategoryName);
+
+/** Etiquetas legibles para breadcrumb (sin slug con guiones) */
+const breadcrumbCategoryLabel =
+  subcategoryData?.category?.name ||
+  categoriesData.find((c: { slug?: string }) => c.slug === category)?.name ||
+  formatSlugAsTitle(categoryName);
 const seoPlpDescription =
   subcategoryData?.SEO?.description ||
   subcategoryData?.SEO?.seoDescription ||
@@ -84,11 +93,11 @@ const heroImageUrl = `${baseUrl}/temp/HeroPLP.png`;
       items={[
         { name: "Inicio", url: `${baseUrl}/` },
         {
-          name: categoryName,
+          name: breadcrumbCategoryLabel,
           url: `${baseUrl}/especialidades/${categoryName}`,
         },
         {
-          name: subcategoryName,
+          name: plpHeadingTitle,
           url: `${baseUrl}/especialidades/${categoryName}/${subcategoryName}`,
         },
       ]}
@@ -163,11 +172,11 @@ const heroImageUrl = `${baseUrl}/temp/HeroPLP.png`;
         items={[
           { name: "INICIO", href: "/" },
           {
-            name: categoryName.toUpperCase(),
+            name: breadcrumbCategoryLabel,
             href: `/especialidades/${categoryName}`,
           },
           {
-            name: subcategoryName.toUpperCase(),
+            name: plpHeadingTitle,
           },
         ]}
       />
@@ -180,7 +189,12 @@ const heroImageUrl = `${baseUrl}/temp/HeroPLP.png`;
   </section>
 
   <!-- PLP -->
-  <PLPLayout title={subcategoryName} seoTitle={seoPlpTitle} seoDescription={seoPlpDescription}>
+  <PLPLayout
+    title={plpHeadingTitle}
+    productCount={products.length}
+    seoTitle={seoPlpTitle}
+    seoDescription={seoPlpDescription}
+  >
     <Fragment slot="filters">
       <SidebarFilters
         brands={brandsData}
