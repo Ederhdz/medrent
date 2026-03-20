@@ -1,13 +1,23 @@
-# PR: Integración PLP + megamenú + blog + newsletter + build (desde `main`)
+# PR (versión final de hito): Integración PLP + megamenú + blog + newsletter + tooling
 
-> Pegar en GitHub/GitLab al abrir el PR desde la rama `feature/integrate-plp-megamenu` (o equivalente). Ajustar el título: `feat: integración PLP, megamenú, blog, newsletter y tooling`.
+> **Pegar en GitHub** al abrir el PR desde el fork (`compare` = `feature/integrate-plp-megamenu`) hacia el repo upstream (**base** = `main` del proyecto principal).  
+> **Título sugerido:** `feat: integración PLP, blog, newsletter, Strapi fixes y documentación`
 
 ## Resumen
 
-Integración de trabajo previo en listados de productos (PLP), navegación con megamenú, mejoras de blog (hero, filtros, orden), newsletter modular, breadcrumbs unificados, SEO/schemas, cliente Strapi, optimización de build y limpieza de archivos muertos. Documentación de ingeniería en `docs/`.
+Integración completa hasta este hito: PLP y rutas de catálogo, navegación/megamenú, blog (filtros, clasificación, tarjetas, artículo), newsletter modular, breadcrumbs y estilos globales, optimización de build (Astro 5), cliente Strapi y **correcciones de populate** que evitaban 400 en Strapi y dejaban la vitrina de blog en home vacía. Incluye documentación en `docs/` (ingeniería, testing, metodología de PRs).
 
-**Base sugerida:** `main`  
-**Rama:** `feature/integrate-plp-megamenu`
+**Base:** `main` (upstream)  
+**Origen:** fork — rama `feature/integrate-plp-megamenu`  
+**Notas de hito:** [MILESTONE-integracion.md](./MILESTONE-integracion.md)
+
+### Fixes finales Strapi (incluidos en esta rama)
+
+- **Home (`index.astro`):** la carga de artículos ya no va en el mismo `Promise.all` que marcas/promos; si falla el blog, no se vacían sliders. Populate mínimo (`heroImage`, `writer`) + fallback `populate=*`; filtro `isActive === true`.
+- **Blog índice:** misma política de populate; clasificación visible sigue viniendo de `/article-classifications`.
+- **Blog artículo (`getStaticPaths`):** populate con `content` sin claves rechazadas por la API actual; fallback y rutas vacías seguras si todo falla.
+
+Índice del hito y lista de commits atómicos recientes: `docs/MILESTONE-integracion.md`.
 
 ---
 
@@ -80,14 +90,15 @@ Integración de trabajo previo en listados de productos (PLP), navegación con m
 
 ## 13. Tests y verificación manual
 
-- [ ] `npm run build` sin errores.
-- [ ] Revisar home, `/blog`, una PLP y PDP en `preview`.
-- [ ] (Opcional) Lighthouse móvil en staging tras deploy.
+- [x] `npm run build` OK en rama de integración.
+- [ ] Home: sección BLOG con carrusel de artículos (no solo título + CTA).
+- [ ] `/blog`, un artículo, una PLP y una PDP en `preview` / staging.
+- [ ] (Opcional) Lighthouse móvil tras deploy.
 
 ## 14. Riesgos / seguimiento
 
-- Errores Strapi en build (p. ej. populate `articleClassification`) pueden requerir ajuste de API en otro PR.
-- Refactor global y documentación exhaustiva quedan para fase final del proyecto según planificación.
+- Si Strapi cambia nombres de relaciones, revisar `strapiFetch` en home, `blog/index`, `blog/[article]` y `eventos.astro`.
+- Refactor global, tests automatizados y documentación exhaustiva: fase posterior acordada.
 
 ---
 

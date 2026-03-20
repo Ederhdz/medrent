@@ -1,5 +1,9 @@
 # PRs sugeridos (cuerpos listos para GitHub/GitLab)
 
+**Merge único de hito:** usá [PR-BODY-integrate-plp-megamenu.md](../PR-BODY-integrate-plp-megamenu.md) + [MILESTONE-integracion.md](../MILESTONE-integracion.md).
+
+---
+
 Orden de merge recomendado y archivos **orientativos** según `git diff main` en la rama de integración. Ajustá rutas si tu diff difiere.
 
 | Orden | Rama sugerida | Documento |
