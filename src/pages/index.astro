@@ -16,15 +16,25 @@ import ImageResponsive from "@components/media/ImageResponsive.astro";
 
 
 let articulosRelacionados = null;
+let marcasData = [];
+let promotionsData = [];
 try {
-    const relacionados = await strapiFetch('/blog-articles?sort=publishedAt:desc&populate[heroImage]=true&populate[writer][populate][avatar]=true');
+    const [relacionados, brandsResp, promotionsResp] = await Promise.all([
+        strapiFetch('/blog-articles?sort=publishedAt:desc&populate[heroImage]=true&populate[writer][populate][avatar]=true'),
+        strapiFetch("/brands?populate=*"),
+        strapiFetch("/promo-sliders?populate[desktopImage]=true&populate[mobileImage]=true&sort=displayOrder:asc"),
+    ]);
     
     // La respuesta de strapiFetch probablemente ya viene como data
     articulosRelacionados = relacionados?.data || relacionados || [];
+    marcasData = Array.isArray(brandsResp?.data) ? brandsResp.data : [];
+    promotionsData = Array.isArray(promotionsResp?.data) ? promotionsResp.data : [];
     
 } catch (e) {
     console.error('Error cargando artículos:', e);
     articulosRelacionados = [];
+    marcasData = [];
+    promotionsData = [];
 }
 
 
@@ -127,7 +137,7 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
                     <BlocksRenderer content={dataHome.DescripcionContacto} />
                 ) : (
                     <>
-                        <span class="font-light">En MedRent no solo distribuimos equipos, impulsamos tu crecimiento profesional. Déjanos asesorarte para encontrar la solución tecnológica perfecta para transformar la vida de tus pacientes.</strong>
+                        <span class="font-light">En MedRent no solo distribuimos equipos, impulsamos tu crecimiento profesional. Déjanos asesorarte para encontrar la solución tecnológica perfecta para transformar la vida de tus pacientes.</span>
                     </>
                 )}
             </p>
@@ -269,10 +279,10 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
     </section>
 
     <!-- Sección slider de marcas -->
-    <BrandSlider />
+    <BrandSlider marcasData={marcasData} />
 
     <!-- Sección slider de promociones -->
-    <PromotionSlider />
+    <PromotionSlider promotionsData={promotionsData} />
 
     <!--  Sección de financiamiento-->
     <section class="defer-section py-6 px-0 lg:px-8 max-w-7xl mx-auto flex flex-col gap-6">

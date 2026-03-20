@@ -54,19 +54,16 @@ const bootLenis = () => {
   });
 
   window.addEventListener("pagehide", stop);
-  window.addEventListener("beforeunload", stop);
+  // Avoid `beforeunload`: it commonly disqualifies the page from the back/forward cache (Lighthouse bfcache audit).
   start();
 };
 
 const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
-if (isCoarsePointer) {
-  const startLenisOnInteraction = () => {
-    window.removeEventListener("touchstart", startLenisOnInteraction);
-    window.removeEventListener("scroll", startLenisOnInteraction);
-    requestAnimationFrame(bootLenis);
-  };
-  window.addEventListener("touchstart", startLenisOnInteraction, { passive: true, once: true });
-  window.addEventListener("scroll", startLenisOnInteraction, { passive: true, once: true });
-} else {
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isSmallViewport = window.matchMedia("(max-width: 1023px)").matches;
+const isElectron = /\bElectron\//.test(navigator.userAgent);
+
+// Keep native scrolling on touch devices, smaller viewports, and reduced-motion users.
+if (!isCoarsePointer && !prefersReducedMotion && !isSmallViewport && !isElectron) {
   requestAnimationFrame(bootLenis);
 }

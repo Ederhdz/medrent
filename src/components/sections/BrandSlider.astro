@@ -1,18 +1,11 @@
 ---
 import ImageResponsive from "@components/media/ImageResponsive.astro";
-import { strapiFetch } from "@server/strapiClient";
-
-let marcasData: any[] = [];
-
-try {
-  const response = await strapiFetch("/brands?populate=*");
-  //console.log('Respuesta de Strapi:', response);
-  marcasData = response?.data || [];
-  
-} catch (error) {
-  //console.error('Error al cargar marcas:', error.message);
-  marcasData = [];
-}
+type BrandItem = {
+  slug?: string;
+  name?: string;
+  logo?: any;
+};
+const { marcasData = [] } = Astro.props as { marcasData?: BrandItem[] };
 ---
 
 <section class="max-w-7xl mx-auto py-16">
@@ -36,7 +29,7 @@ try {
       <div class="glide" id="BrandSlider">
         <div class="glide__track" data-glide-el="track">
           <ul class="glide__slides">
-            {marcasData.map((brand) => (
+            {marcasData.map((brand: BrandItem) => (
               <li class="glide__slide flex justify-center items-center p-6" style="width: 158px;">
                 <a href={'nuestras-marcas/' + brand.slug || '#'} class="hover-scale-img block">
                   <ImageResponsive
@@ -46,6 +39,7 @@ try {
                     loading="lazy"
                     decoding="async"
                     sizes="158px"
+                    fetchpriority="low"
                   />
                 </a>
               </li>

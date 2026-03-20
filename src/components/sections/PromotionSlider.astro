@@ -1,6 +1,5 @@
 ---
 import ImageResponsive from "@components/media/ImageResponsive.astro";
-import { strapiFetch } from "@server/strapiClient";
 
 type PromoSlide = {
   id: number;
@@ -13,25 +12,16 @@ type PromoSlide = {
   mobileImage?: any;
 };
 
-let promotions: PromoSlide[] = [];
-
-try {
-  const response = await strapiFetch(
-    "/promo-sliders?populate[desktopImage]=true&populate[mobileImage]=true&sort=displayOrder:asc",
-  );
-
-  promotions = Array.isArray(response?.data)
-    ? response.data
-        .filter((item: PromoSlide) => item?.isActive)
-        .sort((a: PromoSlide, b: PromoSlide) => {
-          const aOrder = a?.displayOrder ?? Number.MAX_SAFE_INTEGER;
-          const bOrder = b?.displayOrder ?? Number.MAX_SAFE_INTEGER;
-          return aOrder - bOrder;
-        })
-    : [];
-} catch (error) {
-  promotions = [];
-}
+const { promotionsData = [] } = Astro.props as { promotionsData?: PromoSlide[] };
+const promotions = Array.isArray(promotionsData)
+  ? promotionsData
+      .filter((item: PromoSlide) => item?.isActive)
+      .sort((a: PromoSlide, b: PromoSlide) => {
+        const aOrder = a?.displayOrder ?? Number.MAX_SAFE_INTEGER;
+        const bOrder = b?.displayOrder ?? Number.MAX_SAFE_INTEGER;
+        return aOrder - bOrder;
+      })
+  : [];
 
 function buildPromotionHref(item: PromoSlide) {
   const base = (item?.url || "#").trim();
