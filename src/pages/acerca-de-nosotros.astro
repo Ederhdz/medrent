@@ -67,13 +67,18 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
             <span class="about-hero-orb about-hero-orb-a"></span>
             <span class="about-hero-orb about-hero-orb-b"></span>
         </div>
-        <div class="w-full max-w-7xl mx-auto flex flex-col gap-4 py-[32px] px-4 mt-9 sm:px-6 lg:px-[135px] md:py-[32px] sm:py-[32px] relative z-10"> 
-            <div class="text-left flex flex-col gap-4">
-                <h1 class="mt-8 uppercase font-lato font-bold text-[14px] leading-[20px] tracking-[0.1px] text-[var(--color-secondary)]">LÍDERES EN TECNOLOGÍA MÉDICA</h1>
-                <h2 class="text-[24px] font-bold text-[var(--color-white)] tracking-tight">
+        <div class="w-full max-w-7xl mx-auto flex flex-col gap-6 py-[32px] px-4 mt-9 sm:px-6 lg:px-[135px] md:py-[32px] sm:py-[32px] relative z-10"> 
+            <div class="text-left flex flex-col gap-2">
+                <h1
+                    id="about-hero-title"
+                    class="mt-8 uppercase font-lato font-bold text-[14px] leading-[1.43] tracking-[0.1px] text-[var(--color-secondary)]"
+                >
+                    LÍDERES EN TECNOLOGÍA MÉDICA
+                </h1>
+                <h2 class="text-[24px] font-bold text-white/90 tracking-tight">
                     DISTRIBUIMOS LAS MEJORES MARCAS DE EQUIPO MÉDICO
                 </h2>
-                <p class="text-[var(--color-gray)] text-base tracking-[0.5px] ">Contamos el respaldo de más de 50 años de experiencia en el mercado de distribución de equipo médico.</p>
+                <p class="text-white/90 text-base tracking-[0.5px]">Contamos el respaldo de más de 50 años de experiencia en el mercado de distribución de equipo médico.</p>
             </div>
             <a
             href="/productos"
@@ -253,10 +258,11 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
         position: absolute;
         inset: 0;
         z-index: 0;
+        /* Solo tonos oscuros: sin highlights claros para mejor contraste con el texto */
         background:
-          radial-gradient(circle at 95% 8%, rgba(135, 244, 239, 0.42) 0%, rgba(135, 244, 239, 0.22) 12%, rgba(135, 244, 239, 0) 32%),
-          radial-gradient(circle at 5% 95%, rgba(135, 244, 239, 0.5) 0%, rgba(135, 244, 239, 0.22) 16%, rgba(135, 244, 239, 0) 36%),
-          radial-gradient(120% 160% at 50% 50%, #1f6f87 0%, #1c6278 45%, #1f5f86 100%);
+          radial-gradient(circle at 95% 8%, rgba(0, 70, 68, 0.38) 0%, rgba(0, 48, 46, 0.14) 14%, transparent 34%),
+          radial-gradient(circle at 5% 95%, rgba(12, 58, 66, 0.42) 0%, rgba(8, 40, 44, 0.16) 18%, transparent 38%),
+          radial-gradient(120% 160% at 50% 50%, #0c3a3f 0%, #082f34 45%, #061f24 100%);
         background-size: 200% 200%, 200% 200%, 130% 130%;
         animation: heroGradientShift 14s linear infinite;
       }
@@ -269,16 +275,16 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
 
       .about-hero-orb-a {
         inset: -30%;
-        background: radial-gradient(50% 45% at 30% 48%, rgba(105, 216, 211, 0.32) 0%, rgba(105, 216, 211, 0.12) 36%, rgba(105, 216, 211, 0) 70%);
-        opacity: 0.75;
+        background: radial-gradient(50% 45% at 30% 48%, rgba(0, 90, 88, 0.22) 0%, rgba(0, 55, 53, 0.08) 36%, transparent 70%);
+        opacity: 0.7;
         will-change: transform;
         animation: heroOrbA 9s ease-in-out infinite alternate;
       }
 
       .about-hero-orb-b {
         inset: -30%;
-        background: radial-gradient(52% 46% at 72% 56%, rgba(0, 130, 127, 0.28) 0%, rgba(0, 130, 127, 0.08) 34%, rgba(0, 130, 127, 0) 72%);
-        opacity: 0.65;
+        background: radial-gradient(52% 46% at 72% 56%, rgba(0, 55, 53, 0.3) 0%, rgba(0, 38, 37, 0.1) 34%, transparent 72%);
+        opacity: 0.6;
         will-change: transform;
         animation: heroOrbB 11s ease-in-out infinite alternate;
       }

@@ -13,23 +13,30 @@ import CheckboxField from "@components/forms/CheckboxField.astro";
 import SubmitButton from "@components/forms/SubmitButton.astro";
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import ImageResponsive from "@components/media/ImageResponsive.astro";
-
+import { buildClassificationTagByArticleKeyMap } from "@lib/blog/classification";
 
 let articulosRelacionados = null;
 let marcasData = [];
 let promotionsData = [];
+let classificationTagByArticleKey = new Map<string, string>();
 try {
-    const [relacionados, brandsResp, promotionsResp] = await Promise.all([
-        strapiFetch('/blog-articles?sort=publishedAt:desc&populate[heroImage]=true&populate[writer][populate][avatar]=true'),
+    const [relacionados, brandsResp, promotionsResp, clsRes] = await Promise.all([
+        strapiFetch(
+          '/blog-articles?sort=publishedAt:desc&populate[heroImage]=true&populate[writer][populate][avatar]=true&populate[articleClassification]=true&populate[subcategory]=true',
+        ),
         strapiFetch("/brands?populate=*"),
         strapiFetch("/promo-sliders?populate[desktopImage]=true&populate[mobileImage]=true&sort=displayOrder:asc"),
+        strapiFetch(
+          "/article-classifications?pagination[pageSize]=100&sort=tag:asc&populate[articles]=true",
+        ).catch(() => ({ data: [] })),
     ]);
-    
-    // La respuesta de strapiFetch probablemente ya viene como data
+
     articulosRelacionados = relacionados?.data || relacionados || [];
     marcasData = Array.isArray(brandsResp?.data) ? brandsResp.data : [];
     promotionsData = Array.isArray(promotionsResp?.data) ? promotionsResp.data : [];
-    
+    classificationTagByArticleKey = buildClassificationTagByArticleKeyMap(
+      Array.isArray(clsRes?.data) ? clsRes.data : [],
+    );
 } catch (e) {
     console.error('Error cargando artículos:', e);
     articulosRelacionados = [];
@@ -128,7 +135,7 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
         <!-- Columna 1: Encabezado -->
         <div class="space-y-2 p-0 md:pt-16 md:pb-16 md:px-0 lg:pt-[100px] lg:pb-6 lg:px-6 xl:px-6 2xl:px-6">
             <h1 class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase "> SOMOS MEDRENT</h1>
-            <h2 class="font-normal md:text-[28px] text-[28px]  mb-6">
+            <h2 class="medrent-headline-section mb-6">
                 {dataHome.TituloContacto || 'La tecnología del futuro, hoy en tu consultorio gracias a MedRent. Financiamiento sin enganche.'}
             </h2>
             <p class="text-[#212121] md:text-[16px] text-[16px] text-[var(--color-green-dark)] mt-2 text-pretty">
@@ -217,7 +224,7 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
     <section class="defer-section py-6 px-0 lg:px-8 max-w-7xl mx-auto flex flex-col gap-6">
         <div class="text-center p-6">
             <h3 class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase text-center "> Especialistas en tecnología</h3>
-            <h2 class=" text-[24px] font-bold font-bold text-[var(--color-text-default)] tracking-tight">
+            <h2 class="medrent-headline-section text-center tracking-tight">
                 Acercamos tecnología que fortalece los estándares en salud
             </h2>
         </div>
@@ -340,7 +347,7 @@ const logoUrl = `${baseUrl}/favicon-512.png`;
     <section class="defer-section max-w-7xl mx-auto py-8 sliderArticulosRelacionados px-4 md:px-6">
         <span class="mb-2 uppercase font-kallisto text-[12px] font-medium leading-[20px] tracking-[0.1px] text-[var(--color-accent)]">BLOG</span>
         <h3 class="mb-6 font-lato medrent-headline-section">Explora artículos y noticias sobre tecnología médica, innovación y cuidado especializado para mejorar la salud y el bienestar.</h3>
-        <SlideArticles articulos={articulosRelacionados} />
+        <SlideArticles articulos={articulosRelacionados} tagByArticleKey={classificationTagByArticleKey} />
     </section>
 
 

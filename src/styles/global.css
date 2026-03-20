@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./newsletter-module.css";
 
 /* FONTS */
 @font-face {
@@ -300,6 +301,26 @@ div.citaBlogAuthor span {
   display: none;
 }
 
+/* Blog hero: categorías en carrusel horizontal en móvil (overflow-x, sin barra visible) */
+.blog-chips-scroll {
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.blog-chips-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Foco visible en la tira de chips (accesibilidad teclado) */
+.blog-chips-scroll:focus-within {
+  outline: 2px solid #006764;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
 /* Shared typography utilities for templates/pages */
 .type-eyebrow {
   font-size: var(--type-eyebrow);
@@ -365,28 +386,49 @@ div.citaBlogAuthor span {
 }
 
 /**
- * Section titles: xs = Medrent/headline/small, md+ = headline/medium
- * (Tailwind md = 768px; xl can share medium unless design adds display/large)
+ * Medrent/headline/large — mobile titulares (Figma)
+ * Shadow/Light/2xl
+ */
+.medrent-headline-large {
+  font-family: Lato, sans-serif;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 40px;
+  color: var(--color-text-default);
+  text-shadow:
+    0 20px 24px rgba(49, 48, 48, 0.1),
+    0 8px 10px rgba(49, 48, 48, 0.04);
+  align-self: stretch;
+}
+
+/**
+ * Section titles: mobile = headline/large, md+ = headline/medium (sin sombra)
  */
 .medrent-headline-section {
   font-family: Lato, sans-serif;
   font-style: normal;
   font-weight: 700;
   color: var(--color-text-default);
-  font-size: 24px;
-  line-height: 32px;
+  font-size: 32px;
+  line-height: 40px;
+  text-shadow:
+    0 20px 24px rgba(49, 48, 48, 0.1),
+    0 8px 10px rgba(49, 48, 48, 0.04);
+  align-self: stretch;
 }
 
 @media (min-width: 768px) {
   .medrent-headline-section {
     font-size: 28px;
     line-height: 36px;
+    text-shadow: none;
   }
 }
 
 /* Primary CTA — 14px bold, 14px vertical padding (aligned con “Ver más artículos”) */
 .medrent-btn-primary {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
