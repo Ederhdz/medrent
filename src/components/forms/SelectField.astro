@@ -16,7 +16,7 @@ const otherId = `${name}-other`;
     type="button"
     class="select-btn w-full border-2 border-[var(--color-green-dark)] rounded-[4px] px-4 py-3 text-left bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300 flex justify-between items-center"
   >
-    <span class="select-selected text-[var(--color-gray-dark)]">¿Cuál es tu especialidad médica?</span>
+    <span class="select-selected text-[var(--color-green-dark)]">¿Cuál es tu especialidad médica?</span>
     <svg class="w-4 h-4 text-[#5A3A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
     </svg>
@@ -50,7 +50,7 @@ const otherId = `${name}-other`;
     name="otras_especialidades"
     type="text"
     placeholder="Escribe aquí tu especialidad"
-    class="w-full border-2 border-[var(--color-green-dark)] rounded-[4px] px-4 py-3 placeholder:text-[var(--color-gray-dark)] text-[#212121] focus:outline-none bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300"
+    class="w-full border-2 border-[var(--color-green-dark)] rounded-[4px] px-4 py-3 placeholder:text-[var(--color-green-dark)] text-[#212121] focus:outline-none bg-white hover:bg-[var(--color-secondary-light)] focus:bg-[var(--color-secondary-light)] transition-colors duration-300"
   />
 </div>
 
@@ -89,8 +89,8 @@ const otherId = `${name}-other`;
         
         // Cambiar texto y color del span seleccionado
         selectedSpan.textContent = optionText;
-        selectedSpan.classList.remove("text-[var(--color-gray-dark)]");
-        selectedSpan.classList.add('text-[var(--color-green-dark)]');
+        selectedSpan.classList.remove("text-[var(--color-green-dark)]");
+        selectedSpan.classList.add('text-[#212121]');
         
         // Actualizar input oculto
         input.value = value;

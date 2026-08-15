@@ -35,7 +35,7 @@ const filterData = [...(data || [])]
             <li class="glide__slide">
               <a
                 href={item.url}
-                class="block rounded overflow-hidden"
+                class="banner-slide-link block rounded overflow-hidden"
                 target={item.url?.startsWith("http") ? "_self" : undefined}
                 draggable="false"
               >
@@ -43,7 +43,7 @@ const filterData = [...(data || [])]
                   <img
                     src={item.mobileImage.url}
                     alt={item.mobileImage.alternativeText || item.title || "Banner"}
-                    class="block w-full h-auto object-cover md:hidden"
+                    class="banner-slide-img banner-slide-img--mobile block w-full h-auto object-cover md:hidden"
                     loading={index === 0 ? "eager" : "lazy"}
                     fetchpriority={index === 0 ? "high" : undefined}
                     decoding="async"
@@ -57,7 +57,7 @@ const filterData = [...(data || [])]
                   <img
                     src={item.desktopImage.url}
                     alt={item.desktopImage.alternativeText || item.title || "Banner"}
-                    class="hidden w-full h-auto object-cover md:block"
+                    class="banner-slide-img banner-slide-img--desktop hidden w-full h-auto object-cover md:block"
                     loading={index === 0 ? "eager" : "lazy"}
                     fetchpriority={index === 0 ? "high" : undefined}
                     decoding="async"
@@ -129,5 +129,24 @@ const filterData = [...(data || [])]
 
   .banner-progress__fill.animate-fill {
     animation: bannerProgressFill 8000ms linear forwards;
+  }
+
+  /* Reserve space before images paint to cut CLS on the LCP hero */
+  .banner-slide-link {
+    display: block;
+    aspect-ratio: 390 / 583;
+    background: #edf2f0;
+  }
+
+  @media (min-width: 768px) {
+    .banner-slide-link {
+      aspect-ratio: 1600 / 483;
+    }
+  }
+
+  .banner-slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 </style>
