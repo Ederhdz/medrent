@@ -25,12 +25,6 @@ Contacto: contacto@medrent.mx · +52 55 5985 4347 · ${origin}/contacto
 
 ## Optional
 
-- [Inicio (markdown)](${origin}/index.md)
-- [Productos (markdown)](${origin}/productos.md)
-- [Especialidades (markdown)](${origin}/especialidades.md)
-- [Marcas (markdown)](${origin}/nuestras-marcas.md)
-- [Blog (markdown)](${origin}/blog.md)
-- [Contacto (markdown)](${origin}/contacto.md)
 - [Financiamiento](${origin}/financiamiento)
 - [Aviso de privacidad](${origin}/aviso-de-privacidad)
 - [Condiciones de uso](${origin}/condiciones-de-uso)

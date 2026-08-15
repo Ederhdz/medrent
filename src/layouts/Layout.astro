@@ -3,10 +3,9 @@ import "../styles/global.css";
 import "lenis/dist/lenis.css";
 import "@glidejs/glide/dist/css/glide.core.min.css";
 import { getSiteConfig } from "@server/siteConfig";
-import { getLocaleMeta, getLocalePrefix, stripLocalePrefix } from "@lib/locale";
+import { getLocaleMeta, getLocalePrefix } from "@lib/locale";
 import { SITE } from "@lib/site";
 import { absoluteOgImage, DEFAULT_OG_ALT, DEFAULT_OG_HEIGHT, DEFAULT_OG_WIDTH } from "@lib/og";
-import { markdownTwinForPath } from "@lib/llms";
 import OrganizationSchema from "@components/seo/OrganizationSchema.astro";
 import WebSiteSchema from "@components/seo/WebSiteSchema.astro";
 import Upperbar from "@components/layout/header/Upperbar.astro";
@@ -51,8 +50,6 @@ const resolvedTwitterTitle = twitterTitle ?? resolvedOgTitle;
 const resolvedTwitterDescription = twitterDescription ?? resolvedOgDescription;
 const resolvedTwitterImage = twitterImage ? absoluteOgImage(twitterImage, siteOrigin) : resolvedOgImage;
 const llmsTxtHref = new URL("/llms.txt", siteOrigin).toString();
-const markdownTwinPath = markdownTwinForPath(stripLocalePrefix(requestedPathname));
-const markdownTwinHref = markdownTwinPath ? new URL(markdownTwinPath, siteOrigin).toString() : undefined;
 const site = SITE;
 
 const isLocalEnv = import.meta.env.DEV;
@@ -80,9 +77,6 @@ const isLocalEnv = import.meta.env.DEV;
     ))}
     <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site).toString()} />
     <link rel="describedby" href={llmsTxtHref} />
-    {markdownTwinHref && (
-      <link rel="alternate" type="text/markdown" href={markdownTwinHref} />
-    )}
 
     <!-- 4. Favicons -->
     <link rel="icon" href={siteConfig?.faviconIco?.url} sizes="any">
