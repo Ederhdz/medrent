@@ -31,7 +31,7 @@ const filterData = [...(data || [])]
 
       <div class="glide__track" data-glide-el="track">
         <ul class="glide__slides">
-          {filterData.map((item) => (
+          {filterData.map((item, index) => (
             <li class="glide__slide">
               <a
                 href={item.url}
@@ -42,10 +42,13 @@ const filterData = [...(data || [])]
                 {item.mobileImage?.url && (
                   <img
                     src={item.mobileImage.url}
-                    alt={item.mobileImage.alternativeText || item.title || "itemción"}
+                    alt={item.mobileImage.alternativeText || item.title || "Banner"}
                     class="block w-full h-auto object-cover md:hidden"
-                    loading="lazy"
+                    loading={index === 0 ? "eager" : "lazy"}
+                    fetchpriority={index === 0 ? "high" : undefined}
                     decoding="async"
+                    width={item.mobileImage.width || 768}
+                    height={item.mobileImage.height || 432}
                     draggable="false"
                   />
                 )}
@@ -53,10 +56,13 @@ const filterData = [...(data || [])]
                 {item.desktopImage?.url && (
                   <img
                     src={item.desktopImage.url}
-                    alt={item.desktopImage.alternativeText || item.title || "itemción"}
+                    alt={item.desktopImage.alternativeText || item.title || "Banner"}
                     class="hidden w-full h-auto object-cover md:block"
-                    loading="lazy"
+                    loading={index === 0 ? "eager" : "lazy"}
+                    fetchpriority={index === 0 ? "high" : undefined}
                     decoding="async"
+                    width={item.desktopImage.width || 1440}
+                    height={item.desktopImage.height || 560}
                     draggable="false"
                   />
                 )}

@@ -135,23 +135,23 @@ window.addEventListener("load", function () {
 
     // Abrir popup desde sticky demo
     stickyDemoBtn.addEventListener('click', function(e) {
-        var popup = document.getElementById('event-popup-overlay');
+        var popup = document.getElementById('quote-popup-overlay');
         if (popup) popup.classList.remove('hidden');
     });
     
     // Abrir popup desde botón principal
     if (mainBtn) {
         mainBtn.addEventListener('click', function() {
-            var popup = document.getElementById('event-popup-overlay');
+            var popup = document.getElementById('quote-popup-overlay');
             if (popup) popup.classList.remove('hidden');
         });
     }
     
     // Cerrar popup
-    var closeBtn = document.getElementById('close-event-popup');
+    var closeBtn = document.getElementById('close-quote-popup');
     if (closeBtn) {
         closeBtn.addEventListener('click', function() {
-            var popup = document.getElementById('event-popup-overlay');
+            var popup = document.getElementById('quote-popup-overlay');
             if (popup) popup.classList.add('hidden');
         });
     }

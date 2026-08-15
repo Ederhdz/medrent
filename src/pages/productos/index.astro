@@ -49,7 +49,7 @@ const mediaUrl = (value: any) => {
 const fallbackHeroImageUrl = "/temp/HeroPLP.png";
 const heroImageDesktop = mediaUrl(heroPLP.heroImageDesktop) || fallbackHeroImageUrl;
 const heroImageMobile = mediaUrl(heroPLP.heroImageMobile) || heroImageDesktop;
-const heroImageUrl = new URL("/OG_Default_Medrent.jpeg", baseUrl).toString();
+const heroImageUrl = new URL("/og/og-default-medrent.png", baseUrl).toString();
 const totalProducts = products.length;
 const seoPlpTitle = "MEDRENT";
 const seoPlpDescription ="Tecnología médica confiable para diagnóstico, terapia y rehabilitación. MedRent acerca soluciones clínicas de marcas líderes para optimizar la práctica médica y mejorar resultados terapéuticos en todo México.";
@@ -59,7 +59,6 @@ const seoPlpDescription ="Tecnología médica confiable para diagnóstico, terap
   title="Catálogo de productos | Equipos médicos y consumibles | MedRent"
   description="Explora equipos por especialidad, aplicación y marca. Tecnología médica con soporte, instalación y opciones de financiamiento."
   keywords="catálogo equipo médico; productos médicos; consumibles; MedRent"
-  ogImage={heroImageUrl}
 >
   <Fragment slot="head">
     <BreadcrumbSchema

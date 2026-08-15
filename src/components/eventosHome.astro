@@ -32,7 +32,7 @@ const eventosHome = (dataEventos?.events || [])
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <!-- Columna izquierda: textos -->
             <div class="flex-1">
-                <h3 class="text-[var(--color-accent)] uppercase font-bold text-[14px] mb-2">Eventos</h3>
+                <p class="text-[var(--color-accent)] uppercase font-bold text-[14px] mb-2">Eventos</p>
                 <h2 class="font-normal text-[28px] md:text-[28px] text-[#261819]">
                     Nuestra tecnología, presente en los congresos líderes
                 </h2>
@@ -87,7 +87,7 @@ const eventosHome = (dataEventos?.events || [])
                   />
                 </div>
                 <div class="w-full md:w-1/2 text-[#212121] p-0 lg:px-16 flex flex-col gap-4">
-                  <h4 class="text-[var(--color-accent)] font-bold uppercase text-sm mb-1">{evento.eventType || ''}</h4>
+                  <p class="text-[var(--color-accent)] font-bold uppercase text-sm mb-1">{evento.eventType || ''}</p>
                   <h3 class="text-[28px] lg:text-[32px] font-bold mb-1 leading-10">{evento.title || ''}</h3>
                    <p class="text-[#261819] text-[16px] font-medium mb-4">{evento.subtitle || ''} </p>
                   <div class="flex items-center gap-2 mb-2 font-[16px]">
@@ -101,7 +101,7 @@ const eventosHome = (dataEventos?.events || [])
                         </svg>
                         <span class="text-[var(--color-text-default)]">
                           {evento.locationUrl ? (
-                            <a href={evento.locationUrl} target="_blank" class="hover:text-[var(--color-accent)] transition-colors">
+                            <a href={evento.locationUrl} target="_blank" rel="noopener noreferrer" class="hover:text-[var(--color-accent)] transition-colors">
                               {evento.locationLabel}
                             </a>
                           ) : (

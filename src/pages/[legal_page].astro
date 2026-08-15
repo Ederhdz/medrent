@@ -37,7 +37,7 @@ const localeMeta = getLocaleMeta(currentPathname);
 const canonicalUrl = new URL(currentPathname, Astro.site).toString();
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
-const heroImageUrl = imageHero?.url || logoUrl;
+const heroImageUrl = imageHero?.url || undefined;
 const isPrivacy = pageSlug === "aviso-de-privacidad";
 const schemaType = isPrivacy ? "PrivacyPolicy" : "TermsOfService";
 const homeUrl = new URL(localizePath("/", currentPathname), Astro.site).toString();

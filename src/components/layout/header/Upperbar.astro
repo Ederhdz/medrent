@@ -32,7 +32,7 @@ const getSocialIcon = (icon, scope = "") => {
             >
                 Servicio al cliente: <span class="underline">+{siteConfig?.whatsappNumber || ''}</span>
             </a> |
-            <a href="mailto:{siteConfig?.email || ''}" target="_blank" rel="noopener noreferrer" class="hover:text-white text-white text-[11px] tracking-[0.5px] font-light underline">
+            <a href={`mailto:${siteConfig?.email || ""}`} target="_blank" rel="noopener noreferrer" class="hover:text-white text-white text-[11px] tracking-[0.5px] font-light underline">
                 {siteConfig?.email || ""}
             </a>
             {siteConfig?.businessHours  && (

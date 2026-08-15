@@ -117,7 +117,6 @@ const fallbackHeroImageUrl = "/temp/HeroPLP.png";
 const heroImageDesktop = mediaUrl(heroPLP.heroImageDesktop) || fallbackHeroImageUrl;
 const heroImageMobile = mediaUrl(heroPLP.heroImageMobile) || heroImageDesktop;
 const heroImageUrl = new URL(heroImageDesktop, baseUrl).toString();
-const openGraphImageUrl = new URL("/OG_Default_Medrent.jpeg", baseUrl).toString();
 
 const brandUrl = `${baseUrl}/nuestras-marcas/${brand}`;
 const brandId = `${brandUrl}#brand`;
@@ -130,7 +129,6 @@ const seoText = "";
   title={pageTitle}
   description={pageDescription}
   keywords={pageKeywords}
-  ogImage={openGraphImageUrl}
 >
   <Fragment slot="head">
     <BreadcrumbSchema

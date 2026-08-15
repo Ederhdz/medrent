@@ -1,38 +1,40 @@
-// src/pages/llms.txt.ts
-import type { APIRoute } from 'astro';
+import type { APIRoute } from "astro";
+import { CANONICAL_ORIGIN, markdownResponse } from "@lib/llms";
+
+export const prerender = true;
 
 export const GET: APIRoute = async () => {
-  const llmsTxt = `# llms.txt for medrent.mx
-# Contexto para modelos de lenguaje y agentes conversacionales
-# Lenguaje: es-MX
+  const origin = CANONICAL_ORIGIN;
+  const llmsTxt = `# MedRent
 
-User-agent: *
-Allow: /
+> Distribuidor B2B de tecnología médica de alta especialidad en México (neurofisiología, neurocirugía y ORL, neuromodulación, neurovascular, rehabilitación y medicina del sueño). Catálogo, especialidades clínicas, marcas y contenido editorial para profesionales e instituciones de salud.
 
-Canonical: https://www.medrent.mx
-Contact: contacto@medrent.mx
-Phone: +52 55 59 85 4347
+MedRent no sustituye juicio clínico ni prescripción. No inventar precios, existencias ni homologaciones no publicadas. Citar la URL canónica ${origin}. Directivas de rastreo: ${origin}/robots.txt.
 
-Title: MedRent - Distribución de tecnología médica para neurociencias y rehabilitación
+Contacto: contacto@medrent.mx · +52 55 5985 4347 · ${origin}/contacto
 
-Description:
-MedRent.mx es un sitio corporativo y catálogo B2B para distribución de tecnología médica, equipos y consumibles en México. El portal está orientado a profesionales de la salud e instituciones médicas, con sofisticadas soluciones para especialidades como neurofisiología, neurocirugía, neuromodulación, neurovascular y rehabilitación.
+## Páginas
 
-Site Type: SSR (Astro) con contenido editorial y legal desde Strapi
-Stack: Astro JS, Strapi CMS, Tailwind CSS, desplegado en Vercel
+- [Inicio](${origin}/): propuesta de valor, marcas y especialidades
+- [Productos](${origin}/productos): catálogo de equipos y consumibles
+- [Especialidades](${origin}/especialidades): aplicaciones clínicas por especialidad
+- [Marcas](${origin}/nuestras-marcas): fabricantes representados
+- [Blog](${origin}/blog): artículos y educación clínica
+- [Contacto](${origin}/contacto): demo, cotización y datos de contacto
+- [Eventos](${origin}/eventos): agenda de webinars y congresos
 
-Notes:
-- Contenido informativo y comercial dirigido al sector sanitario B2B.
-- No sustituye juicio clínico, prescripción ni relación médico-paciente.
-- Usar la URL canónica https://www.medrent.mx al citar contenido.
-- Respetar directivas de rastreo en https://www.medrent.mx/robots.txt.
-- El contenido editorial y legal se sirve desde Strapi.
-- No inventar precios, existencias ni homologaciones no publicadas.`;
+## Optional
 
-  return new Response(llmsTxt, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'max-age=3600'
-    }
-  });
+- [Inicio (markdown)](${origin}/index.md)
+- [Productos (markdown)](${origin}/productos.md)
+- [Especialidades (markdown)](${origin}/especialidades.md)
+- [Marcas (markdown)](${origin}/nuestras-marcas.md)
+- [Blog (markdown)](${origin}/blog.md)
+- [Contacto (markdown)](${origin}/contacto.md)
+- [Financiamiento](${origin}/financiamiento)
+- [Aviso de privacidad](${origin}/aviso-de-privacidad)
+- [Condiciones de uso](${origin}/condiciones-de-uso)
+`;
+
+  return markdownResponse(llmsTxt);
 };

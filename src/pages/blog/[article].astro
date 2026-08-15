@@ -11,6 +11,7 @@ import FormField from "@components/forms/FormField.astro";
 import CheckboxField from "@components/forms/CheckboxField.astro";
 import SubmitButton from "@components/forms/SubmitButton.astro";
 import PhoneField from "@components/forms/PhoneField.astro";
+import { blogAuthorPath, blogAuthorSlug } from '@lib/blogAuthor';
 
 // import SlideArticulos from '@components/blog/SlideArticulos.astro';
 import { BlocksRenderer } from '@strapi/blocks-react-renderer';
@@ -93,8 +94,8 @@ const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.m
 const canonicalUrl = new URL(Astro.originPathname ?? Astro.url.pathname, Astro.site).toString();
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
-const heroImageUrl = article?.heroImage?.url || logoUrl;
-const authorSlug = article?.writer?.slug || 'team-medrent';
+const heroImageUrl = article?.heroImage?.url || undefined;
+const authorSlug = blogAuthorSlug(article?.writer?.slug);
 const personId = `${baseUrl}/blog/autor/${authorSlug}#person`;
 const postId = `${canonicalUrl}#post`;
 
@@ -391,7 +392,7 @@ if (writerSlugForCount) {
             </span>
             <div class="flex items-center gap-2 mt-1 flex-wrap">
               <a 
-                href={`/blog/autor/${article?.writer?.slug || 'team-medrent'}`}
+                href={blogAuthorPath(article?.writer?.slug)}
                 class="text-[#261819] font-lato text-base font-bold leading-6 tracking-[0.15px] hover:underline decoration-[var(--color-primary)]"
               >
                 {article?.writer?.fullName || 'Backoffice | Team Medrent'}
@@ -493,7 +494,7 @@ if (writerSlugForCount) {
                     <div class="mt-2 flex flex-wrap items-baseline gap-x-1 font-lato text-xs leading-4">
                       <span class="text-on-surface-variant">Por:</span>
                       <a
-                        href={`/blog/autor/${rel.writer?.slug}`}
+                        href={blogAuthorPath(rel.writer?.slug)}
                         class="text-[var(--color-primary)] underline decoration-[var(--color-primary)]"
                       >
                         {rel.writer?.fullName || "Medrent"}

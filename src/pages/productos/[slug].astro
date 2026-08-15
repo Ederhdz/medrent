@@ -21,10 +21,9 @@ import PromotionSlider from "@components/sections/PromotionSlider.astro";
 import { getHomeEspecialidadesForSlider } from "@lib/homeEspecialidades";
 import { isUsableBrandSlug } from "@lib/brandSlug";
 import ProductVariants from '@components/product/ProductVariants.astro';
-import { getSiteConfig } from "@server/siteConfig";
 import { getLocaleMeta, localizePath } from "@lib/locale";
+import { absoluteOgImage } from "@lib/og";
 import TestimonialsSlider from '@components/sections/TestimonialsSlider.astro';
-const siteConfig = await getSiteConfig();
 
 export async function getStaticPaths() {
   const products = await getProducts();
@@ -54,11 +53,15 @@ const currentPathname = Astro.originPathname ?? Astro.url.pathname;
 const localeMeta = getLocaleMeta(currentPathname);
 const canonicalUrl = new URL(currentPathname, Astro.site).toString();
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
-const logoUrl = siteConfig?.favicon512x512?.url;
 const heroImageUrl =
   Array.isArray(product.gallery) && product.gallery.length > 0
     ? product.gallery[0]
-    : logoUrl;
+    : undefined;
+const resolvedProductImage = absoluteOgImage(heroImageUrl, baseUrl);
+const pdpTitle = `${product.name} | Equipo médico especializado | MedRent`;
+const pdpDescription =
+  (typeof product.description === "string" && product.description.trim()) ||
+  `${product.name} | Equipo médico especializado de MedRent. Referencia ${slug}.`;
 
 const productId = `${baseUrl}/entity/product/${product.slug}#id`;
 const offerId = `${baseUrl}/entity/offer/${product.slug}#offer`;
@@ -86,10 +89,8 @@ const pdpGraph: any[] = [
     "@type": "WebPage",
     "@id": `${canonicalUrl}#webpage`,
     url: canonicalUrl,
-    name: `${product.name} | Equipo médico especializado | MedRent`,
-    description:
-      product.description ||
-      `${product.name} | Equipo médico especializado de MedRent.`,
+    name: pdpTitle,
+    description: pdpDescription,
     isPartOf: { "@id": `${baseUrl}/#website` },
     about: { "@id": `${baseUrl}/#organization` },
     inLanguage: localeMeta.htmlLang,
@@ -97,15 +98,15 @@ const pdpGraph: any[] = [
     mainEntity: { "@id": productId },
     primaryImageOfPage: {
       "@type": "ImageObject",
-      url: heroImageUrl,
+      url: resolvedProductImage,
     },
   },
   {
     "@type": ["Product", "MedicalDevice"],
     "@id": productId,
     name: product.name,
-    description: product.description,
-    image: heroImageUrl ? [heroImageUrl] : undefined,
+    description: pdpDescription,
+    image: [resolvedProductImage],
     category: ["Medical Device"],
     brand:
       product.brand && isUsableBrandSlug(product.brand.slug)
@@ -142,8 +143,8 @@ const pdpJsonLd = {
 
 ---
 <Layout
-  title={`${product.name} | Equipo médico especializado | MedRent`}
-  description={product.description || `${product.name} | Equipo médico especializado de MedRent.`}
+  title={pdpTitle}
+  description={pdpDescription}
   keywords={`${product.name}; equipo médico; MedRent`}
   ogType="product"
   pageType="product"

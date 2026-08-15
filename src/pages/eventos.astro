@@ -126,7 +126,7 @@ const baseUrl = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.m
 const canonicalUrl = new URL(Astro.originPathname ?? Astro.url.pathname, Astro.site).toString();
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
-const heroImageUrl = data?.heroImage?.url ?? logoUrl;
+const heroImageUrl = data?.heroImage?.url || undefined;
 
 ---
 
@@ -255,8 +255,8 @@ const heroImageUrl = data?.heroImage?.url ?? logoUrl;
                                 
                                 <!-- Agrupa los botones aquí -->
                                 <div class="flex gap-8">
-                                    <button id="prev-month-btn" type="button" class="text-gray-400 color-[var(--color-gray-dark)] hover:text-gray-600">&lt;</button>
-                                    <button id="next-month-btn" type="button" class="text-gray-400 color-[var(--color-gray-dark)] hover:text-gray-600">&gt;</button>
+                                    <button id="prev-month-btn" type="button" aria-label="Mes anterior" class="text-gray-400 color-[var(--color-gray-dark)] hover:text-gray-600">&lt;</button>
+                                    <button id="next-month-btn" type="button" aria-label="Mes siguiente" class="text-gray-400 color-[var(--color-gray-dark)] hover:text-gray-600">&gt;</button>
                                 </div>
                             </div>
                             <div id="calendario-dias" class="mt-4">
@@ -500,7 +500,7 @@ const heroImageUrl = data?.heroImage?.url ?? logoUrl;
                                                                                     </svg>
                                                                                     <span class="text-[#261819] text-[16px] font-normal">
                                                                                         {evento.locationUrl ? (
-                                                                                            <a href={evento.locationUrl} target="_blank" class="hover:text-[var(--color-accent)] transition-colors">
+                                                                                            <a href={evento.locationUrl} target="_blank" rel="noopener noreferrer" class="hover:text-[var(--color-accent)] transition-colors">
                                                                                                 {evento.locationLabel}
                                                                                             </a>
                                                                                         ) : (

@@ -105,7 +105,6 @@ const logoUrl = siteConfig?.favicon512x512?.url;
   title="MedRent México | Tecnología médica y financiamiento sin enganche"
   description="Equipos médicos para neurodiagnóstico, neuromodulación, rehabilitación y ultrasonido con soporte y asesoría. Agenda tu demo."
   keywords="equipo médico México; financiamiento equipo médico; neurodiagnóstico; neuromodulación; rehabilitación; ultrasonido"
-  ogImage={logoUrl}
 >
 
     <Fragment slot="head">
@@ -149,7 +148,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
     <!--  Sección mosaico de categorías-->
     <section class="max-w-7xl mx-auto py-6 px-4 md:px-6 lg:px-8">
         <div class="text-center p-6 w-full"> 
-            <h3 class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase text-center">ESPECIALISTAS EN TECNOLOGÍA </h3> 
+            <p class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase text-center">ESPECIALISTAS EN TECNOLOGÍA </p> 
             <h2 class="text-[24px] font-bold text-[var(--color-text-default)] tracking-tight">Acercamos tecnología que fortalece los estándares en salud.</h2>
         </div>
         <div class="w-full flex gap-6 justify-center flex-wrap">
@@ -267,7 +266,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                         href={`https://wa.me/${siteConfig?.whatsappNumber}`} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        class="text-[var(--color-secondary)] underline"
+                        class="text-white underline"
                     >
                         {(() => {
                             const num = siteConfig?.whatsappNumber;
@@ -287,7 +286,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                         href={`https://mail.google.com/mail/?extsrc=mailto&url=mailto%3A${siteConfig?.email || ''}`} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        class="text-[var(--color-secondary)] underline"
+                        class="text-white underline"
                     >
                         {siteConfig?.email}
                     </a>

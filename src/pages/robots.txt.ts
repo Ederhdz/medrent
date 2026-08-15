@@ -10,7 +10,7 @@
  */
 
 import type { APIRoute } from 'astro';
-import { ROBOTS_CONFIG, SITE_INFO, STATIC_ROUTES } from '@lib/siteMetadata';
+import { ROBOTS_CONFIG, SITE_INFO, SPECIALTIES } from '@lib/siteMetadata';
 import { getCategories } from '@server/api/categories';
 import { getProducts } from '@server/api/products';
 import { getArticles as getBlogPosts } from '@server/api/articles';
@@ -35,13 +35,14 @@ export const GET: APIRoute = async () => {
     .map((p: any) => `/productos/${p.slug}`);
   
   const blogPaths = blogPosts
-    .filter((b: any) => b?.slug)
-    .map((b: any) => `/blog/${b.slug}`);
+    .map((b: any) => b?.slug || b?.attributes?.slug)
+    .filter((slug: unknown): slug is string => typeof slug === "string" && slug.trim().length > 0 && slug !== "undefined")
+    .map((slug: string) => `/blog/${slug}`);
 
   // Si no hay datos dinámicos, usar defaults de STATIC_ROUTES
   const finalSpecialtyPaths = specialtyPaths.length > 0 
     ? specialtyPaths 
-    : Object.values(STATIC_ROUTES).filter(route => route.includes('/especialidades/'));
+    : Object.values(SPECIALTIES).map((specialty) => `/especialidades/${specialty.slug}`);
 
   // ============================================
   // Construcción de robots.txt

@@ -18,6 +18,7 @@ import {
   getArticleClassificationIdString,
   getClassificationTag,
 } from '@lib/blog/classification';
+import { blogAuthorPath } from '@lib/blogAuthor';
 
 let articulosActivos: any[] = [];
 let clasificacionesCms: any[] = [];
@@ -104,7 +105,6 @@ const logoUrl = siteConfig?.favicon512x512?.url;
   title="Blog MedRent | Innovación, neurodiagnóstico y tecnología médica"
   description="Artículos y tendencias sobre tecnología médica, neurodiagnóstico y práctica clínica para especialistas."
   keywords="blog MedRent; tecnología médica; neurodiagnóstico; innovación médica"
-  ogImage={logoUrl}
 >
   <!-- <Fragment slot="metas"> -->
     <!-- <title>Blog | Medrent – Tecnología médica</title>
@@ -509,7 +509,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                   <div class="flex items-end justify-between mt-auto">
                     <span class="text-xs text-on-surface-variant font-lato w-full flex">
                         Por:&nbsp;
-                        <a href={`/blog/autor/${articulosActivos[0]?.writer?.slug}`} 
+                        <a href={blogAuthorPath(articulosActivos[0]?.writer?.slug)} 
                           class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato">
                             {articulosActivos[0]?.writer?.fullName}
                         </a>&nbsp;• {formatDate(articulosActivos[0]?.createdAt)}
@@ -536,7 +536,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                     <div class="flex items-end justify-between mt-auto">
                       <span class="text-xs text-on-surface-variant font-lato w-full flex">
                         Por:&nbsp;
-                        <a href={`/blog/autor/${articulo?.writer?.slug}`} 
+                        <a href={blogAuthorPath(articulo?.writer?.slug)} 
                         class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato ">
                           {articulo?.writer?.fullName}
                         </a>

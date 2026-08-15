@@ -139,15 +139,10 @@ export const ROBOTS_CONFIG = {
 
   // Rutas permitidas (recursos Astro)
   allowedAssets: [
-    '/_astro/',
-    '/assets/',
-    '/images/',
-    '/css/',
-    '/js/',
-    '/uploads/',
     '/favicon.ico',
     '/scripts/',
-    '/fonts/'
+    '/fonts/',
+    '/og/',
   ],
   // Configuración por bot
   bots: {

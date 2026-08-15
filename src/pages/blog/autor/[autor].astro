@@ -10,6 +10,7 @@ import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import { getSiteConfig } from "@server/siteConfig";
 const siteConfig = await getSiteConfig();
 import { buildClassificationTagByArticleKeyMap } from '@lib/blog/classification';
+import { blogAuthorPath } from '@lib/blogAuthor';
 import {
   type NormalizedBlogArticle,
   type NormalizedWriter,
@@ -322,7 +323,7 @@ const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 /** Misma ruta que `Layout.astro` (origen actual del documento; evita URL absoluta rota en preview). */
 const heroBrandLogoSrc = siteConfig?.favicon512x512?.url;
 const logoUrl = `${baseUrl}${heroBrandLogoSrc}`;
-const authorHeroImageUrl = authorPortraitUrl || logoUrl;
+const authorHeroImageUrl = authorPortraitUrl || undefined;
 const authorSlug = author.slug;
 const personId = `${baseUrl}/blog/autor/${authorSlug}#person`;
 const postlistId = `${canonicalUrl}#postlist`;
@@ -641,7 +642,7 @@ try {
         </div>
         <ul class="mt-8 flex list-none flex-wrap justify-center gap-x-10 gap-y-10 p-0 sm:justify-start">
           {otherAuthorsSlice.map((oa) => {
-            const href = `/blog/autor/${oa.slug}`;
+            const href = blogAuthorPath(oa.slug);
             const img = oa.heroImage?.url;
             const label = oa.fullName || oa.slug;
             const initials = label
@@ -719,7 +720,7 @@ try {
         <div class="glider-track flex gap-8 scroll-smooth snap-x snap-mandatory overflow-hidden lg:flex-wrap justify-flex-start items-start self-stretch py-6" id="gliderTrack">
           {todosEscritores && todosEscritores.map((writer: any, index: number) => (
             <a 
-              href={`/blog/autor/${writer.slug}`} 
+              href={blogAuthorPath(writer.slug)} 
               class="glider-slide flex-shrink-0 w-[155px] snap-start lg:w-auto"
               data-slide-index={index}
             >  
