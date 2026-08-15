@@ -23,6 +23,7 @@ import { isUsableBrandSlug } from "@lib/brandSlug";
 import ProductVariants from '@components/product/ProductVariants.astro';
 import { getLocaleMeta, localizePath } from "@lib/locale";
 import { absoluteOgImage } from "@lib/og";
+import { buildImageUrl, toSameOriginMediaUrl, proxyMediaInData } from "@lib/utils.js";
 import TestimonialsSlider from '@components/sections/TestimonialsSlider.astro';
 
 export async function getStaticPaths() {
@@ -58,6 +59,7 @@ const heroImageUrl =
     ? product.gallery[0]
     : undefined;
 const resolvedProductImage = absoluteOgImage(heroImageUrl, baseUrl);
+const lcpImageUrl = heroImageUrl ? toSameOriginMediaUrl(heroImageUrl) : undefined;
 const pdpTitle = `${product.name} | Equipo médico especializado | MedRent`;
 const pdpDescription =
   (typeof product.description === "string" && product.description.trim()) ||
@@ -151,6 +153,9 @@ const pdpJsonLd = {
   ogImage={heroImageUrl}
 >
   <Fragment slot="head">
+    {lcpImageUrl && (
+      <link rel="preload" as="image" href={lcpImageUrl} fetchpriority="high" />
+    )}
     <BreadcrumbSchema
       items={[
         { name: 'Inicio', url: homeUrl },
@@ -170,8 +175,8 @@ const pdpJsonLd = {
     ]}
   />
   
-  <!-- Contenido Principal del Producto -->
-  <main class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Contenido Principal del Producto (article: Layout already provides <main>) -->
+  <article class="max-w-7xl mx-auto px-4 py-8">
     <section class="max-w-7xl mx-auto py-6">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
         <!-- =========================
@@ -186,7 +191,7 @@ const pdpJsonLd = {
                 <span class="badge-launch-mobile-tail" aria-hidden="true"></span>
               </div>
             )}
-            <div id="glider-slideimagenesProducto" class="w-full px-0 mobile-gallery-slider overflow-x-auto scroll-smooth" data-lenis-prevent data-gallery-images={JSON.stringify(product.gallery)}>
+            <div id="glider-slideimagenesProducto" class="w-full px-0 mobile-gallery-slider overflow-x-auto scroll-smooth" data-lenis-prevent data-gallery-images={JSON.stringify(proxyMediaInData(product.gallery))}>
               <ul class="flex snap-x snap-mandatory">
                 {product.gallery && product.gallery.map((item, index) => {
                   const isImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(item);
@@ -239,10 +244,11 @@ const pdpJsonLd = {
               type="button"
               data-zoom-button
               aria-pressed="false"
+              aria-label="Activar zoom"
               title="Activar zoom"
               class="w-10 h-10 flex items-center justify-center rounded cursor-pointer border border-[#212121] bg-transparent text-[#212121] transition-colors duration-200"
             >
-                <svg class="zoom-icon-inactive w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="zoom-icon-inactive w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M14.9999 9.9999H11.9999V6.9999C11.9999 6.73469 11.8945 6.48033 11.707 6.2928C11.5195 6.10526 11.2651 5.9999 10.9999 5.9999C10.7347 5.9999 10.4803 6.10526 10.2928 6.2928C10.1053 6.48033 9.9999 6.73469 9.9999 6.9999V9.9999H6.9999C6.73469 9.9999 6.48033 10.1053 6.2928 10.2928C6.10526 10.4803 5.9999 10.7347 5.9999 10.9999C5.9999 11.2651 6.10526 11.5195 6.2928 11.707C6.48033 11.8945 6.73469 11.9999 6.9999 11.9999H9.9999V14.9999C9.9999 15.2651 10.1053 15.5195 10.2928 15.707C10.4803 15.8945 10.7347 15.9999 10.9999 15.9999C11.2651 15.9999 11.5195 15.8945 11.707 15.707C11.8945 15.5195 11.9999 15.2651 11.9999 14.9999V11.9999H14.9999C15.2651 11.9999 15.5195 11.8945 15.707 11.707C15.8945 11.5195 15.9999 11.2651 15.9999 10.9999C15.9999 10.7347 15.8945 10.4803 15.707 10.2928C15.5195 10.1053 15.2651 9.9999 14.9999 9.9999ZM21.7099 20.2899L17.9999 16.6099C19.44 14.8143 20.1374 12.5352 19.9487 10.2412C19.76 7.94721 18.6996 5.81269 16.9854 4.27655C15.2713 2.74041 13.0337 1.91941 10.7328 1.98237C8.43194 2.04534 6.24263 2.98747 4.61505 4.61505C2.98747 6.24263 2.04534 8.43194 1.98237 10.7328C1.91941 13.0337 2.74041 15.2713 4.27655 16.9854C5.81269 18.6996 7.94721 19.76 10.2412 19.9487C12.5352 20.1374 14.8143 19.44 16.6099 17.9999L20.2899 21.6799C20.3829 21.7736 20.4935 21.848 20.6153 21.8988C20.7372 21.9496 20.8679 21.9757 20.9999 21.9757C21.1319 21.9757 21.2626 21.9496 21.3845 21.8988C21.5063 21.848 21.6169 21.7736 21.7099 21.6799C21.8901 21.4934 21.9909 21.2442 21.9909 20.9849C21.9909 20.7256 21.8901 20.4764 21.7099 20.2899ZM10.9999 17.9999C9.61544 17.9999 8.26206 17.5894 7.11091 16.8202C5.95977 16.051 5.06256 14.9578 4.53275 13.6787C4.00293 12.3996 3.86431 10.9921 4.13441 9.63427C4.4045 8.27641 5.07119 7.02912 6.05016 6.05016C7.02912 5.07119 8.27641 4.4045 9.63427 4.13441C10.9921 3.86431 12.3996 4.00293 13.6787 4.53275C14.9578 5.06256 16.051 5.95977 16.8202 7.11091C17.5894 8.26206 17.9999 9.61544 17.9999 10.9999C17.9999 12.8564 17.2624 14.6369 15.9497 15.9497C14.6369 17.2624 12.8564 17.9999 10.9999 17.9999Z" fill="#212121"/>
                 </svg>
                 <svg class="zoom-icon-active hidden w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -253,22 +259,22 @@ const pdpJsonLd = {
         </div>
 
         <!-- Galería de Imágenes (solo tablet/desktop) -->
-        <div id="galleryProducto" class="flex flex-col lg:flex-row-reverse gap-4 lg:sticky lg:top-32 self-start items-center lg:items-start hidden sm:flex mt-8">
+        <div id="galleryProducto" class="flex w-full flex-col lg:flex-row-reverse gap-4 lg:sticky lg:top-32 self-start items-stretch lg:items-start hidden sm:flex mt-8">
 
           <!-- Imagen Principal -->  
-          <div class="flex-1 aspect-squar bg-white rounded-lg overflow-hidden relative">
+          <div class="w-full flex-1 aspect-square bg-white rounded-lg overflow-hidden relative">
             {product.isNew && (
               <div class="absolute top-3 left-3 bg-[var(--color-primary)] text-white text-[11px] font-semibold px-3 py-1 rounded-[2px] z-20 w-fit">
                 LANZAMIENTO
                 <span class="absolute -bottom-2 right-2 w-0 h-0 border-l-[8px] border-l-transparent border-t-[8px] border-t-[var(--color-primary)]"></span>
               </div>    
             )}
-            <div id="main-media-container" style="min-height: 400px; justify-content: center; display: flex; align-items: center; margin-bottom: 16px;">
+            <div id="main-media-container" class="flex w-full h-full min-h-0 items-center justify-center mb-4 lg:min-h-[400px]">
               {product.gallery.length > 0 ? (
                 <ImageResponsive
                   src={product.gallery[0]}
                   alt={product.name}
-                  class="w-full h-full object-contain max-h-[600px] rounded-lg"
+                  class="w-full h-full object-contain rounded-lg lg:max-h-[600px]"
                   id="main-image-desktop"
                   loading="eager"
                   decoding="async"
@@ -289,10 +295,11 @@ const pdpJsonLd = {
                   type="button"
                   data-zoom-button
                   aria-pressed="false"
+                  aria-label="Activar zoom"
                   title="Activar zoom"
                   class="w-10 h-10 flex absolute z-10 items-center justify-center rounded cursor-pointer border border-[#212121] bg-transparent text-[#212121] transition-colors duration-200"
                 >
-                  <svg class="zoom-icon-inactive w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg class="zoom-icon-inactive w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                       <path d="M14.9999 9.9999H11.9999V6.9999C11.9999 6.73469 11.8945 6.48033 11.707 6.2928C11.5195 6.10526 11.2651 5.9999 10.9999 5.9999C10.7347 5.9999 10.4803 6.10526 10.2928 6.2928C10.1053 6.48033 9.9999 6.73469 9.9999 6.9999V9.9999H6.9999C6.73469 9.9999 6.48033 10.1053 6.2928 10.2928C6.10526 10.4803 5.9999 10.7347 5.9999 10.9999C5.9999 11.2651 6.10526 11.5195 6.2928 11.707C6.48033 11.8945 6.73469 11.9999 6.9999 11.9999H9.9999V14.9999C9.9999 15.2651 10.1053 15.5195 10.2928 15.707C10.4803 15.8945 10.7347 15.9999 10.9999 15.9999C11.2651 15.9999 11.5195 15.8945 11.707 15.707C11.8945 15.5195 11.9999 15.2651 11.9999 14.9999V11.9999H14.9999C15.2651 11.9999 15.5195 11.8945 15.707 11.707C15.8945 11.5195 15.9999 11.2651 15.9999 10.9999C15.9999 10.7347 15.8945 10.4803 15.707 10.2928C15.5195 10.1053 15.2651 9.9999 14.9999 9.9999ZM21.7099 20.2899L17.9999 16.6099C19.44 14.8143 20.1374 12.5352 19.9487 10.2412C19.76 7.94721 18.6996 5.81269 16.9854 4.27655C15.2713 2.74041 13.0337 1.91941 10.7328 1.98237C8.43194 2.04534 6.24263 2.98747 4.61505 4.61505C2.98747 6.24263 2.04534 8.43194 1.98237 10.7328C1.91941 13.0337 2.74041 15.2713 4.27655 16.9854C5.81269 18.6996 7.94721 19.76 10.2412 19.9487C12.5352 20.1374 14.8143 19.44 16.6099 17.9999L20.2899 21.6799C20.3829 21.7736 20.4935 21.848 20.6153 21.8988C20.7372 21.9496 20.8679 21.9757 20.9999 21.9757C21.1319 21.9757 21.2626 21.9496 21.3845 21.8988C21.5063 21.848 21.6169 21.7736 21.7099 21.6799C21.8901 21.4934 21.9909 21.2442 21.9909 20.9849C21.9909 20.7256 21.8901 20.4764 21.7099 20.2899ZM10.9999 17.9999C9.61544 17.9999 8.26206 17.5894 7.11091 16.8202C5.95977 16.051 5.06256 14.9578 4.53275 13.6787C4.00293 12.3996 3.86431 10.9921 4.13441 9.63427C4.4045 8.27641 5.07119 7.02912 6.05016 6.05016C7.02912 5.07119 8.27641 4.4045 9.63427 4.13441C10.9921 3.86431 12.3996 4.00293 13.6787 4.53275C14.9578 5.06256 16.051 5.95977 16.8202 7.11091C17.5894 8.26206 17.9999 9.61544 17.9999 10.9999C17.9999 12.8564 17.2624 14.6369 15.9497 15.9497C14.6369 17.2624 12.8564 17.9999 10.9999 17.9999Z" fill="#212121"/>
                   </svg>
                   <svg class="zoom-icon-active hidden w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -306,26 +313,30 @@ const pdpJsonLd = {
           <!-- Miniaturas debajo de la imagen principal (tablet/desktop: 6 máx, overlay en la última) -->
           {product?.gallery && product.gallery.length > 1 && (
             <div class="relative w-full lg:w-24 flex-shrink-0 hidden sm:block py-6 lg:py-0">
-                <div class="flex flex-row lg:flex-col gap-3 w-full lg:w-24 max-h-[420px] lg:max-h-fit overflow-y-auto justify-center" id="thumbnails-scroll" style="scrollbar-width: none; -ms-overflow-style: none; justify-content: center;">
+                <div class="flex flex-row lg:flex-col gap-3 w-full lg:w-24 max-h-none lg:max-h-fit overflow-x-auto lg:overflow-y-auto justify-stretch lg:justify-start" id="thumbnails-scroll" style="scrollbar-width: none; -ms-overflow-style: none;">
                 <style>
                     #thumbnails-scroll::-webkit-scrollbar { display: none; }
                 </style>
                 {(() => {
                   const total = product.gallery.length;
                   const maxThumbnails = 6;
+                  const thumbShellClass =
+                    "relative flex-1 aspect-square min-w-0 max-w-none lg:flex-none lg:w-20 lg:h-20 lg:max-w-none";
+                  const thumbBtnClass =
+                    "thumb-btn w-full h-full aspect-square bg-white rounded overflow-hidden transition-colors cursor-pointer border border-[var(--color-secondary-light)] hover:border-[var(--color-primary)] lg:w-20 lg:h-20";
                     return product.gallery.slice(0, maxThumbnails).map((imagen, index) => {
                       const isImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(imagen);
                       const isVideo = /\.(mp4|webm|ogg)$/i.test(imagen);
                       // Si es la última visible y hay más, muestra el overlay '+N'
                       if (index === maxThumbnails - 1 && total > maxThumbnails) {
                       return (
-                        <div class="relative w-20 h-20 btnVerPopUpImagenes" data-imagenes={JSON.stringify(product.gallery)}>
+                        <div class={`${thumbShellClass} btnVerPopUpImagenes`} data-imagenes={JSON.stringify(proxyMediaInData(product.gallery))}>
                           <button
-                            class="w-20 h-20 bg-white rounded overflow-hidden transition-colors cursor-pointer border border-[var(--color-secondary-light)] hover:border-[var(--color-primary)]"
-                            style="min-height:80px; max-height:80px;"
+                            class={thumbBtnClass}
                             data-gallery-popup="true"
                             data-start-index={index}
                             type="button"
+                            aria-label={`+${total - maxThumbnails + 1}: ver ${total - maxThumbnails + 1} imágenes más de la galería`}
                           >
                             {isImage ? (
                               <ImageResponsive
@@ -334,12 +345,12 @@ const pdpJsonLd = {
                                 class="w-full h-full object-cover opacity-20"
                                 loading="lazy"
                                 decoding="async"
-                                sizes="80px"
+                                sizes="(min-width: 1024px) 80px, 18vw"
                               />
                             ) : isVideo ? (
                               <video src={imagen} class="w-full h-full object-cover opacity-20" />
                             ) : null}
-                            <div class="absolute inset-0 bg-opacity-60 flex items-center justify-center text-[var(--color-primary)] text-lg font-bold rounded">
+                            <div class="absolute inset-0 bg-opacity-60 flex items-center justify-center text-[var(--color-primary)] text-lg font-bold rounded" aria-hidden="true">
                               +{total - maxThumbnails + 1}
                             </div>
                           </button>
@@ -347,14 +358,14 @@ const pdpJsonLd = {
                       );
                     }
                       return (
-                        <div class="relative w-20 h-20 " data-gallery={JSON.stringify(product.gallery)}>
+                        <div class={thumbShellClass} data-gallery={JSON.stringify(proxyMediaInData(product.gallery))}>
                           <button
-                            class="w-20 h-20 bg-white rounded overflow-hidden transition-colors cursor-pointer border border-[var(--color-secondary-light)] hover:border-[var(--color-primary)]"
-                            style="min-height:80px; max-height:80px;"
+                            class={thumbBtnClass}
                             data-thumbnail={imagen}
                             data-type={isImage ? 'image' : isVideo ? 'video' : 'other'}
                             data-index={index}
                             type="button"
+                            aria-label={`Ver miniatura ${index + 1} de ${product.name}`}
                           >
                             {isImage ? (
                               <ImageResponsive
@@ -363,7 +374,7 @@ const pdpJsonLd = {
                                 class="w-full h-full object-cover"
                                 loading="lazy"
                                 decoding="async"
-                                sizes="80px"
+                                sizes="(min-width: 1024px) 80px, 18vw"
                               />
                             ) : isVideo ? (
                               <video src={imagen} class="w-full h-full object-cover" />
@@ -442,17 +453,21 @@ const pdpJsonLd = {
                     {benefit.icon?.url && (
                     <div class="flex-shrink-0  rounded-full bg-[#E3FFFC] p-4">
                         <img
-                        src={benefit.icon.url}
+                        src={buildImageUrl(benefit.icon.url)}
                         alt={benefit.benefit}
                         class="w-6 h-6 object-contain"
+                        width="24"
+                        height="24"
+                        loading="lazy"
+                        decoding="async"
                         />
                     </div>
                     )}
                     {/* Contenido */}
                     <div class="flex-1">
-                    <h3 class="font-lato text-[16px] font-bold text-[var(--color-primary)]">
+                    <h2 class="font-lato text-[16px] font-bold text-[var(--color-primary)]">
                       {benefit.benefit}
-                    </h3>
+                    </h2>
                     <p class="font-lato text-[16px] font-normal text-[var(--color-green-dark)]">
                       {benefit.description}
                     </p>
@@ -467,9 +482,9 @@ const pdpJsonLd = {
           <!-- Preguntas Frecuentes -->
           {product?.faqItem && product.faqItem.length > 0 && (
             <div id="preguntas-frecuentes" class="pt-6">
-              <h3 class="pdp-section-title">
+              <h2 class="pdp-section-title">
                 Preguntas frecuentes
-              </h3>
+              </h2>
             
               <div class="space-y-4" x-data="{ openItems: [] }">
                 {product.faqItem.map((faq, index) => {
@@ -483,12 +498,12 @@ const pdpJsonLd = {
                                   class="cursor-pointer flex-1" 
                                   x-on:click={`openItems.includes(${itemIndex}) ? openItems = openItems.filter(item => item !== ${itemIndex}) : openItems.push(${itemIndex})`}
                               >
-                                  <h4 style="font-family: Lato; font-size: 16px; font-style: normal; color: #261819;" class="cursor-pointer font-bold ">
+                                  <h3 style="font-family: Lato; font-size: 16px; font-style: normal; color: #261819;" class="cursor-pointer font-bold ">
                                       {itemIndex}. {faq.question}
-                                  </h4>
+                                  </h3>
                               </div>
                               <button
-                                  aria-label="Abrir" 
+                                  aria-label={`Abrir respuesta: ${faq.question}`} 
                                   x-on:click.stop={`openItems.includes(${itemIndex}) ? openItems = openItems.filter(item => item !== ${itemIndex}) : openItems.push(${itemIndex})`}
                                   :class={`openItems.includes(${itemIndex}) ? 'bg-transparent text-[var(--color-primary)]' : 'bg-transparent text-[var(--color-primary)]'`}
                                   class="rounded px-3 py-2 flex items-center justify-center cursor-pointer transition-all duration-300 border-none flex-shrink-0"
@@ -597,9 +612,11 @@ const pdpJsonLd = {
                             <div class="w-full md:w-[160px] md:flex-shrink-0 flex items-center justify-center relative z-10">
                               <div class="w-full aspect-square md:aspect-[4/3]">
                                 <img
-                                  src={product.gallery[0]}
+                                  src={toSameOriginMediaUrl(product.gallery[0])}
                                   alt={product.name}
                                   class="w-full h-full object-contain rounded-[16px] bg-white"
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                               </div>
                             </div>
@@ -685,21 +702,20 @@ const pdpJsonLd = {
 
       
     </section>
+  </article>
 
-  </main>
-      
-  <!-- Newsletter -->
-  <Newsletter />
-
-  <!-- Testimonios -->
+  <!-- Testimonios (fuera del max-w-7xl; antes del newsletter) -->
   <TestimonialsSlider productId={product.id} />
 
-  </main>
+  <!-- Newsletter: fondo full-bleed pegado al footer (como productivo) -->
+  <Newsletter />
 
   <script is:inline define:vars={{ product, item_variant  }}>
-    /* Event: view_item_list */
+    /* Event: view_item — only when GTM helper is present (off in DEV) */
     setTimeout(() => {
-      window.view_item(product, item_variant)
+      if (typeof window.view_item === "function") {
+        window.view_item(product, item_variant);
+      }
     }, 2000);
   </script>
 
@@ -959,16 +975,20 @@ const pdpJsonLd = {
         const type = this.dataset.type;
         if (mainMediaContainer && newSrc) {
           if (type === 'image') {
-            mainMediaContainer.innerHTML = `<img src='${newSrc}' alt='' class='w-full h-full object-contain max-h-[600px] rounded-lg' id='main-image-desktop' data-type='image' />`;
+            const productAlt =
+              document.querySelector('h1')?.textContent?.trim() ||
+              'Imagen del producto';
+            const safeAlt = productAlt.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+            mainMediaContainer.innerHTML = `<img src='${newSrc}' alt="${safeAlt}" class='w-full h-full object-contain rounded-lg lg:max-h-[600px]' id='main-image-desktop' data-type='image' />`;
           } else if (type === 'video') {
-            mainMediaContainer.innerHTML = `<video src='${newSrc}' controls class='w-full h-full object-contain max-h-[600px] rounded-lg' id='main-image-desktop' data-type='video'></video>`;
+            mainMediaContainer.innerHTML = `<video src='${newSrc}' controls class='w-full h-full object-contain rounded-lg lg:max-h-[600px]' id='main-image-desktop' data-type='video'></video>`;
           }
           if (window.reinitZoom) window.reinitZoom();
           
           document.querySelectorAll('[data-thumbnail]').forEach(t => {
-            t.className = 'w-20 h-20 bg-white rounded overflow-hidden transition-colors cursor-pointer border border-[var(--color-secondary-light)] hover:border-[var(--color-primary)]';
+            t.className = 'thumb-btn w-full h-full aspect-square bg-white rounded overflow-hidden transition-colors cursor-pointer border border-[var(--color-secondary-light)] hover:border-[var(--color-primary)] lg:w-20 lg:h-20';
           });
-          this.className = 'w-20 h-20 bg-white rounded overflow-hidden transition-colors cursor-pointer border-3 border-[var(--color-primary)]';
+          this.className = 'thumb-btn w-full h-full aspect-square bg-white rounded overflow-hidden transition-colors cursor-pointer border-3 border-[var(--color-primary)] lg:w-20 lg:h-20';
         }
       });
     });

@@ -447,16 +447,6 @@ const logoUrl = siteConfig?.favicon512x512?.url;
     </div>
 </section>
 
-<!-- Script para Alpine -->
-<script>
-    if (typeof window !== 'undefined' && typeof (window as any).Alpine === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js';
-        script.defer = true;
-        document.head.appendChild(script);
-    }
-</script>
-
 <style>
     [x-cloak] { display: none !important; }
     

@@ -1,9 +1,11 @@
 ---
-const marcas = Astro.props.marcas || [];
-const categorias = Astro.props.categorias || [];
-const subcategorias = Astro.props.subcategorias || [];
-const products = Astro.props.products || [];
-const articles = Astro.props.articles || [];
+import { proxyMediaInData } from "@lib/utils.js";
+
+const marcas = proxyMediaInData(Astro.props.marcas || []);
+const categorias = proxyMediaInData(Astro.props.categorias || []);
+const subcategorias = proxyMediaInData(Astro.props.subcategorias || []);
+const products = proxyMediaInData(Astro.props.products || []);
+const articles = proxyMediaInData(Astro.props.articles || []);
 const currentPathname = Astro.originPathname ?? Astro.url.pathname;
 const localePrefix = currentPathname === "/co" || currentPathname.startsWith("/co/") ? "/co" : "";
 

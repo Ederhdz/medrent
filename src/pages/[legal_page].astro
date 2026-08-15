@@ -8,6 +8,7 @@ import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
 import { getSiteConfig } from "@server/siteConfig";
 import { getLocaleMeta, localizePath } from "@lib/locale";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 const siteConfig = await getSiteConfig();
 
 export async function getStaticPaths() {
@@ -109,9 +110,11 @@ const pageDescription =
     <div class="w-full">
       {imageHero && (
         <img 
-          src={imageHero.url} 
+          src={toSameOriginMediaUrl(imageHero.url)} 
           alt={title} 
           class="w-full h-[300px] object-cover"
+          loading="eager"
+          decoding="async"
         />
       )}
       

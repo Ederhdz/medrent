@@ -25,12 +25,37 @@ const navLayout =
   navPosition === 'inline'
     ? 'relative'
     : 'absolute';
+/**
+ * Map legacy `text-dark` / CSS dark-theme token to real dark ink.
+ * `--color-text-dark` is near-white in this design system — unsafe on light brand bands.
+ */
+function resolveBreadcrumbTextColor(
+  requested: string | undefined,
+  surfaceMode: 'dark' | 'light',
+): string {
+  const fallback = surfaceMode === 'light' ? 'text-[#171D1C]' : 'text-white';
+  if (!requested) return fallback;
+  if (
+    requested === 'text-dark' ||
+    requested.includes('text-dark') ||
+    requested.includes('--color-text-dark') ||
+    requested.includes('--color-text-default')
+  ) {
+    return 'text-[#171D1C]';
+  }
+  return requested;
+}
+const resolvedTextColor = resolveBreadcrumbTextColor(textColor, surface);
+const chevronFill =
+  resolvedTextColor.includes('white') || resolvedTextColor === 'text-white'
+    ? 'white'
+    : '#171D1C';
 ---
 <div class={`mx-auto flex w-full max-w-[1280px] flex-col justify-start ${outerBg} relative `}>
   <nav
-    class={`mx-auto flex w-full max-w-[1280px] items-center absolute 
+    class={`mx-auto flex w-full max-w-[1280px] items-center 
     top-0 lg:top-4
-    max-lg:pt-3 max-lg:pb-3 max-lg:px-0 max-lg:mt-6 
+    max-lg:pt-3 max-lg:pb-3 max-lg:px-0 
     lg:px-8 lg:py-4 
     ${navLayout} ${className || ""}`}
     aria-label="Breadcrumb"
@@ -70,14 +95,14 @@ const navLayout =
             <li>
               {isLast ? (
                 <span
-                  class={`${uppercaseAll ? "font-semibold" : "font-medium"} ${textColor || "text-black"}`}
+                  class={`${uppercaseAll ? "font-semibold" : "font-medium"} ${resolvedTextColor}`}
                 >
                   {item.name}
                 </span>
               ) : (
                 <a
                   href={item.href}
-                  class={`opacity-70 hover:opacity-100 transition cursor-pointer ${textColor || 'text-black'}`}
+                  class={`opacity-70 hover:opacity-100 transition cursor-pointer ${resolvedTextColor}`}
                   style="cursor: pointer;"
                 >
                   {item.name}
@@ -88,7 +113,7 @@ const navLayout =
             {!isLast && (
               <li class={`${index === items.length - 2 ? '' : 'opacity-70'} shrink-0`} aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M10 7L15 12L10 17L10 7Z" fill={textColor === 'text-white' ? 'white' : 'black'}/>
+                  <path d="M10 7L15 12L10 17L10 7Z" fill={chevronFill}/>
                 </svg>
               </li>
             )}

@@ -14,6 +14,7 @@ import { getCategories } from "@server/api/categories";
 import { getAllSubcategories } from "@server/api/subcategories";
 import { getSiteConfig } from "@server/siteConfig";
 import { localizePath, stripLocalePrefix } from "@lib/locale";
+import { toSameOriginMediaUrl, proxyMediaInData } from "@lib/utils.js";
 const siteConfig = await getSiteConfig();
 const currentPathname = Astro.originPathname ?? Astro.url.pathname;
 const currentPath = stripLocalePrefix(currentPathname);
@@ -63,7 +64,7 @@ if (!cachedSubcategorias) {
   }
 }
 
-if (!cachedProducts) {
+if (!cachedProducts && !hideSearch) {
   try {
     cachedProducts = await getProducts();
     globalThis[navCacheKeys.products] = cachedProducts;
@@ -73,7 +74,7 @@ if (!cachedProducts) {
   }
 }
 
-if (!cachedArticles) {
+if (!cachedArticles && !hideSearch) {
   try {
     cachedArticles = await getArticles();
     globalThis[navCacheKeys.articles] = cachedArticles;
@@ -106,10 +107,12 @@ const categoriesData = Array.isArray(cachedCategories)
 const subcategoriasData = Array.isArray(cachedSubcategorias)
   ? cachedSubcategorias.filter((subcategory) => subcategory?.isActive === true && hasActiveProducts(subcategory))
   : [];
-const productsData = Array.isArray(cachedProducts)
-  ? cachedProducts.filter((product) => product?.isActive === true)
-  : [];
-const articlesData = cachedArticles;
+const productsData = hideSearch
+  ? []
+  : Array.isArray(cachedProducts)
+    ? cachedProducts.filter((product) => product?.isActive === true)
+    : [];
+const articlesData = hideSearch ? [] : cachedArticles;
 // cachedProducts ya disponible para usar
 const especialidades = categoriesData;
 
@@ -145,7 +148,7 @@ const getSocialIcon = (icon, scope = "") => {
     <!-- Logo -->
     <div>
       <a href={localizePath("/", currentPathname)} aria-label="Ir al inicio de MedRent">
-        <img src="/temp/Logotipo_Medrent.png" alt="MedRent" width="134" height="39">
+        <img src="/temp/Logotipo_Medrent.png" alt="MedRent" width="134" height="23">
       </a>
     </div>
 
@@ -221,9 +224,11 @@ const getSocialIcon = (icon, scope = "") => {
                       style={`order: ${Number.isFinite(Number(marca.displayOrder)) ? Number(marca.displayOrder) : 998};`} 
                     >
                      <img 
-                        src={marca.logo?.url} 
+                        src={toSameOriginMediaUrl(marca.logo?.url)} 
                         alt={marca.name} 
                         class="w-auto  max-w-[100px] max-h-[45px]  h-auto object-contain"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </a>
                   ))
@@ -268,7 +273,7 @@ const getSocialIcon = (icon, scope = "") => {
               activeAplicacion = null;
             }
           "
-          data-especialidades={JSON.stringify(categoriesData)}
+          data-especialidades={JSON.stringify(proxyMediaInData(categoriesData))}
           class="relative"
           style="height: -webkit-fill-available;">
             <button 
@@ -597,10 +602,11 @@ const getSocialIcon = (icon, scope = "") => {
                     {/* Logo de la marca */}
                     {marca.logo?.url ? (
                       <img 
-                        src={marca.logo.url} 
+                        src={toSameOriginMediaUrl(marca.logo.url)} 
                         alt={`Logo de ${marca.name}`}
                         class="w-auto  max-w-[100px] max-h-[45px]  h-auto  object-contain"
                         loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       /* Fallback: ícono o placeholder si no hay logo */
@@ -638,7 +644,7 @@ const getSocialIcon = (icon, scope = "") => {
       }" 
         x-effect="document.querySelectorAll('#mobileMenuLinks > *:not(.especialidades-container)').forEach(el => el.style.display = (vistaActual === 'catalogo-aplicaciones') ? 'none' : '')"
       
-        data-especialidades={JSON.stringify(categoriesData || [])}
+        data-especialidades={JSON.stringify(proxyMediaInData(categoriesData || []))}
         x-init="(() => {
             try {
               especialidadesData = JSON.parse($el.dataset.especialidades || '[]');
@@ -685,11 +691,11 @@ const getSocialIcon = (icon, scope = "") => {
             
             <!-- Template de especialidades -->
             <template x-for="especialidad in especialidadesData" :key="especialidad.id">
-              <a href="#"
-                @click.prevent="activeItem = especialidad.id; vistaActual = 'catalogo-aplicaciones'"
+              <button type="button"
+                @click="activeItem = especialidad.id; vistaActual = 'catalogo-aplicaciones'"
                 :aria-label="`Abrir aplicaciones de ${especialidad.name}`"
                 :class="activeItem === especialidad.id ? 'rounded-[4px]' : 'text-gray-700'"
-                class="especialidadLink flex flex-row items-center justify-between gap-2 rounded text-[#261819] transition-colors min-w-[140px] group min-h-[80px] md:min-h-[120px] w-full px-4">
+                class="especialidadLink flex flex-row items-center justify-between gap-2 rounded text-[#261819] transition-colors min-w-[140px] group min-h-[80px] md:min-h-[120px] w-full px-4 bg-transparent border-0 cursor-pointer text-left">
                 
                 <div class="flex items-center gap-2">
                   <img :src="especialidad.figure?.url" 
@@ -706,10 +712,11 @@ const getSocialIcon = (icon, scope = "") => {
                     width="24" 
                     height="24" 
                     viewBox="0 0 24 24" 
-                    fill="none">
+                    fill="none"
+                    aria-hidden="true">
                   <path d="M8 19V5L19 12L8 19Z" fill="currentColor"/>
                 </svg>
-              </a>
+              </button>
             </template>
             
             <!-- Ver más link -->

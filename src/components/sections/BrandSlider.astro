@@ -1,5 +1,6 @@
 ---
 import { isUsableBrandSlug } from "@lib/brandSlug";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 type BrandItem = {
   slug?: string;
   name?: string;
@@ -67,10 +68,11 @@ const visibleMarcasData = Array.isArray(marcasData)
             <div class="brand-logo-wrapper flex h-auto w-full items-center justify-center p-4 transition-all duration-300 ease-out">
               {brand.logo?.url ? (
                 <img 
-                  src={brand.logo.url} 
+                  src={toSameOriginMediaUrl(brand.logo.url)} 
                   alt={brand.name}
                   class="brand-logo block h-auto max-h-10 w-auto max-w-full object-contain transition-all duration-300 ease-out group-hover:brightness-105 group-hover:saturate-110"
                   loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div class="brand-placeholder flex h-full w-full items-center justify-center rounded-xl bg-[#f5f5f5] text-[32px] font-bold text-[#ccc]">

@@ -3,7 +3,7 @@ export const prerender = true;
 
 import Layout from '@layouts/Layout.astro';
 import { strapiFetch } from "@server/strapiClient";
-import { formatDate } from '@lib/utils.js';
+import { formatDate, toSameOriginMediaUrl } from '@lib/utils.js';
 import SocialMedia from '@components/blog/SocialMedia.astro';
 import Newsletter from '@components/seo/Newsletter.astro';
 import BaseForm from "@components/forms/BaseForm.astro";
@@ -24,6 +24,24 @@ import {
   getClassificationTag,
 } from '@lib/blog/classification';
 import ArticleRelatedMobile from '@components/blog/ArticleRelatedMobile.astro';
+
+/** Keep article body headings sequential under the page H1 (CMS often starts at H3). */
+function normalizeArticleHeadings(nodes: unknown): unknown {
+  if (!Array.isArray(nodes)) return nodes;
+  return nodes.map((node) => {
+    if (!node || typeof node !== "object") return node;
+    const item = { ...(node as Record<string, unknown>) };
+    if (item.type === "heading") {
+      const level = Number(item.level) || 2;
+      if (level <= 3) item.level = 2;
+      else item.level = level - 1;
+    }
+    if (Array.isArray(item.children)) {
+      item.children = normalizeArticleHeadings(item.children);
+    }
+    return item;
+  });
+}
 
 export async function getStaticPaths() {
   const res = await strapiFetch(
@@ -160,7 +178,11 @@ if (writerSlugForCount) {
 ---
 
 <Layout
-  title={article?.title || "Blog MedRent"}
+  title={
+    article?.title
+      ? (String(article.title).includes("MedRent") ? article.title : `${article.title} | MedRent`)
+      : "Blog MedRent"
+  }
   description={article?.shortDescription || "Artículo de MedRent sobre tecnología médica e innovación clínica."}
   keywords={`${article?.title || "blog"}; tecnología médica; MedRent`}
   ogType="article"
@@ -297,9 +319,11 @@ if (writerSlugForCount) {
     ) : (
       article?.heroImage?.url && (
         <img
-          src={article.heroImage.url}
+          src={toSameOriginMediaUrl(article.heroImage.url)}
           alt={article.heroImage.alternativeText || 'Imagen del artículo'}
           class="w-full h-auto rounded mb-6"
+          loading="eager"
+          decoding="async"
         />
       )
     )}
@@ -313,10 +337,11 @@ if (writerSlugForCount) {
           ? article.content.map((item: any) => {
               switch (item?.__component) {
                 case 'blog.article-content': {
-                  const blocks = Array.isArray(item.articleContent)
+                  const rawBlocks = Array.isArray(item.articleContent)
                     ? item.articleContent
                     : [item.articleContent];
-                  return <BlocksRenderer content={blocks} />;
+                  const blocks = normalizeArticleHeadings(rawBlocks);
+                  return <BlocksRenderer content={blocks as any} />;
                 }
                 case 'blog.article-image': {
                   // PRIORIDAD: Si hay video (con o sin imagen), mostrar el video
@@ -349,9 +374,11 @@ if (writerSlugForCount) {
                   if (item.articleImage?.url) {
                     return (
                       <img
-                        src={item.articleImage.url}
+                        src={toSameOriginMediaUrl(item.articleImage.url)}
                         alt={item.articleImage.alternativeText || 'Imagen del artículo'}
                         class="w-full max-w-[400px] h-auto rounded mb-6 mx-auto"
+                        loading="lazy"
+                        decoding="async"
                       />
                     );
                   }
@@ -381,9 +408,13 @@ if (writerSlugForCount) {
         <section class="acreditadoPor flex items-center gap-4 p-4 pt-6" style="border-top: 0.5px dashed var(--color-gray-dark);">
           {article?.writer?.avatar?.url && (
             <img
-              src={article.writer.avatar.url}
+              src={toSameOriginMediaUrl(article.writer.avatar.url)}
               alt={article.writer.fullName || 'Autor'}
               class="w-20 h-20 rounded-full object-cover"
+              width="80"
+              height="80"
+              loading="lazy"
+              decoding="async"
             />
           )}
           <div class="flex flex-col justify-center items-start gap-1">
@@ -474,7 +505,7 @@ if (writerSlugForCount) {
                 <div class="bg-white rounded-[16px] p-4 flex items-start gap-4 hover:bg-[var(--color-secondary-light)] min-h-[220px]" style="padding:16px; gap:16px;">
                   <div class="flex-shrink-0 w-20 h-20 rounded-[8px] overflow-hidden bg-[#F8E6EA] flex items-center justify-center">
                     {rel.heroImage?.url ? (
-                      <img src={rel.heroImage.url} alt={rel.heroImage.alternativeText || 'Imagen del artículo'} class="object-cover w-20 h-20 rounded-[8px]" />
+                      <img src={toSameOriginMediaUrl(rel.heroImage.url)} alt={rel.heroImage.alternativeText || 'Imagen del artículo'} class="object-cover w-20 h-20 rounded-[8px]" loading="lazy" decoding="async" width="80" height="80" />
                     ) : null}
                   </div>
                   <div class="flex flex-col h-full justify-between w-full">

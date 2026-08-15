@@ -3,9 +3,10 @@ import "../styles/global.css";
 import "lenis/dist/lenis.css";
 import "@glidejs/glide/dist/css/glide.core.min.css";
 import { getSiteConfig } from "@server/siteConfig";
-import { getLocaleMeta, getLocalePrefix } from "@lib/locale";
+import { getLocaleMeta, getLocalePrefix, localizePath } from "@lib/locale";
 import { SITE } from "@lib/site";
 import { absoluteOgImage, DEFAULT_OG_ALT, DEFAULT_OG_HEIGHT, DEFAULT_OG_WIDTH } from "@lib/og";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 import OrganizationSchema from "@components/seo/OrganizationSchema.astro";
 import WebSiteSchema from "@components/seo/WebSiteSchema.astro";
 import Upperbar from "@components/layout/header/Upperbar.astro";
@@ -14,11 +15,30 @@ import Navbar from "@components/layout/header/Navbar.astro";
 import StickyCta from "@components/layout/overlays/StickyCta.astro";
 
 const siteConfig = await getSiteConfig();
+const faviconIco = siteConfig?.faviconIco?.url
+  ? toSameOriginMediaUrl(siteConfig.faviconIco.url)
+  : undefined;
+const favicon512 = siteConfig?.favicon512x512?.url
+  ? toSameOriginMediaUrl(siteConfig.favicon512x512.url)
+  : undefined;
+const favicon16 = siteConfig?.favicon16x16?.url
+  ? toSameOriginMediaUrl(siteConfig.favicon16x16.url)
+  : undefined;
+const faviconApple = siteConfig?.faviconApple180x180?.url
+  ? toSameOriginMediaUrl(siteConfig.faviconApple180x180.url)
+  : undefined;
 
 const requestedPathname = Astro.originPathname ?? Astro.url.pathname;
 const localeMeta = getLocaleMeta(requestedPathname);
 const localePrefix = getLocalePrefix(requestedPathname);
-const canonical = new URL(requestedPathname, Astro.site).toString();
+/** Match hreflang (no trailing slash) so canonical and alternates stay consistent. */
+const canonicalPath =
+  localeMeta.canonicalPath === "/"
+    ? localePrefix
+      ? `${localePrefix}/`
+      : "/"
+    : localizePath(localeMeta.canonicalPath, requestedPathname);
+const canonical = new URL(canonicalPath, Astro.site).toString();
 const {
   title,
   description,
@@ -60,7 +80,7 @@ const isLocalEnv = import.meta.env.DEV;
   <head>
     <!-- 1. Meta esenciales -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="google-site-verification" content="bfDcp6cDny991Jfo6sn0-XdBnk7ZsE_uMlqxZuBNDBY" />
 
     <!-- 2. Title -->
@@ -79,14 +99,13 @@ const isLocalEnv = import.meta.env.DEV;
     <link rel="describedby" href={llmsTxtHref} />
 
     <!-- 4. Favicons -->
-    <link rel="icon" href={siteConfig?.faviconIco?.url} sizes="any">
-    <link rel="icon" href={siteConfig?.favicon512x512?.url} sizes="512x512">
-    <link rel="icon" href={siteConfig?.favicon16x16?.url} sizes="16x16">
-    <link rel="apple-touch-icon" href={siteConfig?.faviconApple180x180?.url}>
+    <link rel="icon" href={faviconIco} sizes="any">
+    <link rel="icon" href={favicon512} sizes="512x512">
+    <link rel="icon" href={favicon16} sizes="16x16">
+    <link rel="apple-touch-icon" href={faviconApple}>
 
-    <link rel="preload" href="/fonts/Lato-Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="preload" href="/fonts/Lato-Bold.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="/fonts/Lato-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
     {!isLocalEnv && <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>}
     <link rel="dns-prefetch" href="//media.strapiapp.com">
 
@@ -224,72 +243,6 @@ const isLocalEnv = import.meta.env.DEV;
           setTimeout(() => { overlay.style.display = 'none'; }, 200);
         }
       };
-    </script>
-
-
-    <script>
-      console.log(
-        `%c
-    ╔═══════════════════════════════════════════════════════════════╗
-    ║                                                               ║
-    ║   ███╗   ███╗███████╗██████╗ ██████╗ ███████╗███╗   ██╗████████╗
-    ║   ████╗ ████║██╔════╝██╔══██╗██╔══██╗██╔════╝████╗  ██║╚══██╔══╝
-    ║   ██╔████╔██║█████╗  ██║  ██║██████╔╝█████╗  ██╔██╗ ██║   ██║   
-    ║   ██║╚██╔╝██║██╔══╝  ██║  ██║██╔══██╗██╔══╝  ██║╚██╗██║   ██║   
-    ║   ██║ ╚═╝ ██║███████╗██████╔╝██║  ██║███████╗██║ ╚████║   ██║   
-    ║   ╚═╝     ╚═╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
-    ║                                                               ║
-    ║              MedRent.mx - Tecnología médica                   ║
-    ╚═══════════════════════════════════════════════════════════════╝
-        `,
-        'font-family: monospace; white-space: pre; display: block;'
-      );
-
-      console.log(`%c
-    /* ============================================
-      TEAM MEDRENT
-    ============================================ */
-
-    /* Product Lead & UX Strategy */
-    Name: Benjamin Giovanni Vidaurri Solís
-    Role: Product Lead & UX Strategy
-    Expertise: Information architecture, UX/UI design, accessibility, atomic design system, technical SEO strategy, CRO alignment
-    Portfolio: https://www.giovidaurri.com/
-
-    /* Principal Full-Stack Developer */
-    Name: Eder Hernández Avendaño
-    Role: Principal Full-Stack Developer
-    Expertise: Astro + Strapi architecture, performance optimization, CMS modeling, structured data implementation, Vercel deployments
-    GitHub: https://github.com/Ederhdz
-
-    /* Frontend Developer Jr. */
-    Name: María de la Paz Medina Guzmán
-    Role: Frontend Developer Jr.
-    Expertise: Frontend development, UI/UX redesign, bug fixing, QA, Strapi CMS administration (content modeling & population), cross-browser testing, and performance optimization
-    GitHub: https://github.com/PazMedinaGuz
-
-    /* Direction */
-    Name: Iván Francisco García Anguiano
-    Role: MedRent Direction
-    Expertise: Marketing strategy, brand supervision, business alignment, clinical content validation
-
-    /* ============================================
-      TECH STACK
-    ============================================ */
-    Astro JS · Strapi · Tailwind CSS · Vercel · GA4 · GTM · HubSpot
-
-    /* ============================================
-      SITE
-    ============================================ */
-    https://www.medrent.mx
-    /humans.txt · /robots.txt · /sitemap-index.xml
-
-    /* ============================================
-      THANK YOU
-    ============================================ */
-    Medical technology, deployed by real humans.
-    Built in Mexico for advanced clinical practice.
-      `, 'font-family: monospace;');
     </script>
     
   </body>

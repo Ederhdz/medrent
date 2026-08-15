@@ -1,6 +1,24 @@
 ---
 const { seoText } = Astro.props;
 import { BlocksRenderer } from '@strapi/blocks-react-renderer';
+
+/** Remap CMS h1 → h2 so PLPs keep a single page H1 for a11y/SEO. */
+function demoteHeadingLevels(nodes: unknown): unknown {
+  if (!Array.isArray(nodes)) return nodes;
+  return nodes.map((node) => {
+    if (!node || typeof node !== 'object') return node;
+    const item = node as Record<string, unknown>;
+    if (item.type === 'heading' && item.level === 1) {
+      return { ...item, level: 2 };
+    }
+    if (Array.isArray(item.children)) {
+      return { ...item, children: demoteHeadingLevels(item.children) };
+    }
+    return item;
+  });
+}
+
+const safeSeoText = demoteHeadingLevels(seoText);
 ---
 
 <style>
@@ -30,12 +48,11 @@ import { BlocksRenderer } from '@strapi/blocks-react-renderer';
 </style>
 
 
-{ seoText == '' ? null : ( 
+{ safeSeoText == '' || !safeSeoText ? null : ( 
     <div id="seo-blocks-container" class="relative max-w-[800px] mx-auto px-4 py-6 md:px-6 md:py-16 lg:px-2 lg:py-16">
         <div id="seo-blocks-content" class="closed" style="position:relative;">
-            <label class=" uppercase font-bold text-[var(--color-primary)]">MEDRENT</label>
-            <!-- <h2 class="mb-6 text-[28px] not-italic font-bold">{data?.seoTitle || "Más sobre nuestros productos"}</h2> -->
-            <BlocksRenderer content={seoText} />
+            <p class="uppercase font-bold text-[var(--color-primary)] m-0">MEDRENT</p>
+            <BlocksRenderer content={safeSeoText as any} />
         </div>
 
         <button id="seo-blocks-toggle" type="button"
@@ -43,7 +60,7 @@ import { BlocksRenderer } from '@strapi/blocks-react-renderer';
             onclick="toggleSeoBlocks()"
         >
             <span id="seo-blocks-toggle-text">Ver más</span>
-            <span id="seo-blocks-toggle-icon">
+            <span id="seo-blocks-toggle-icon" aria-hidden="true">
                 <svg id="seo-blocks-svg-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display:inline">
                     <path d="M19 11H13V5C13 4.73478 12.8946 4.48043 12.7071 4.29289C12.5196 4.10536 12.2652 4 12 4C11.7348 4 11.4804 4.10536 11.2929 4.29289C11.1054 4.48043 11 4.73478 11 5V11H5C4.73478 11 4.48043 11.1054 4.29289 11.2929C4.10536 11.4804 4 11.7348 4 12C4 12.2652 4.10536 12.5196 4.29289 12.7071C4.48043 12.8946 4.73478 13 5 13H11V19C11 19.2652 11.1054 19.5196 11.2929 19.7071C11.4804 19.8946 11.7348 20 12 20C12.2652 20 12.5196 19.8946 12.7071 19.7071C12.8946 19.5196 13 19.2652 13 19V13H19C19.2652 13 19.5196 12.8946 19.7071 12.7071C19.8946 12.5196 20 12.2652 20 12C20 11.7348 19.8946 11.4804 19.7071 11.2929C19.5196 11.1054 19.2652 11 19 11Z" fill="white"/>
                 </svg>
@@ -67,14 +84,16 @@ import { BlocksRenderer } from '@strapi/blocks-react-renderer';
             if (!container || !btn || !icon || !text || !svgPlus || !svgMinus) return;
             if (!window.seoBlocksExpanded) {
                 container.style.maxHeight = String(container.scrollHeight) + 'px';
-                container.style.opacity = '1';
+                container.style.webkitMaskImage = 'none';
+                container.style.maskImage = 'none';
                 text.textContent = 'Ver menos';
                 svgPlus.style.display = 'none';
                 svgMinus.style.display = 'inline';
                 container.classList.remove('closed');
             } else {
                 container.style.maxHeight = '250px';
-                container.style.opacity = '0.8';
+                container.style.webkitMaskImage = 'linear-gradient(to bottom, #000 55%, transparent)';
+                container.style.maskImage = 'linear-gradient(to bottom, #000 55%, transparent)';
                 text.textContent = 'Ver más';
                 svgPlus.style.display = 'inline';
                 svgMinus.style.display = 'none';
@@ -87,8 +106,10 @@ import { BlocksRenderer } from '@strapi/blocks-react-renderer';
         if (container) {
             container.style.maxHeight = '250px';
             container.style.overflow = 'hidden';
-            container.style.transition = 'max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.3s';
-            container.style.opacity = '0.8';
+            container.style.transition = 'max-height 0.5s cubic-bezier(0.4,0,0.2,1)';
+            // Fade via mask (not opacity) so link contrast stays WCAG AA for Lighthouse.
+            container.style.webkitMaskImage = 'linear-gradient(to bottom, #000 55%, transparent)';
+            container.style.maskImage = 'linear-gradient(to bottom, #000 55%, transparent)';
             container.classList.add('closed');
         }
     });

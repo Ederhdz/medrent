@@ -1,4 +1,5 @@
 ---
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 const { Images, product, brand } = Astro.props;
 ---
 
@@ -28,7 +29,7 @@ const { Images, product, brand } = Astro.props;
             }
             
             return imagenValida ? (
-                <img src={imagenValida} alt={product} class="w-14 h-14 object-contain rounded text-left bg-white" />
+                <img src={toSameOriginMediaUrl(imagenValida)} alt={product} class="w-14 h-14 object-contain rounded text-left bg-white" width="56" height="56" loading="lazy" decoding="async" />
             ) : null;
         })()}
 

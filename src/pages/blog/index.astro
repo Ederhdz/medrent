@@ -3,7 +3,7 @@ export const prerender = true;
 
 import Layout from '@layouts/Layout.astro';
 import ArticleCard from '@components/blog/articleCard.astro';
-import { formatDate } from '@lib/utils.js';
+import { formatDate, toSameOriginMediaUrl } from '@lib/utils.js';
 import { strapiFetch } from "@server/strapiClient";
 import Newsletter from '@components/seo/Newsletter.astro';
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
@@ -90,7 +90,7 @@ const articlesForClient = articulosActivos.map((a: any) => ({
   writerName: a.writer?.fullName || "",
   classification: getClassificationTag(a, classificationTagByArticleKey) || "",
   classificationId: getArticleClassificationIdString(a, chipsClasificacion, classificationTagByArticleKey),
-  imgUrl: a.heroImage?.url || "",
+  imgUrl: a.heroImage?.url ? toSameOriginMediaUrl(a.heroImage.url) : "",
   imgAlt: a.heroImage?.alternativeText || a.title || "",
   dateLabel: formatDate(a.createdAt),
 }));
@@ -510,8 +510,9 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                     <span class="text-xs text-on-surface-variant font-lato w-full flex">
                         Por:&nbsp;
                         <a href={blogAuthorPath(articulosActivos[0]?.writer?.slug)} 
-                          class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato">
-                            {articulosActivos[0]?.writer?.fullName}
+                          class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato"
+                          aria-label={`Autor: ${articulosActivos[0]?.writer?.fullName || "Team MedRent"}`}>
+                            {articulosActivos[0]?.writer?.fullName || "Team MedRent"}
                         </a>&nbsp;• {formatDate(articulosActivos[0]?.createdAt)}
                     </span>
                 </div>
@@ -537,8 +538,9 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                       <span class="text-xs text-on-surface-variant font-lato w-full flex">
                         Por:&nbsp;
                         <a href={blogAuthorPath(articulo?.writer?.slug)} 
-                        class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato ">
-                          {articulo?.writer?.fullName}
+                        class="block text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato"
+                        aria-label={`Autor: ${articulo?.writer?.fullName || "Team MedRent"}`}>
+                          {articulo?.writer?.fullName || "Team MedRent"}
                         </a>
                         &nbsp;• {formatDate(articulo?.createdAt)}
                       </span>
@@ -717,12 +719,14 @@ const logoUrl = siteConfig?.favicon512x512?.url;
 
                 function writerFooterGrid(art) {
                   var date = escapeHtml(art.dateLabel || "");
-                  var name = escapeHtml(art.writerName || "");
+                  var name = escapeHtml(art.writerName || "Team MedRent");
                   var slug = art.writerSlug || "";
                   var inner = slug
                     ? '<a href="/blog/autor/' +
                       escapeHtml(slug) +
-                      '" class="inline text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato">' +
+                      '" class="inline text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato" aria-label="Autor: ' +
+                      name +
+                      '">' +
                       name +
                       "</a>"
                     : '<span class="inline text-xs text-[var(--color-primary)] font-lato">' + name + "</span>";

@@ -1,4 +1,6 @@
 ---
+import { toSameOriginMediaUrl } from "@lib/utils.js";
+
 const { data, class: className = "" } = Astro.props;
 const filterData = [...(data || [])]
   .filter(item => item?.isActive)
@@ -31,17 +33,21 @@ const filterData = [...(data || [])]
 
       <div class="glide__track" data-glide-el="track">
         <ul class="glide__slides">
-          {filterData.map((item, index) => (
+          {filterData.map((item, index) => {
+            const slideHref = item.url && item.url !== "#" ? item.url : null;
+            const SlideTag = slideHref ? "a" : "div";
+            return (
             <li class="glide__slide">
-              <a
-                href={item.url}
+              <SlideTag
+                {...(slideHref
+                  ? { href: slideHref, target: slideHref.startsWith("http") ? "_self" : undefined }
+                  : {})}
                 class="banner-slide-link block rounded overflow-hidden"
-                target={item.url?.startsWith("http") ? "_self" : undefined}
                 draggable="false"
               >
                 {item.mobileImage?.url && (
                   <img
-                    src={item.mobileImage.url}
+                    src={toSameOriginMediaUrl(item.mobileImage.url)}
                     alt={item.mobileImage.alternativeText || item.title || "Banner"}
                     class="banner-slide-img banner-slide-img--mobile block w-full h-auto object-cover md:hidden"
                     loading={index === 0 ? "eager" : "lazy"}
@@ -55,7 +61,7 @@ const filterData = [...(data || [])]
 
                 {item.desktopImage?.url && (
                   <img
-                    src={item.desktopImage.url}
+                    src={toSameOriginMediaUrl(item.desktopImage.url)}
                     alt={item.desktopImage.alternativeText || item.title || "Banner"}
                     class="banner-slide-img banner-slide-img--desktop hidden w-full h-auto object-cover md:block"
                     loading={index === 0 ? "eager" : "lazy"}
@@ -72,9 +78,10 @@ const filterData = [...(data || [])]
                     <span class="text-gray-500">{item.title || "itemción"}</span>
                   </div>
                 )}
-              </a>
+              </SlideTag>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
 

@@ -1,5 +1,6 @@
 ---
 import { strapiFetch } from "@server/strapiClient";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 const response = await strapiFetch(
   "/promo-sliders?populate[desktopImage]=true&populate[mobileImage]=true&sort=displayOrder:asc"
 );
@@ -62,7 +63,7 @@ function buildPromotionHref(item: any) {
                 {/* Mobile image - visible en móvil */}
                 {promo.mobileImage?.url && (
                   <img
-                    src={promo.mobileImage.url}
+                    src={toSameOriginMediaUrl(promo.mobileImage.url)}
                     alt={promo.mobileImage.alternativeText || promo.title || "Promoción"}
                     class="block w-full h-auto object-cover md:hidden"
                     loading="lazy"
@@ -73,7 +74,7 @@ function buildPromotionHref(item: any) {
                 {/* Desktop image - visible en desktop */}
                 {promo.desktopImage?.url && (
                   <img
-                    src={promo.desktopImage.url}
+                    src={toSameOriginMediaUrl(promo.desktopImage.url)}
                     alt={promo.desktopImage.alternativeText || promo.title || "Promoción"}
                     class="hidden w-full h-auto object-cover md:block"
                     loading="lazy"

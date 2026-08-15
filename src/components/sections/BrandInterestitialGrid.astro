@@ -1,5 +1,6 @@
 ---
 import { localizePath } from "@lib/locale";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 
 const {
   cards = [],
@@ -22,6 +23,7 @@ const validCards = Array.isArray(cards)
   : [];
 
 const maxVisibleProducts = 7;
+const proxiedBrandLogo = brandLogo ? toSameOriginMediaUrl(brandLogo) : "";
 ---
 
 {validCards.length > 0 && (
@@ -34,16 +36,20 @@ const maxVisibleProducts = 7;
           >
             {card.image ? (
               <img
-                src={card.image}
+                src={toSameOriginMediaUrl(card.image)}
                 alt={card.name}
+                width="1280"
+                height="800"
                 class="h-full w-full object-cover"
                 loading="lazy"
                 decoding="async"
               />
-            ) : brandLogo ? (
+            ) : proxiedBrandLogo ? (
               <img
-                src={brandLogo}
+                src={proxiedBrandLogo}
                 alt={brandName}
+                width="320"
+                height="160"
                 class="max-h-[45%] max-w-[55%] object-contain"
                 loading="lazy"
                 decoding="async"
@@ -53,11 +59,11 @@ const maxVisibleProducts = 7;
 
           <div class="flex flex-1 flex-col justify-between gap-8 px-6 pb-6 pt-6 md:px-8 md:pb-8">
             <div class="flex flex-col gap-4">
-              <h3 class="m-0 text-[24px] font-bold leading-tight text-[#171D1C]">
+              <h2 class="m-0 text-[24px] font-bold leading-tight text-[#171D1C]">
                 {card.name}
-              </h3>
+              </h2>
 
-              <p class="m-0 text-[14px] leading-[1.55] text-[var(--color-text-default)]">
+              <p class="m-0 text-[14px] leading-[1.55] text-[#171D1C]">
                 {card.description ?? ""}
               </p>
 

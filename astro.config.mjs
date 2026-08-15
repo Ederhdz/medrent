@@ -14,6 +14,10 @@ export default defineConfig({
   site: 'https://www.medrent.mx',
   output: 'server',
   compressHTML: true,
+  /** Evita que el toolbar de Astro (link genérico "Learn more") baje SEO en Lighthouse local. */
+  devToolbar: {
+    enabled: false,
+  },
   build: {
     /** auto: inline CSS pequeño; CSS grande en archivo (balance LCP / caché) */
     inlineStylesheets: 'auto',

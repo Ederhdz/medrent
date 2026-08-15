@@ -156,7 +156,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
             .filter((marca) => marca.isActive)
             .map((marca) => (
                 <a 
-                    href={marca.isActive && marca.slug ? `/especialidades/${marca.slug}` : '#'}
+                    href={marca.isActive && marca.slug ? `/especialidades/${marca.slug}` : '/especialidades'}
                     class="block text-center p-6 transition-all duration-300 cursor-pointer rounded-[24px] max-w-[380px] mx-auto w-full
                         hover:border-[3px] hover:border-[#006764] 
                         hover:bg-[#F5FAF9] 
@@ -166,7 +166,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                     <div class="flex items-center justify-center p-4">
                         <ImageResponsive
                             src={marca.figure}
-                            alt={marca.name}
+                            alt=""
                             // width={84}
                             height={84}
                             class="object-contain max-w-[130px]"
@@ -174,9 +174,9 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                             decoding="async"
                         />
                     </div>
-                    <h3 class="my-2 text-[22px] font-bold text-[var(--color-primary)]">
+                    <h2 class="my-2 text-[22px] font-bold text-[var(--color-primary)]">
                         {marca.name}
-                    </h3>
+                    </h2>
                 </a>
             ))}
         </div>
@@ -262,7 +262,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                         </svg>
                     </div>
                     <a 
-                        id="btnWhatsapp" 
+                        id="btnWhatsappHome" 
                         href={`https://wa.me/${siteConfig?.whatsappNumber}`} 
                         target="_blank" 
                         rel="noopener noreferrer" 

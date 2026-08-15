@@ -12,7 +12,9 @@ import { getBrandLandingBySlug, getBrands } from "@server/api/brands";
 import { getProducts } from "@server/api/products";
 import { getSiteConfig } from "@server/siteConfig";
 import { isUsableBrandSlug } from "@lib/brandSlug";
+import { getAccessibleTextOnBackground } from "@lib/color-contrast";
 import { getLocaleMeta, localizePath } from "@lib/locale";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 
 const siteConfig = await getSiteConfig();
 
@@ -66,7 +68,9 @@ const pageDescription =
   brandData.seoDescription ||
   brandData.description ||
   `Conoce las soluciones de ${brandData.name} disponibles en MedRent.`;
-  const openGraphImageUrl = brandData.seoOgImage || undefined;
+const openGraphImageUrl = brandData.seoOgImage || undefined;
+/** Light brand bands (e.g. Care Pump #5EAEDB) fail WCAG with white breadcrumb text. */
+const brandBandText = getAccessibleTextOnBackground(brandData.interstitialColor);
 ---
 
 <Layout
@@ -125,7 +129,7 @@ const pageDescription =
         <Breadcrumb
           surface="light"
           navPosition="inline"
-          textColor="text-white"
+          textColor={brandBandText.textClass}
           items={[
             { name: "INICIO", href: localizePath("/", currentPathname) },
             { name: "MARCAS", href: localizePath("/nuestras-marcas", currentPathname) },
@@ -135,29 +139,31 @@ const pageDescription =
       </div>
     </div>
     <div class="pt-16 py-8 md:pt-8" style={`background-color: ${brandData.interstitialColor};`}>
+        <h1 class="sr-only">{brandData.name}</h1>
         <img
-            src={brandData.interstitialLogo || logoUrl}
-            alt={brandData.name}
-            class="mx-auto max-h-[24px] object-contain mt-8"
-            loading="lazy"
+            src={toSameOriginMediaUrl(brandData.interstitialLogo || logoUrl)}
+            alt=""
+            width="240"
+            height="24"
+            class="mx-auto h-6 w-auto max-h-[24px] object-contain mt-8"
+            loading="eager"
             decoding="async"
+            fetchpriority="high"
+            aria-hidden="true"
         />
     </div>
     <BannerSlider data={sliderHero} />
   </div>
 
   <div class="w-full max-w-7xl mx-auto flex flex-col">
-    <section class="relative w-full h-auto rounded-b-[24px] md:rounded-none">
-      
-        <BrandInterestitialGrid
-            cards={interestitialCards}
-            brand={brandData.slug}
-            brandName={brandData.name}
-            brandLogo={brandData.logoUrl}
-            fallbackColor={brandData.interstitialColor}
-            currentPathname={currentPathname}
-        />
-    </section>
+    <BrandInterestitialGrid
+        cards={interestitialCards}
+        brand={brandData.slug}
+        brandName={brandData.name}
+        brandLogo={brandData.logoUrl}
+        fallbackColor={brandData.interstitialColor}
+        currentPathname={currentPathname}
+    />
   </div>
 
   <ProductSlider

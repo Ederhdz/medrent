@@ -41,8 +41,9 @@ const currentPathname = Astro.originPathname ?? Astro.url.pathname;
             <span class="whitespace-nowrap">
               Por:&nbsp;
               <a href={localizePath(blogAuthorPath(article?.writer?.slug), currentPathname)} 
-                  class="inline text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato ">
-                      {article?.writer?.fullName}
+                  class="inline text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato"
+                  aria-label={`Autor: ${article?.writer?.fullName || "Team MedRent"}`}>
+                      {article?.writer?.fullName || "Team MedRent"}
               </a>
             </span>
             <span class="whitespace-nowrap">• {formatDate(article?.createdAt)}</span>
