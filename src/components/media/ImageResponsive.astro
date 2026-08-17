@@ -1,4 +1,6 @@
 ---
+import { toSameOriginMediaUrl } from "@lib/utils.js";
+
 type StrapiFormat = {
   url?: string;
   width?: number;
@@ -39,7 +41,8 @@ const {
   [key: string]: any;
 };
 
-const imageUrl = src ?? image?.url ?? "";
+const rawUrl = src ?? image?.url ?? "";
+const imageUrl = rawUrl ? toSameOriginMediaUrl(rawUrl) : "";
 const resolvedAlt = alt || image?.alternativeText || "";
 const resolvedWidth = width ?? image?.width;
 const resolvedHeight = height ?? image?.height;
@@ -48,7 +51,7 @@ const formats = image?.formats ? Object.values(image.formats) : [];
 const srcsetCandidates = formats
   .filter((f) => f.url && f.width)
   .sort((a, b) => (a.width ?? 0) - (b.width ?? 0))
-  .map((f) => `${f.url} ${f.width}w`);
+  .map((f) => `${toSameOriginMediaUrl(f.url)} ${f.width}w`);
 
 if (imageUrl) {
   srcsetCandidates.push(`${imageUrl} ${resolvedWidth ?? 1920}w`);

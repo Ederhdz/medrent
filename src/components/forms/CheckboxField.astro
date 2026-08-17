@@ -13,7 +13,7 @@ const { id, label, link } = Astro.props;
 
   <label for={id} class="text-sm text-[#212121] cursor-pointer">
     {label}
-    <a href={link} target="_blank" class="text-[var(--color-accent)] underline">
+    <a href={link} target="_blank" rel="noopener noreferrer" class="text-[var(--color-primary)] underline">
       Aviso de Privacidad
     </a>
   </label>

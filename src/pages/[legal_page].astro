@@ -8,6 +8,7 @@ import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
 import { getSiteConfig } from "@server/siteConfig";
 import { getLocaleMeta, localizePath } from "@lib/locale";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 const siteConfig = await getSiteConfig();
 
 export async function getStaticPaths() {
@@ -37,7 +38,7 @@ const localeMeta = getLocaleMeta(currentPathname);
 const canonicalUrl = new URL(currentPathname, Astro.site).toString();
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
-const heroImageUrl = imageHero?.url || logoUrl;
+const heroImageUrl = imageHero?.url || undefined;
 const isPrivacy = pageSlug === "aviso-de-privacidad";
 const schemaType = isPrivacy ? "PrivacyPolicy" : "TermsOfService";
 const homeUrl = new URL(localizePath("/", currentPathname), Astro.site).toString();
@@ -109,9 +110,11 @@ const pageDescription =
     <div class="w-full">
       {imageHero && (
         <img 
-          src={imageHero.url} 
+          src={toSameOriginMediaUrl(imageHero.url)} 
           alt={title} 
           class="w-full h-[300px] object-cover"
+          loading="eager"
+          decoding="async"
         />
       )}
       

@@ -1,5 +1,6 @@
 ---
 import { localizePath } from "@lib/locale";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 
 const {
   applications = [],
@@ -25,7 +26,7 @@ const validApplications = Array.isArray(applications)
         <article class="flex min-h-[460px] flex-col overflow-hidden rounded-[24px] bg-white">
           <div class="relative aspect-[16/10] w-full overflow-hidden bg-[var(--color-secondary-light)]">
             <img
-              src={application?.image}
+              src={toSameOriginMediaUrl(application?.image)}
               alt={application.name}
               class="h-full w-full object-cover"
               loading="lazy"
@@ -35,9 +36,9 @@ const validApplications = Array.isArray(applications)
 
           <div class="flex flex-1 flex-col justify-between gap-8 px-6 pb-6 pt-6 md:px-8 md:pb-8">
             <div class="flex flex-col gap-4">
-              <h3 class="m-0 text-[24px] font-bold leading-tight text-[#171D1C]">
+              <h2 class="m-0 text-[24px] font-bold leading-tight text-[#171D1C]">
                 {application.name}
-              </h3>
+              </h2>
 
               <p class="m-0 text-[14px] leading-[1.55] text-[var(--color-text-default)]">
                 {application.description ?? ""}

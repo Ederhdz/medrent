@@ -16,7 +16,8 @@ import ViewMore from "@components/seo/ViewMore.astro";
 const promotionsData = await getPromotionSlides();
 const { title, productCount, seoText='' } = Astro.props;
 const showHeading = Boolean(title);
-const plpGradient = "bg-[linear-gradient(266deg,#007BB6_0%,#00827F_100.77%)] bg-clip-text text-transparent";
+/** Solid primary passes WCAG AA on secondary-light; accent (#00827F) is 4.42:1. */
+const plpHeadingColor = "text-[var(--color-primary)]";
 
 ---
 
@@ -26,12 +27,12 @@ const plpGradient = "bg-[linear-gradient(266deg,#007BB6_0%,#00827F_100.77%)] bg-
   {showHeading && (
     <div class="mb-8 flex flex-col">
       <h1
-        class={`plp-heading-title font-lato self-stretch font-bold text-[32px] leading-[40px] md:text-[28px] md:leading-[36px] md:filter-none ${plpGradient}`}
+        class={`plp-heading-title font-lato self-stretch font-bold text-[32px] leading-[40px] md:text-[28px] md:leading-[36px] md:filter-none ${plpHeadingColor}`}
       >
         {title}
       </h1>
       {typeof productCount === "number" && (
-        <p class={`mt-1 font-lato text-[22px] font-normal leading-[28px] ${plpGradient}`}>
+        <p class={`mt-1 font-lato text-[22px] font-normal leading-[28px] ${plpHeadingColor}`}>
           {productCount} {productCount === 1 ? "Equipo disponible" : "Equipos disponibles"}
         </p>
       )}
@@ -62,7 +63,6 @@ const plpGradient = "bg-[linear-gradient(266deg,#007BB6_0%,#00827F_100.77%)] bg-
 
 <style>
   body { background-color: var(--color-secondary-light); }
-  .heroproductos nav { position: absolute !important; }
 
   /* headline/large en mobile: sombra sobre texto con gradiente (drop-shadow respeta el alpha) */
   @media (max-width: 767px) {

@@ -101,7 +101,7 @@ export async function getBrandLandingBySlug(slug: string) {
     interstitialLogo: mediaUrl(attrs.interstitialLogo),
     seoTitle: attrs.SEO?.seoTitle ?? attrs.SEO?.title ?? "",
     seoDescription: attrs.SEO?.seoDescription ?? attrs.SEO?.description ?? "",
-    seoOgImage: attrs.SEO?.ogImage?.url ?? "/OG_Default_Medrent.jpeg",
+    seoOgImage: attrs.SEO?.ogImage?.url || undefined,
     sliderHero: asCollection(attrs.sliderHero),
     featuredProducts,
     interestitialCard: asCollection(attrs.interestitialCard)

@@ -114,6 +114,17 @@ const specialtiesUrl = new URL(localizePath("/especialidades", currentPathname),
         currentPathname={currentPathname}
       /> -->
 
+      <header class="px-4 md:px-6 lg:px-8 pt-8 pb-4">
+        <h1 class="font-lato text-[28px] md:text-[32px] font-bold leading-[36px] text-[var(--color-text-default)]">
+          {especialidad?.name ?? "Especialidad"}
+        </h1>
+        {especialidad?.heroDescription && (
+          <p class="mt-3 max-w-3xl text-[16px] leading-6 text-[var(--color-green-dark)]">
+            {especialidad.heroDescription}
+          </p>
+        )}
+      </header>
+
       <SpecialtyApplicationsGrid
         applications={especialidad?.subcategories}
         category={category}

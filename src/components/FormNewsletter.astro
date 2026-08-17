@@ -248,19 +248,7 @@ import NewsletterSuccessBanner from "./newsletter/NewsletterSuccessBanner.astro"
     },
     form_submission: {
       form_id: 'form-newsletter',
-      form_data: {
-        full_name: '',
-        email: email,
-        phone: '',
-        institution: '',
-        medical_specialty: '',
-        state: '',
-        discovery_channel: '',
-        product_interest: '',
-        message: '',
-        eventName: '',
-        statusResponseHubspot: estatus || "error",
-      },
+      status: estatus || "error",
     },
     tracking: tracking,
   };

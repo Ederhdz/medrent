@@ -3,6 +3,7 @@ import { formatDate } from '@lib/utils.js';
 import ImageResponsive from '@components/media/ImageResponsive.astro';
 import { getClassificationTag } from '@lib/blog/classification';
 import { localizePath } from '@lib/locale';
+import { blogAuthorPath } from '@lib/blogAuthor';
 
 const { article, tagByArticleKey } = Astro.props as {
   article: any;
@@ -39,9 +40,10 @@ const currentPathname = Astro.originPathname ?? Astro.url.pathname;
         <span class="text-xs text-on-surface-variant font-lato w-full flex flex-wrap items-center gap-x-1 gap-y-1">
             <span class="whitespace-nowrap">
               Por:&nbsp;
-              <a href={localizePath(`/blog/autor/${article?.writer?.slug}`, currentPathname)} 
-                  class="inline text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato ">
-                      {article?.writer?.fullName}
+              <a href={localizePath(blogAuthorPath(article?.writer?.slug), currentPathname)} 
+                  class="inline text-xs text-[var(--color-primary)] underline decoration-[var(--color-primary)] cursor-pointer font-lato"
+                  aria-label={`Autor: ${article?.writer?.fullName || "Team MedRent"}`}>
+                      {article?.writer?.fullName || "Team MedRent"}
               </a>
             </span>
             <span class="whitespace-nowrap">• {formatDate(article?.createdAt)}</span>
