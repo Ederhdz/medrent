@@ -27,5 +27,18 @@ Production path is snapshot-only. Staging path stays live.
 
 ## Verificación local
 
-- `npm run test:cms` → unit 12 PASS, source boundary PASS, mutation PASS
-- Missing `CMS_RELEASE_MODE` → `prepare-cms-build` exit 1 (`BLOCKED_CONFIG`)
+| Gate | Result |
+| --- | --- |
+| cms tests | PASS (12) |
+| source boundary | PASS |
+| boundary mutation | PASS |
+| artifact mutation | PASS |
+| media hashing | PASS |
+| fingerprint atomicity | PASS |
+| fail-closed missing `CMS_RELEASE_MODE` | PASS (exit 1) |
+| API isolation (source) | PASS (`/api/strapi` 404; media-proxy 404 in snapshot) |
+| SSR isolation (source) | PASS (`snapshotSource` when `CMS_RELEASE_MODE=snapshot`) |
+| live build | BLOCKED_CONFIG (local Strapi env cannot be injected into the build process here) |
+| snapshot build | BLOCKED_CONFIG |
+| artifact audit (post snapshot) | BLOCKED_CONFIG |
+| route smoke (preview) | BLOCKED_CONFIG |
