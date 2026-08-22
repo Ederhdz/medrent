@@ -10,7 +10,9 @@
     "astro": "astro",
     "test:cms-boundary": "node scripts/audit-cms-boundaries.mjs",
     "test:cms-leak": "node scripts/audit-production-build.mjs",
-    "test:cms": "node --test tests/cms/*.test.mjs && npm run test:cms-boundary"
+    "test:cms-mutations": "node scripts/test-cms-mutations.mjs",
+    "test:cms-smoke": "node scripts/smoke-routes.mjs",
+    "test:cms": "node --test tests/cms/*.test.mjs && npm run test:cms-boundary && npm run test:cms-mutations"
   },
   "engines": {
     "node": ">=20.17.0"
