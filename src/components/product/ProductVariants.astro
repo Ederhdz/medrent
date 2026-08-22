@@ -1,5 +1,5 @@
 ---
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import { localizePath } from "@lib/locale";
 
 export interface Props {
@@ -10,7 +10,7 @@ const { currentProductSlug } = Astro.props;
 const currentPathname = Astro.originPathname ?? Astro.url.pathname;
 
 async function getProductVariants() {
-  const response = await strapiFetch(
+  const response = await cms.get(
     `/products?filters[slug][$eq]=${currentProductSlug}&populate[variants][populate]=*`
   );
   const product = response?.data?.[0] || null;

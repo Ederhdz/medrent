@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import Layout from '@layouts/Layout.astro';
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import { formatDate, toSameOriginMediaUrl } from '@lib/utils.js';
 import SocialMedia from '@components/blog/SocialMedia.astro';
 import Newsletter from '@components/seo/Newsletter.astro';
@@ -44,7 +44,7 @@ function normalizeArticleHeadings(nodes: unknown): unknown {
 }
 
 export async function getStaticPaths() {
-  const res = await strapiFetch(
+  const res = await cms.get(
     "/blog-articles?fields[0]=slug&fields[1]=isActive&pagination[pageSize]=1000",
   );
 
@@ -63,7 +63,7 @@ if (!slugParam) {
 
 let article: any = null;
 try {
-  const primary = await strapiFetch(
+  const primary = await cms.get(
     `/blog-articles?filters[slug][$eq]=${encodeURIComponent(slugParam)}&filters[isActive][$eq]=true&populate[heroImage]=true&populate[writer][populate][avatar]=true&populate[content][populate]=*`,
   );
   const rows = primary?.data;
@@ -73,7 +73,7 @@ try {
 }
 if (!article) {
   try {
-    const fallback = await strapiFetch(
+    const fallback = await cms.get(
       `/blog-articles?filters[slug][$eq]=${encodeURIComponent(slugParam)}&filters[isActive][$eq]=true&populate=*`,
     );
     const rows = fallback?.data;
@@ -89,7 +89,7 @@ if (!article) {
 
 let classificationTagByArticleKey = new Map<string, string>();
 try {
-  const clsRes = await strapiFetch(
+  const clsRes = await cms.get(
     '/article-classifications?pagination[pageSize]=100&sort=tag:asc&populate[articles]=true',
   );
   if (Array.isArray(clsRes?.data)) {
@@ -97,7 +97,7 @@ try {
   }
 } catch {
   try {
-    const clsRes = await strapiFetch('/article-classifications?pagination[pageSize]=100&sort=tag:asc');
+    const clsRes = await cms.get('/article-classifications?pagination[pageSize]=100&sort=tag:asc');
     if (Array.isArray(clsRes?.data)) {
       classificationTagByArticleKey = buildClassificationTagByArticleKeyMap(clsRes.data);
     }
@@ -121,7 +121,7 @@ const postId = `${canonicalUrl}#post`;
 let articulosRelacionados: any[] = [];
 const classTagForRelated = getClassificationTag(article, classificationTagByArticleKey);
 try {
-  const poolRes = await strapiFetch(
+  const poolRes = await cms.get(
     '/blog-articles?populate=*&sort=publishedAt:desc&pagination[pageSize]=100',
   );
   const pool = Array.isArray(poolRes?.data) ? poolRes.data : [];
@@ -156,7 +156,7 @@ if (writerSlugForCount) {
       (a: any) => a.isActive === true && a.writer?.slug === writerSlugForCount,
     ).length;
   try {
-    const countRes = await strapiFetch(
+    const countRes = await cms.get(
       `/blog-articles?filters[writer][slug][$eq]=${encodeURIComponent(writerSlugForCount)}&pagination[pageSize]=500&fields[0]=slug&fields[1]=isActive`,
     );
     const list = Array.isArray(countRes?.data) ? countRes.data : [];
@@ -164,7 +164,7 @@ if (writerSlugForCount) {
     if (n > 0) authorArticleTotal = n;
   } catch {
     try {
-      const all = await strapiFetch(
+      const all = await cms.get(
         "/blog-articles?pagination[pageSize]=500&populate[writer]=true",
       );
       const list = Array.isArray(all?.data) ? all.data : [];

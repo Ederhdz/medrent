@@ -111,8 +111,7 @@ const heroBg = especialidad?.heroImage
                 <img 
                   id="nextSpecialtyImage"
                   src={toSameOriginMediaUrl(
-                    nextItem?.heroImage ||
-                      "https://balanced-amusement-bd4a404315.media.strapiapp.com/image_14_7aa0fcd37b.webp",
+                    nextItem?.heroImage || "/images/doctora.webp",
                   )}
                   alt={nextItem?.name ? `Siguiente especialidad: ${nextItem.name}` : "Siguiente especialidad"}
                   class="w-full h-[68px] object-cover"

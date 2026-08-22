@@ -1,4 +1,4 @@
-import { strapiFetch } from "../strapiClient";
+import { cms } from "../cms";
 
 export async function getArticles() {
   const allArticles = [];
@@ -12,7 +12,7 @@ export async function getArticles() {
     params.append("pagination[page]", String(page));
     params.append("pagination[pageSize]", String(pageSize));
     const url = `/blog-articles?${params.toString()}`;
-    const res = await strapiFetch(url);
+    const res = await cms.get(url);
     const articles = res.data || [];
     allArticles.push(...articles);
     total = res.meta?.pagination?.total || articles.length;

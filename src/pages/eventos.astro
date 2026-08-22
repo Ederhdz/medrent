@@ -4,7 +4,7 @@ export const prerender = true;
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import Layout from '../layouts/Layout.astro';
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import PromotionSlider from '@components/sections/PromotionSlider.astro';
 import ImageResponsive from "@components/media/ImageResponsive.astro";
 import SlideArticles from '@components/blog/slideArticles.astro';
@@ -27,7 +27,7 @@ let data: any = {};
 
 try { 
     const currentYear = new Date().getFullYear();
-    const response = await strapiFetch(
+    const response = await cms.get(
     `/events-page?populate[events][filters][startDate][$gte]=${currentYear}-01-01` +
     `&populate[events][filters][startDate][$lte]=${currentYear}-12-31` +
     `&populate[events][sort][0]=startDate:asc` +

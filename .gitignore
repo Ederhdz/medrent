@@ -30,3 +30,7 @@ pnpm-debug.log*
 .cache/
 .cursor/
 .cache-audit/
+src/generated/
+public/cms-assets/*
+!public/cms-assets/.gitkeep
+release-manifest.json

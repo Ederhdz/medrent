@@ -1,6 +1,6 @@
 ---
 // TestimonialsSlider.astro
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import { toSameOriginMediaUrl } from "@lib/utils.js";
 
 export interface Props {
@@ -17,7 +17,7 @@ let allTestimonials = globalThis.__cachedTestimonials || null;
 
 if (!allTestimonials) {
   try {
-    const response = await strapiFetch(`/testimonials?${filterQuery}`);
+    const response = await cms.get(`/testimonials?${filterQuery}`);
     allTestimonials = response?.data || [];
     globalThis.__cachedTestimonials = allTestimonials;
   } catch (error) {

@@ -1,4 +1,4 @@
-import { strapiFetch } from "../strapiClient";
+import { cms } from "../cms";
 import { mapStrapiProduct } from "@lib/domain/product/mapper";
 import type { Product } from "@lib/domain/product/types";
 import { isVisibleProduct } from "./catalogVisibility";
@@ -64,7 +64,7 @@ export async function getProducts(filters?: {
     params.append("pagination[pageSize]", String(pageSize));
     const url = `/products?${params.toString()}`;
 
-    const res = await strapiFetch(url);
+    const res = await cms.get(url);
     const rawProducts = Array.isArray(res.data) ? res.data : [];
     const products = rawProducts.filter(isVisibleProduct).map(mapStrapiProduct);
     allProducts.push(...products);
@@ -92,7 +92,7 @@ const PDP_POPULATE = `
 `.replace(/\s+/g, '');
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const res = await strapiFetch(
+  const res = await cms.get(
     `/products?filters[slug][$eq]=${encodeURIComponent(slug)}&filters[isActive][$eq]=true${PDP_POPULATE}`
   );
 

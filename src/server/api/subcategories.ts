@@ -1,4 +1,4 @@
-import { strapiFetch } from "../strapiClient";
+import { cms } from "../cms";
 import {
   asAttributes,
   asCollection,
@@ -9,7 +9,7 @@ import {
 } from "./catalogVisibility";
 
 export async function getAllSubcategories() {
-  const res = await strapiFetch(
+  const res = await cms.get(
     `/subcategories?filters[isActive][$eq]=true&populate[category]=true&populate[image]=true&populate[products][populate][brand]=true`
   );
 
@@ -36,7 +36,7 @@ export async function getAllSubcategories() {
 }
 
 export async function getSubcategoryBySlug(slug: string) {
-  const res = await strapiFetch(
+  const res = await cms.get(
     `/subcategories?filters[slug][$eq]=${encodeURIComponent(slug)}&filters[isActive][$eq]=true&populate[category]=true&populate[image]=true&populate[SEO]=true&populate[products][populate][brand]=true`
   );
 
