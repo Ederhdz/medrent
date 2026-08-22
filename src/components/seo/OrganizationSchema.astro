@@ -1,8 +1,8 @@
 ---
 const baseUrl = Astro.site; // Uses the same value as Layout canonical
 const organizationId = `${baseUrl}/#organization`;
+const logoUrl = `${baseUrl}/og/og-default-medrent.png`;
 
-// Keep this global schema "stable": templates can add WebPage/BreadcrumbList specifics.
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "MedicalOrganization",
@@ -13,9 +13,9 @@ const jsonLd = {
   "logo": {
     "@type": "ImageObject",
     "@id": `${baseUrl}/#logo`,
-    "url": `${baseUrl}/wp-content/uploads/2023/07/MedRent-Logo.jpg`,
-    "width": 672,
-    "height": 316,
+    "url": logoUrl,
+    "width": 1200,
+    "height": 630,
     "caption": "MedRent - Tecnología Médica de Alta Especialidad",
   },
   "description":
@@ -38,7 +38,7 @@ const jsonLd = {
     {
       "@type": "ContactPoint",
       "telephone": "+52-55-5985-4347",
-      "email": "info@medrent.mx",
+      "email": "contacto@medrent.mx",
       "contactType": "customer service",
       "areaServed": "MX",
       "availableLanguage": ["es"],
@@ -61,8 +61,8 @@ const jsonLd = {
     {
       "@type": "MedicalSpecialty",
       "name": "Neurosurgery",
-      "alternateName": "Neurocirugía",
-      "url": `${baseUrl}/especialidades/neurocirugia`,
+      "alternateName": "Neurocirugía y ORL",
+      "url": `${baseUrl}/especialidades/neurocirugia-y-orl`,
     },
     {
       "@type": "MedicalSpecialty",

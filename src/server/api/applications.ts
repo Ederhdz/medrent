@@ -1,4 +1,4 @@
-import { strapiFetch } from "../strapiClient";
+import { cms } from "../cms";
 import {
   asAttributes,
   asCollection,
@@ -9,7 +9,7 @@ import {
 } from "./catalogVisibility";
 
 export async function getApplicationsByCategory(categorySlug: string) {
-  const res = await strapiFetch(
+  const res = await cms.get(
     `/subcategories?filters[category][slug][$eq]=${encodeURIComponent(categorySlug)}&filters[isActive][$eq]=true&populate[image]=true&populate[SEO]=true&populate[category]=true&populate[products][populate][brand]=true`
   );
 

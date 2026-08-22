@@ -1,4 +1,4 @@
-import { strapiFetch } from "../strapiClient";
+import { cms } from "../cms";
 import { getProducts } from "./products";
 import {
   asAttributes,
@@ -10,7 +10,7 @@ import {
 
 export async function getBrands() {
   const [res, visibleProducts] = await Promise.all([
-    strapiFetch("/brands?populate=*"),
+    cms.get("/brands?populate=*"),
     getProducts(),
   ]);
 
@@ -49,7 +49,7 @@ export async function getBrands() {
 }
 
 export async function getBrandBySlug(slug: string) {
-  const res = await strapiFetch(
+  const res = await cms.get(
     `/brands?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[SEO]=true`
   );
 
@@ -72,7 +72,7 @@ export async function getBrandLandingBySlug(slug: string) {
   params.append("populate[interestitialCard][populate][products][populate][subcategory][populate][category]", "true");
 
 
-  const res = await strapiFetch(`/brands?${params.toString()}`);
+  const res = await cms.get(`/brands?${params.toString()}`);
 
   if (!Array.isArray(res?.data) || !res.data.length) return null;
 
@@ -101,7 +101,7 @@ export async function getBrandLandingBySlug(slug: string) {
     interstitialLogo: mediaUrl(attrs.interstitialLogo),
     seoTitle: attrs.SEO?.seoTitle ?? attrs.SEO?.title ?? "",
     seoDescription: attrs.SEO?.seoDescription ?? attrs.SEO?.description ?? "",
-    seoOgImage: attrs.SEO?.ogImage?.url ?? "/OG_Default_Medrent.jpeg",
+    seoOgImage: attrs.SEO?.ogImage?.url || undefined,
     sliderHero: asCollection(attrs.sliderHero),
     featuredProducts,
     interestitialCard: asCollection(attrs.interestitialCard)

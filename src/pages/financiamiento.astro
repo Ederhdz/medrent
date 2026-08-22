@@ -1,5 +1,5 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from "@layouts/Layout.astro"
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
@@ -17,7 +17,6 @@ const logoUrl = siteConfig?.favicon512x512?.url;
   title="Financiamiento Korum Capital | Equipos médicos sin enganche | MedRent"
   description="Adquiere tecnología médica con planes flexibles, tasas preferenciales y aprobación ágil. Acompañamiento biomédico e instalación."
   keywords="financiamiento equipo médico; Korum Capital; sin enganche; renta equipo médico"
-  ogImage={logoUrl}
 >
     <Fragment slot="head">
         <BreadcrumbSchema
@@ -447,16 +446,6 @@ const logoUrl = siteConfig?.favicon512x512?.url;
         </div>
     </div>
 </section>
-
-<!-- Script para Alpine -->
-<script>
-    if (typeof window !== 'undefined' && typeof (window as any).Alpine === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js';
-        script.defer = true;
-        document.head.appendChild(script);
-    }
-</script>
 
 <style>
     [x-cloak] { display: none !important; }

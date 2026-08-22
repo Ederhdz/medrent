@@ -10,12 +10,6 @@ const jsonLd = {
   name: "MedRent",
   publisher: { "@id": organizationId },
   inLanguage: "es-MX",
-  potentialAction: {
-    "@type": "SearchAction",
-    // Site uses direct query at root: /?s=...
-    target: `${baseUrl}/?s={search_term_string}`,
-    "query-input": "required name=search_term_string",
-  },
 };
 ---
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

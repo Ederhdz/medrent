@@ -2,130 +2,158 @@ export const prerender = false;
 
 const HUBSPOT_TOKEN = import.meta.env.HUBSPOT_PAT_TK;
 
-// Dominios permitidos para CORS
 const allowedOrigins = [
-  'https://mvp-medrent.vercel.app',
-  'https://www.medrent.mx',
-  'http://localhost:4321', 'http://localhost:4322' // Permitir para desarrollo local
+  "https://mvp-medrent.vercel.app",
+  "https://www.medrent.mx",
+  "https://medrent.mx",
+  "http://localhost:4321",
+  "http://localhost:4322",
 ];
+
+const HUBSPOT_PROPERTY_ALLOWLIST = new Set([
+  "email",
+  "firstname",
+  "lastname",
+  "phone",
+  "especialidad_medica",
+  "otras_especialidades",
+  "lugar_de_trabajo",
+  "estado_mx",
+  "por_qu_medio_nos_conociste",
+  "message",
+  "unidades_de_negocios",
+  "hs_all_assigned_business_unit_ids",
+  "definicion_de_necesidad",
+  "utm_term",
+  "utm_medium",
+  "utm_source",
+  "utm_content",
+  "utm_campaign",
+  "multi_equipo__medrent_",
+]);
 
 function capitalizeName(value) {
   return String(value)
     .trim()
     .split(/\s+/)
-    .map(part => part.charAt(0).toLocaleUpperCase('es-MX') + part.slice(1).toLocaleLowerCase('es-MX'))
-    .join(' ');
+    .map((part) => part.charAt(0).toLocaleUpperCase("es-MX") + part.slice(1).toLocaleLowerCase("es-MX"))
+    .join(" ");
 }
 
-// Función para enviar datos a HubSpot (sin cambios)
+function isAllowedOrigin(origin) {
+  return Boolean(origin && allowedOrigins.includes(origin));
+}
+
+function genericError(status, headers) {
+  headers.set("Content-Type", "application/json");
+  return new Response(JSON.stringify({ error: "Unable to submit form" }), { status, headers });
+}
+
 async function sendToHubspot(properties) {
   const payload = { properties };
-  const response = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
-    method: 'POST',
+  const response = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${HUBSPOT_TOKEN}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${HUBSPOT_TOKEN}`,
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
-  const data = await response.json();
   return {
-    data,
-    status: response.status
+    status: response.status,
+    ok: response.ok || response.status === 409,
   };
 }
 
-// --- Manejador de la API para Astro ---
 export async function ALL({ request }) {
-  const origin = request.headers.get('origin');
+  const origin = request.headers.get("origin");
   const headers = new Headers();
 
-  // --- Manejo de CORS ---
-    if (origin && allowedOrigins.some(o => origin.startsWith(o))) {
-        headers.set('Access-Control-Allow-Origin', origin);
-        headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        headers.set('Access-Control-Allow-Headers', 'Content-Type');
-    }
+  if (isAllowedOrigin(origin)) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type");
+  }
 
-  // --- Manejo de Petición OPTIONS (preflight) ---
-  if (request.method === 'OPTIONS') {
+  if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers });
   }
 
-  // --- Validar Método POST ---
-  if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405, headers });
+  if (request.method !== "POST") {
+    return genericError(405, headers);
   }
 
-  // --- Validar Token ---
   if (!HUBSPOT_TOKEN) {
-    console.error('HUBSPOT_PAT_TK is not defined');
-    return new Response(JSON.stringify({ error: 'HubSpot token is not configured' }), { status: 500, headers });
+    console.error("HUBSPOT_PAT_TK is not defined");
+    return genericError(500, headers);
   }
-  
+
   try {
-    // --- Procesar el cuerpo de la petición ---
     const input = await request.json();
 
     if (!input.email) {
-      return new Response(JSON.stringify({ error: 'Invalid request body - email is required' }), { status: 400, headers });
+      return genericError(400, headers);
     }
 
-    // --- Construir propiedades para HubSpot ---
     const properties = {};
-    
-    // Separar nombre y apellido
+
     if (input.name) {
-      const nameParts = input.name.trim().split(/\s+/);
-      properties.firstname = capitalizeName(nameParts.shift() || '');
-      properties.lastname = capitalizeName(nameParts.join(' ') || '');
+      const nameParts = String(input.name).trim().split(/\s+/);
+      properties.firstname = capitalizeName(nameParts.shift() || "");
+      properties.lastname = capitalizeName(nameParts.join(" ") || "");
     }
 
-    // Procesar todos los campos del formulario
     for (const key in input) {
-      if (key === 'name') continue; // Ya procesado
+      if (key === "name") continue;
 
       const value = input[key];
 
-      if (key === 'specialty') {
-        properties['especialidad_medica'] = String(value).trim();
+      if (key === "specialty") {
+        properties.especialidad_medica = String(value).trim();
         continue;
       }
 
-      if (key === 'phone') {
-        let rawPhone = String(value).replace(/[^0-9]/g, '');
-        // Validar que tenga exactamente 10 dígitos (número mexicano)
+      if (key === "phone") {
+        const rawPhone = String(value).replace(/[^0-9]/g, "");
         if (rawPhone.length !== 10) {
-          return new Response(JSON.stringify({ error: 'El número de teléfono debe tener exactamente 10 dígitos (México).' }), { status: 400, headers });
+          return genericError(400, headers);
         }
-        let phone = `+52${rawPhone}`;
-        properties.phone = phone;
+        properties.phone = `+52${rawPhone}`;
         continue;
       }
 
-      // Si el campo es un array (checkboxes), lo convierte a string separado por ;
+      if (key === "equipoInteres[]" || key === "equipoInteres") {
+        const values = Array.isArray(value) ? value : [value];
+        const filtered = values.map((v) => String(v).trim()).filter(Boolean);
+        if (filtered.length > 0) {
+          properties.multi_equipo__medrent_ = filtered.join("; ");
+        }
+        continue;
+      }
+
+      if (!HUBSPOT_PROPERTY_ALLOWLIST.has(key)) continue;
+      if (value == null || value === "") continue;
+
       if (Array.isArray(value)) {
-        const filteredValues = value.map(v => String(v).trim()).filter(Boolean);
+        const filteredValues = value.map((v) => String(v).trim()).filter(Boolean);
         if (filteredValues.length > 0) {
-          properties[key] = filteredValues.join('; ');
+          properties[key] = filteredValues.join("; ");
         }
       } else {
         properties[key] = String(value).trim();
       }
     }
 
-    let result = await sendToHubspot(properties);
+    const result = await sendToHubspot(properties);
 
-    // --- Enviar respuesta final ---
-    headers.set('Content-Type', 'application/json');
-    return new Response(JSON.stringify(result.data), { status: result.status, headers });
-
+    headers.set("Content-Type", "application/json");
+    return new Response(JSON.stringify({ ok: result.ok }), {
+      status: result.ok ? (result.status === 409 ? 409 : 200) : 500,
+      headers,
+    });
   } catch (error) {
-    console.error('Function error:', error);
-    if (error instanceof SyntaxError) { // Error al parsear JSON
-        return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), { status: 400, headers });
-    }
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers });
+    console.error("Function error:", error instanceof Error ? error.message : "unknown");
+    return genericError(error instanceof SyntaxError ? 400 : 500, headers);
   }
 }

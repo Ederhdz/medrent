@@ -1,5 +1,5 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
@@ -12,8 +12,8 @@ const canonicalUrl = new URL(Astro.originPathname ?? Astro.url.pathname, Astro.s
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
 
-import { strapiFetch } from "@server/strapiClient";
-const about = await strapiFetch(
+import { cms } from "@server/cms";
+const about = await cms.get(
   "/about?populate=*"
 );
 
@@ -49,7 +49,6 @@ const metrics = [
   title="Acerca de MedRent | Distribución de equipo médico en México"
   description="Conoce MedRent y cómo acercamos tecnología médica con soporte y capacitación. Experiencia en distribución y acompañamiento a especialistas."
   keywords="MedRent; equipo médico; distribución; soporte biomédico; capacitación"
-  ogImage={logoUrl}
 >
     <Fragment slot="head">
         <BreadcrumbSchema

@@ -5,18 +5,20 @@
 /* FONTS */
 @font-face {
   font-family: "Lato";
-  src: url("/fonts/Lato-Regular.ttf") format("opentype");
+  src: url("/fonts/Lato-Regular.woff2") format("woff2"),
+    url("/fonts/Lato-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {
   font-family: "Lato";
-  src: url("/fonts/Lato-Bold.ttf") format("opentype");
+  src: url("/fonts/Lato-Bold.woff2") format("woff2"),
+    url("/fonts/Lato-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 /* CSS variables colors */
@@ -29,7 +31,7 @@
   --color-green-dark: #3D4948;
   --color-text-default: #171d1c;
   --color-gray: #bcc9c8;
-  --color-gray-dark: #6d7a78;
+  --color-gray-dark: #3D4948;
   --color-white: #ffffff;
   --color-primary-light: #87f4ef;
 
@@ -193,13 +195,46 @@ select option:focus {
 }
 
 /* Cuerpo del artículo (Strapi blocks): headline/small en móvil, medium en desktop */
-.dinamicContent h2 {
+.dinamicContent h1,
+.dinamicContent h2,
+.dinamicContent h3,
+.dinamicContent h4,
+.dinamicContent h5,
+.dinamicContent h6 {
   font-family: Lato, sans-serif;
   color: var(--Schemes-On-Surface, #261819);
-  font-size: 24px;
   font-weight: 700;
-  line-height: 32px;
   margin: 0;
+}
+
+.dinamicContent h1 {
+  font-size: 32px;
+  line-height: 40px;
+}
+
+.dinamicContent h2 {
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.dinamicContent h3 {
+  font-size: 22px;
+  line-height: 30px;
+}
+
+.dinamicContent h4 {
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.dinamicContent h5 {
+  font-size: 18px;
+  line-height: 26px;
+}
+
+.dinamicContent h6 {
+  font-size: 16px;
+  line-height: 24px;
 }
 
 @media (min-width: 1024px) {
@@ -208,9 +243,34 @@ select option:focus {
     line-height: 36px;
   }
 
+  .dinamicContent h1 {
+    font-size: 36px;
+    line-height: 44px;
+  }
+
   .dinamicContent h2 {
     font-size: 28px;
     line-height: 36px;
+  }
+
+  .dinamicContent h3 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .dinamicContent h4 {
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .dinamicContent h5 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .dinamicContent h6 {
+    font-size: 18px;
+    line-height: 26px;
   }
 }
 
@@ -663,7 +723,7 @@ select:autofill {
   font-size: 14px;
   font-weight: 700;
   line-height: 1.2;
-  background: #2B993E !important;
+  background: #167A2C !important;
   color: var(--color-white);
   text-decoration: none;
   transition: background-color 0.2s ease;

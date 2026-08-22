@@ -1,5 +1,5 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from "@layouts/Layout.astro";
 import BreadcrumbSchema from "@components/seo/BreadcrumbSchema.astro";
@@ -12,12 +12,13 @@ import { getBrands } from "@server/api/brands";
 import { getCategories } from "@server/api/categories";
 import { getAllSubcategories } from "@server/api/subcategories";
 import { getSiteConfig } from "@server/siteConfig";
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 const siteConfig = await getSiteConfig();
 
 let heroPLP: any = {};
 try {
-    const response = await strapiFetch("/plp?populate=*");
+    const response = await cms.get("/plp?populate=*");
     const sliderHero = response?.data || {};
     heroPLP = Array.isArray(sliderHero) ? sliderHero[0] || {} : sliderHero;
 } catch (error) {
@@ -27,28 +28,9 @@ try {
 
 /* ---------------- QUERY PARAMS ---------------- */
 
-const url = new URL(Astro.request.url);
-
-const parseFilterParam = (key: string) => {
-  const values = url.searchParams
-    .getAll(key)
-    .flatMap((value) => value.split(","))
-    .map((value) => value.trim())
-    .filter(Boolean);
-  return [...new Set(values)];
-};
-
-const brandQuery = parseFilterParam("brand");
-const categoryQuery = parseFilterParam("category");
-const subcategoryQuery = parseFilterParam("subcategory");
-
 /* ---------------- FETCH DATA ---------------- */
 
-const products = await getProducts({
-  brands: brandQuery,
-  categories: categoryQuery,
-  subcategories: subcategoryQuery,
-});
+const products = await getProducts();
 
 const brandsData = await getBrands();
 const categoriesData = await getCategories();
@@ -59,16 +41,19 @@ const canonicalUrl = new URL(Astro.originPathname ?? Astro.url.pathname, Astro.s
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
 const mediaUrl = (value: any) => {
-  if (typeof value === "string") return value;
-  if (typeof value?.url === "string") return value.url;
-  if (typeof value?.data?.attributes?.url === "string") return value.data.attributes.url;
-  if (typeof value?.data?.url === "string") return value.data.url;
-  return "";
+  let url = "";
+  if (typeof value === "string") url = value;
+  else if (typeof value?.url === "string") url = value.url;
+  else if (typeof value?.data?.attributes?.url === "string") url = value.data.attributes.url;
+  else if (typeof value?.data?.url === "string") url = value.data.url;
+  return url ? toSameOriginMediaUrl(url) : "";
 };
 const fallbackHeroImageUrl = "/temp/HeroPLP.png";
-const heroImageDesktop = mediaUrl(heroPLP.heroImageDesktop) || fallbackHeroImageUrl;
-const heroImageMobile = mediaUrl(heroPLP.heroImageMobile) || heroImageDesktop;
-const heroImageUrl = new URL("/OG_Default_Medrent.jpeg", baseUrl).toString();
+const heroImageDesktopObj = heroPLP.heroImageDesktop ?? null;
+const heroImageMobileObj = heroPLP.heroImageMobile ?? heroImageDesktopObj;
+const heroImageDesktop = mediaUrl(heroImageDesktopObj) || fallbackHeroImageUrl;
+const heroImageMobile = mediaUrl(heroImageMobileObj) || heroImageDesktop;
+const heroImageUrl = new URL("/og/og-default-medrent.png", baseUrl).toString();
 const totalProducts = products.length;
 const seoPlpTitle = "MEDRENT";
 const seoPlpDescription ="Tecnología médica confiable para diagnóstico, terapia y rehabilitación. MedRent acerca soluciones clínicas de marcas líderes para optimizar la práctica médica y mejorar resultados terapéuticos en todo México.";
@@ -78,9 +63,9 @@ const seoPlpDescription ="Tecnología médica confiable para diagnóstico, terap
   title="Catálogo de productos | Equipos médicos y consumibles | MedRent"
   description="Explora equipos por especialidad, aplicación y marca. Tecnología médica con soporte, instalación y opciones de financiamiento."
   keywords="catálogo equipo médico; productos médicos; consumibles; MedRent"
-  ogImage={heroImageUrl}
 >
   <Fragment slot="head">
+    <link rel="preload" as="image" href={heroImageDesktop} fetchpriority="high" />
     <BreadcrumbSchema
       items={[
         { name: "Inicio", url: `${baseUrl}/` },
@@ -163,13 +148,21 @@ const seoPlpDescription ="Tecnología médica confiable para diagnóstico, terap
         <img
           src={heroImageDesktop}
           alt="Todos los productos"
-          class="absolute inset-0 w-full h-full object-cover rounded-b-[24px]"
+          width={heroImageDesktopObj?.width ?? 1920}
+          height={heroImageDesktopObj?.height}
+          sizes="100vw"
+          class="absolute inset-0 w-full h-full object-cover object-top rounded-b-[24px]"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
         />
       </picture>
 
       <div class="relative z-10">
         <Breadcrumb
+          surface="light"
           textColor="text-white"
+          navPosition="inline"
           items={[
             { name: "INICIO", href: "/" },
             { name: "PRODUCTOS" },
@@ -183,10 +176,10 @@ const seoPlpDescription ="Tecnología médica confiable para diagnóstico, terap
   <PLPLayout seoTitle={seoPlpTitle} seoDescription={seoPlpDescription}  seoText={siteConfig.seoTextPLP}>
     <Fragment slot="filters">
       <div class="mb-6 self-stretch">
-        <h1 class="font-lato text-[28px] font-bold leading-[36px] bg-[linear-gradient(266deg,#007BB6_0%,#00827F_100.77%)] bg-clip-text text-transparent">
+        <h1 class="font-lato text-[28px] font-bold leading-[36px] text-[var(--color-primary)]">
           Todos los productos
         </h1>
-        <p class="font-lato text-[22px] font-normal leading-[28px] bg-[linear-gradient(266deg,#007BB6_0%,#00827F_100.77%)] bg-clip-text text-transparent">
+        <p class="font-lato text-[22px] font-normal leading-[28px] text-[var(--color-primary)]">
           {totalProducts} Equipos disponibles
         </p>
       </div>
@@ -202,9 +195,11 @@ const seoPlpDescription ="Tecnología médica confiable para diagnóstico, terap
 
 
   <script is:inline define:vars={{ products }}>
-    /* Event: view_item_list */
+    /* Event: view_item_list — only when GTM helper is present (off in DEV) */
     setTimeout(() => {
-      window.view_item_list(products, "Productos")
+      if (typeof window.view_item_list === "function") {
+        window.view_item_list(products, "Productos");
+      }
     }, 2000);
   </script>
 

@@ -1,27 +1,28 @@
-// Utilities para el proyecto
-
-// Variable de entorno para Strapi URL
-const STRAPI_URL =
-  import.meta.env.STRAPI_URL ||
-  "https://balanced-amusement-bd4a404315.strapiapp.com";
-
-/**
- * Función helper para construir URLs de imágenes de Strapi
- * Maneja tanto URLs absolutas (producción) como relativas (desarrollo)
- * @param {string} imageUrl - URL de la imagen desde Strapi
- * @param {string} fallback - Imagen por defecto si no hay URL
- * @returns {string} URL completa de la imagen
- */
-export function buildImageUrl(imageUrl, fallback = "/images/doctora.webp") {
-  if (!imageUrl) return fallback;
-
-  // Si la URL ya es absoluta (comienza con http:// o https://), usarla tal como está
-  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+export function toSameOriginMediaUrl(imageUrl) {
+  if (!imageUrl || typeof imageUrl !== "string") return imageUrl;
+  if (imageUrl.startsWith("/") && !imageUrl.startsWith("//")) return imageUrl;
+  if (imageUrl.startsWith("/api/media-proxy") || imageUrl.startsWith("/cms-assets/")) {
     return imageUrl;
   }
+  return imageUrl;
+}
 
-  // Si es una URL relativa, concatenar con STRAPI_URL
-  return `${STRAPI_URL}${imageUrl}`;
+export function buildImageUrl(imageUrl, fallback = "/images/doctora.webp", options = {}) {
+  if (!imageUrl) return fallback;
+  return toSameOriginMediaUrl(imageUrl);
+}
+
+export function proxyMediaInData(value) {
+  if (typeof value === "string") return toSameOriginMediaUrl(value);
+  if (Array.isArray(value)) return value.map((item) => proxyMediaInData(item));
+  if (value && typeof value === "object") {
+    const out = {};
+    for (const [key, val] of Object.entries(value)) {
+      out[key] = proxyMediaInData(val);
+    }
+    return out;
+  }
+  return value;
 }
 
 export function formatDate(dateString) {
@@ -33,7 +34,6 @@ export function formatDate(dateString) {
   return `${day}/${month}/${year}`;
 }
 
-/** Convierte un slug con guiones en título legible (mayúscula inicial por palabra). */
 export function formatSlugAsTitle(slug) {
   if (!slug || typeof slug !== "string") return "";
   return slug

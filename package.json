@@ -4,9 +4,15 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/prepare-cms-build.mjs && astro build && node scripts/audit-production-build.mjs",
+    "build:live": "CMS_RELEASE_MODE=live node scripts/prepare-cms-build.mjs && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:cms-boundary": "node scripts/audit-cms-boundaries.mjs",
+    "test:cms-leak": "node scripts/audit-production-build.mjs",
+    "test:cms-mutations": "node scripts/test-cms-mutations.mjs",
+    "test:cms-smoke": "node scripts/smoke-routes.mjs",
+    "test:cms": "node --test tests/cms/*.test.mjs && npm run test:cms-boundary && npm run test:cms-mutations"
   },
   "engines": {
     "node": ">=20.17.0"

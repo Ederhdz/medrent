@@ -1,10 +1,10 @@
 ---
-export const prerender = false;
-import { strapiFetch } from "@server/strapiClient";
+export const prerender = true;
+import { cms } from "@server/cms";
 
 let heroPLP: any = {};
 try {
-    const response = await strapiFetch("/plp?populate=*");
+    const response = await cms.get("/plp?populate=*");
     const sliderHero = response?.data || {};
     heroPLP = Array.isArray(sliderHero) ? sliderHero[0] || {} : sliderHero;
 } catch (error) {
@@ -26,9 +26,21 @@ import { getProducts } from "@server/api/products";
 import { getBrands } from "@server/api/brands";
 import { getCategories } from "@server/api/categories";
 import { getAllSubcategories, getSubcategoryBySlug } from "@server/api/subcategories";
-import { formatSlugAsTitle } from "@lib/utils.js";
+import { formatSlugAsTitle, toSameOriginMediaUrl } from "@lib/utils.js";
 import { getSiteConfig } from "@server/siteConfig";
 const siteConfig = await getSiteConfig();
+
+export async function getStaticPaths() {
+  const categories = await getCategories();
+  return categories.flatMap((category: any) =>
+    (category.subcategories ?? []).map((subcategory: any) => ({
+      params: {
+        category: category.slug,
+        subcategory: subcategory.slug,
+      },
+    })),
+  );
+}
 
 /* ---------------- ROUTE PARAMS ---------------- */
 
@@ -36,20 +48,9 @@ const { category, subcategory } = Astro.params;
 
 /* ---------------- QUERY PARAMS ---------------- */
 
-const url = new URL(Astro.request.url);
-
-const parseFilterParam = (key: string) => {
-  const values = url.searchParams
-    .getAll(key)
-    .flatMap((value) => value.split(","))
-    .map((value) => value.trim())
-    .filter(Boolean);
-  return [...new Set(values)];
-};
-
-const brandQuery = parseFilterParam("brand");
-const categoryQuery = parseFilterParam("category");
-const subcategoryQuery = parseFilterParam("subcategory");
+const brandQuery: string[] = [];
+const categoryQuery: string[] = [];
+const subcategoryQuery: string[] = [];
 
 /* Siempre incluir contexto base */
 if (category && !categoryQuery.includes(category)) {
@@ -96,24 +97,30 @@ const canonicalUrl = new URL(Astro.originPathname ?? Astro.url.pathname, Astro.s
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
 const mediaUrl = (value: any) => {
-  if (typeof value === "string") return value;
-  if (typeof value?.url === "string") return value.url;
-  if (typeof value?.data?.attributes?.url === "string") return value.data.attributes.url;
-  if (typeof value?.data?.url === "string") return value.data.url;
-  return "";
+  let url = "";
+  if (typeof value === "string") url = value;
+  else if (typeof value?.url === "string") url = value.url;
+  else if (typeof value?.data?.attributes?.url === "string") url = value.data.attributes.url;
+  else if (typeof value?.data?.url === "string") url = value.data.url;
+  return url ? toSameOriginMediaUrl(url) : "";
 };
 const fallbackHeroImageUrl = "/temp/HeroPLP.png";
-const heroImageDesktop = mediaUrl(heroPLP.heroImageDesktop?.url) || fallbackHeroImageUrl;
-const heroImageMobile = mediaUrl(heroPLP.heroImageMobile?.url) || heroImageDesktop;
+const heroImageDesktopObj = heroPLP.heroImageDesktop ?? null;
+const heroImageMobileObj = heroPLP.heroImageMobile ?? heroImageDesktopObj;
+const heroImageDesktop = mediaUrl(heroImageDesktopObj?.url ?? heroImageDesktopObj) || fallbackHeroImageUrl;
+const heroImageMobile = mediaUrl(heroImageMobileObj?.url ?? heroImageMobileObj) || heroImageDesktop;
 const heroImageUrl = new URL(heroImageDesktop, baseUrl).toString();
 const seoText = subcategoryData?.SEO?.seoText || "";
 
 ---
 
 <Layout
-  title={`${subcategoryName} | MedRent`}
-  description={`Soluciones y productos para ${subcategoryName} con tecnología médica especializada y soporte de MedRent.`}
-  keywords={`${subcategoryName}; aplicación clínica; equipo médico; MedRent`}
+  title={`${plpHeadingTitle} | MedRent`}
+  description={
+    seoPlpDescription ||
+    `Soluciones y productos para ${plpHeadingTitle} con tecnología médica especializada y soporte de MedRent.`
+  }
+  keywords={`${plpHeadingTitle}; aplicación clínica; equipo médico; MedRent`}
   ogImage={heroImageUrl}
 >
   <Fragment slot="head">
@@ -159,8 +166,8 @@ const seoText = subcategoryData?.SEO?.seoText || "";
               "@type": "WebPage",
               "@id": `${canonicalUrl}#webpage`,
               url: canonicalUrl,
-              name: `${subcategoryName} | MedRent`,
-              description: `Soluciones y productos para ${subcategoryName} con tecnología médica especializada y soporte de MedRent.`,
+              name: `${plpHeadingTitle} | MedRent`,
+              description: `Soluciones y productos para ${plpHeadingTitle} con tecnología médica especializada y soporte de MedRent.`,
               isPartOf: { "@id": `${baseUrl}/#website` },
               about: { "@id": `${baseUrl}/#organization` },
               inLanguage: "es-MX",
@@ -172,8 +179,8 @@ const seoText = subcategoryData?.SEO?.seoText || "";
               "@type": "CollectionPage",
               "@id": itemListId,
               url: canonicalUrl,
-              name: `${subcategoryName} | MedRent`,
-              description: `Soluciones y productos para ${subcategoryName} con tecnología médica especializada y soporte de MedRent.`,
+              name: `${plpHeadingTitle} | MedRent`,
+              description: `Soluciones y productos para ${plpHeadingTitle} con tecnología médica especializada y soporte de MedRent.`,
               isPartOf: { "@id": `${baseUrl}/#website` },
               about: { "@id": `${baseUrl}/#organization` },
               inLanguage: "es-MX",
@@ -182,7 +189,7 @@ const seoText = subcategoryData?.SEO?.seoText || "";
             {
               "@type": "ItemList",
               "@id": itemListId,
-              name: `${subcategoryName} — productos`,
+              name: `${plpHeadingTitle} — productos`,
               itemListOrder: "https://schema.org/ItemListOrderAscending",
               itemListElement,
             },
@@ -195,27 +202,37 @@ const seoText = subcategoryData?.SEO?.seoText || "";
   <!-- HERO -->
   <section class="relative w-full h-[140px] overflow-hidden">
     <div class="absolute inset-0 heroproductos">
-      <Breadcrumb
-        textColor="text-white"
-        items={[
-          { name: "INICIO", href: "/" },
-          {
-            name: breadcrumbCategoryLabel,
-            href: `/especialidades/${categoryName}`,
-          },
-          {
-            name: plpHeadingTitle,
-          },
-        ]}
-      />
       <picture>
         <source media="(max-width: 767px)" srcset={heroImageMobile} />
         <img
           src={heroImageDesktop}
-          alt={subcategoryName}
-          class="w-full h-full object-cover rounded-b-[24px]"
+          alt={plpHeadingTitle}
+          width={heroImageDesktopObj?.width ?? 1920}
+          height={heroImageDesktopObj?.height}
+          sizes="100vw"
+          class="absolute inset-0 w-full h-full object-cover object-top rounded-b-[24px]"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
         />
       </picture>
+      <div class="relative z-10">
+        <Breadcrumb
+          surface="light"
+          textColor="text-white"
+          navPosition="inline"
+          items={[
+            { name: "INICIO", href: "/" },
+            {
+              name: breadcrumbCategoryLabel,
+              href: `/especialidades/${categoryName}`,
+            },
+            {
+              name: plpHeadingTitle,
+            },
+          ]}
+        />
+      </div>
     </div>
   </section>
 
@@ -239,9 +256,11 @@ const seoText = subcategoryData?.SEO?.seoText || "";
   </PLPLayout>
 
   <script is:inline define:vars={{ products, subcategoryName  }}>
-    /* Event: view_item_list */
+    /* Event: view_item_list — only when GTM helper is present (off in DEV) */
     setTimeout(() => {
-      window.view_item_list(products, subcategoryName)
+      if (typeof window.view_item_list === "function") {
+        window.view_item_list(products, subcategoryName);
+      }
     }, 2000);
   </script>
 </Layout>

@@ -1,4 +1,4 @@
-import { strapiFetch } from "../strapiClient";
+import { cms } from "../cms";
 import {
   asAttributes,
   asCollection,
@@ -21,7 +21,7 @@ export async function getCategories() {
   params.append("populate[sliderHero][populate][desktopImage]", "true");
   params.append("populate[sliderHero][populate][mobileImage]", "true");
 
-  const res = await strapiFetch(`/categories?${params.toString()}`);
+  const res = await cms.get(`/categories?${params.toString()}`);
 
   // Mapear los datos correctamente
   return (

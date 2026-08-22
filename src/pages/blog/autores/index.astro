@@ -1,17 +1,18 @@
 ---
 // /blog/autores/index.astro
-export const prerender = false;
+export const prerender = true;
 
 import Layout from '@layouts/Layout.astro';
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import Newsletter from '@components/seo/Newsletter.astro';
+import { blogAuthorPath } from '@lib/blogAuthor';
 
 // Obtener todos los escritores desde Strapi
 let writers: any[] = [];
 try {
-  const response = await strapiFetch('/writers?populate[avatar]=true&populate[heroImage]=true&populate[articles]=true&sort=fullName:asc');
+  const response = await cms.get('/writers?populate[avatar]=true&populate[heroImage]=true&populate[articles]=true&sort=fullName:asc');
   writers = Array.isArray(response?.data) ? response.data : [];
 } catch (error) {
   console.error('Error fetching writers:', error);
@@ -114,7 +115,7 @@ const breadcrumbId = `${canonicalUrl}#breadcrumb`;
                     
                     return (
                         <a
-                            href={`/blog/autor/${writer.slug}`}
+                            href={blogAuthorPath(writer.slug)}
                             class="group flex h-full flex-col overflow-hidden rounded-2xl transition-all no-underline"
                         >
                             {/* PARTE DE ARRIBA: imagen que ocupa TODO el contenedor de 218px */}

@@ -3,13 +3,42 @@ import "../styles/global.css";
 import "lenis/dist/lenis.css";
 import "@glidejs/glide/dist/css/glide.core.min.css";
 import { getSiteConfig } from "@server/siteConfig";
-import { getLocaleMeta, getLocalePrefix } from "@lib/locale";
+import { getLocaleMeta, getLocalePrefix, localizePath } from "@lib/locale";
+import { SITE } from "@lib/site";
+import { absoluteOgImage, DEFAULT_OG_ALT, DEFAULT_OG_HEIGHT, DEFAULT_OG_WIDTH } from "@lib/og";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
+import OrganizationSchema from "@components/seo/OrganizationSchema.astro";
+import WebSiteSchema from "@components/seo/WebSiteSchema.astro";
+import Upperbar from "@components/layout/header/Upperbar.astro";
+import Footer from "@components/layout/footer/Footer.astro";
+import Navbar from "@components/layout/header/Navbar.astro";
+import StickyCta from "@components/layout/overlays/StickyCta.astro";
+
 const siteConfig = await getSiteConfig();
+const faviconIco = siteConfig?.faviconIco?.url
+  ? toSameOriginMediaUrl(siteConfig.faviconIco.url)
+  : undefined;
+const favicon512 = siteConfig?.favicon512x512?.url
+  ? toSameOriginMediaUrl(siteConfig.favicon512x512.url)
+  : undefined;
+const favicon16 = siteConfig?.favicon16x16?.url
+  ? toSameOriginMediaUrl(siteConfig.favicon16x16.url)
+  : undefined;
+const faviconApple = siteConfig?.faviconApple180x180?.url
+  ? toSameOriginMediaUrl(siteConfig.faviconApple180x180.url)
+  : undefined;
 
 const requestedPathname = Astro.originPathname ?? Astro.url.pathname;
 const localeMeta = getLocaleMeta(requestedPathname);
 const localePrefix = getLocalePrefix(requestedPathname);
-const canonical = new URL(requestedPathname, Astro.site).toString();
+/** Match hreflang (no trailing slash) so canonical and alternates stay consistent. */
+const canonicalPath =
+  localeMeta.canonicalPath === "/"
+    ? localePrefix
+      ? `${localePrefix}/`
+      : "/"
+    : localizePath(localeMeta.canonicalPath, requestedPathname);
+const canonical = new URL(canonicalPath, Astro.site).toString();
 const {
   title,
   description,
@@ -28,7 +57,7 @@ const {
   twitterDescription,
   twitterImage,
 } = Astro.props;
-const siteOrigin = Astro.url?.origin ?? (Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx");
+const siteOrigin = Astro.site ? new URL(Astro.site).origin : "https://www.medrent.mx";
 const resolvedTitle = title ?? "MedRent México | Tecnología médica y financiamiento sin enganche";
 const resolvedDescription =
   description ??
@@ -36,23 +65,13 @@ const resolvedDescription =
 const resolvedOgTitle = ogTitle ?? resolvedTitle;
 const resolvedOgDescription = ogDescription ?? resolvedDescription;
 const resolvedOgUrl = ogUrl ?? canonical;
-const resolvedOgImage = ogImage ?? siteConfig?.favicon512x512?.url;
+const resolvedOgImage = absoluteOgImage(ogImage, siteOrigin);
 const resolvedTwitterTitle = twitterTitle ?? resolvedOgTitle;
 const resolvedTwitterDescription = twitterDescription ?? resolvedOgDescription;
-const resolvedTwitterImage = twitterImage ?? resolvedOgImage;
-
-import { SITE } from '@lib/site';
+const resolvedTwitterImage = twitterImage ? absoluteOgImage(twitterImage, siteOrigin) : resolvedOgImage;
+const llmsTxtHref = new URL("/llms.txt", siteOrigin).toString();
 const site = SITE;
 
-import OrganizationSchema from '@components/seo/OrganizationSchema.astro';
-import WebSiteSchema from '@components/seo/WebSiteSchema.astro';
-
-import Upperbar from "@components/layout/header/Upperbar.astro";
-import Footer from "@components/layout/footer/Footer.astro";
-import Navbar from "@components/layout/header/Navbar.astro";
-import StickyCta from "@components/layout/overlays/StickyCta.astro";
-
-// GTM: no usar hostname del request (en SSR/Vercel no es el dominio publico).
 const isLocalEnv = import.meta.env.DEV;
 ---
 
@@ -61,7 +80,7 @@ const isLocalEnv = import.meta.env.DEV;
   <head>
     <!-- 1. Meta esenciales -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="google-site-verification" content="bfDcp6cDny991Jfo6sn0-XdBnk7ZsE_uMlqxZuBNDBY" />
 
     <!-- 2. Title -->
@@ -77,18 +96,17 @@ const isLocalEnv = import.meta.env.DEV;
       />
     ))}
     <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site).toString()} />
+    <link rel="describedby" href={llmsTxtHref} />
 
     <!-- 4. Favicons -->
-    <link rel="icon" href={siteConfig?.faviconIco?.url} sizes="any">
-    <link rel="icon" href={siteConfig?.favicon512x512?.url} sizes="512x512">
-    <link rel="icon" href={siteConfig?.favicon16x16?.url} sizes="16x16">
-    <link rel="apple-touch-icon" href={siteConfig?.faviconApple180x180?.url}>
+    <link rel="icon" href={faviconIco} sizes="any">
+    <link rel="icon" href={favicon512} sizes="512x512">
+    <link rel="icon" href={favicon16} sizes="16x16">
+    <link rel="apple-touch-icon" href={faviconApple}>
 
-    <link rel="preload" href="/fonts/Lato-Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="preload" href="/fonts/Lato-Bold.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="/fonts/Lato-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
     {!isLocalEnv && <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>}
-    <link rel="dns-prefetch" href="//media.strapiapp.com">
 
     <!-- 5. Metas dinámicos (OG, description, etc.) -->
     <meta name="description" content={resolvedDescription} />
@@ -100,6 +118,9 @@ const isLocalEnv = import.meta.env.DEV;
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={resolvedOgUrl} />
     <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:image:width" content={String(DEFAULT_OG_WIDTH)} />
+    <meta property="og:image:height" content={String(DEFAULT_OG_HEIGHT)} />
+    <meta property="og:image:alt" content={DEFAULT_OG_ALT} />
     <meta property="og:site_name" content={ogSiteName} />
     <meta property="og:locale" content={ogLocale ?? localeMeta.ogLocale} />
 
@@ -120,11 +141,15 @@ const isLocalEnv = import.meta.env.DEV;
     <!-- 8. Glide core se importa en el frontmatter (Vite); evita carrera con el JS del carrusel -->
 
     <!-- 9. Scripts que deben cargarse temprano (GTM) -->
-    {/* {!isLocalEnv && ( */}
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+    </script>
+    {!isLocalEnv && (
       <>
         <!-- Google Tag Manager -->
         <script is:inline define:vars={{ gtmId: siteConfig?.gtmId }}>
           (function(w,d,s,l,i){
+            if (!i) return;
             w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer',gtmId);
@@ -132,7 +157,7 @@ const isLocalEnv = import.meta.env.DEV;
         <!-- End Google Tag Manager -->
         <script src="/scripts/setEventsDataLayer.js" defer></script>
       </>
-    {/* )} */}
+    )}
 
   </head>
   

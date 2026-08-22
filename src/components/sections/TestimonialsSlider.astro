@@ -1,6 +1,7 @@
 ---
 // TestimonialsSlider.astro
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 
 export interface Props {
   productId?: number;
@@ -16,7 +17,7 @@ let allTestimonials = globalThis.__cachedTestimonials || null;
 
 if (!allTestimonials) {
   try {
-    const response = await strapiFetch(`/testimonials?${filterQuery}`);
+    const response = await cms.get(`/testimonials?${filterQuery}`);
     allTestimonials = response?.data || [];
     globalThis.__cachedTestimonials = allTestimonials;
   } catch (error) {
@@ -87,7 +88,7 @@ const hasTestimonials = cachedTestimonials && cachedTestimonials.length > 0;
               <div class="rounded-2xl p-6 h-full bg-[var(--color-secondary-light)]">
                 <div class="flex items-start gap-4">
                   <img
-                    src={testimonial.avatar?.url || "/default-avatar.png"}
+                    src={toSameOriginMediaUrl(testimonial.avatar?.url || "/default-avatar.png")}
                     alt={testimonial.name}
                     class="w-16 h-16 rounded-full object-cover"
                   />

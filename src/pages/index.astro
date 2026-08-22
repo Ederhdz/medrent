@@ -1,6 +1,6 @@
 ---
-export const prerender = false;
-import { strapiFetch } from "@server/strapiClient";
+export const prerender = true;
+import { cms } from "@server/cms";
 import { getBrands } from "@server/api/brands";
 import { getCategories } from "@server/api/categories";
 import Layout from '../layouts/Layout.astro';
@@ -30,7 +30,7 @@ let sliderHero = [];
 
 
 try {
-    const response = await strapiFetch("/home-page?populate[sliderHero][populate][desktopImage]=true&populate[sliderHero][populate][mobileImage]=true&pagination[limit]=1");
+    const response = await cms.get("/home-page?populate[sliderHero][populate][desktopImage]=true&populate[sliderHero][populate][mobileImage]=true&pagination[limit]=1");
     sliderHero = response?.data?.sliderHero || [];
 } catch (error) {
     console.error('Error fetching slider hero:', error);
@@ -59,7 +59,7 @@ const marcas = marcasData.map((category) => {
 try {
   const [brandsResp, promotionsResp] = await Promise.all([
     getBrands(),
-    strapiFetch("/promo-sliders?populate[desktopImage]=true&populate[mobileImage]=true&sort=displayOrder:asc"),
+    cms.get("/promo-sliders?populate[desktopImage]=true&populate[mobileImage]=true&sort=displayOrder:asc"),
   ]);
   brandsData = Array.isArray(brandsResp) ? brandsResp : [];
   promotionsData = Array.isArray(promotionsResp?.data) ? promotionsResp.data : [];
@@ -82,7 +82,7 @@ try {
 
 let dataEventos = null;
 try {
-    const response = await strapiFetch("/events-page?populate[events][populate]=image&populate=heroImage");
+    const response = await cms.get("/events-page?populate[events][populate]=image&populate=heroImage");
     dataEventos = response.data;
 } catch (error) {
     console.error('Error fetching events:', error);
@@ -105,7 +105,6 @@ const logoUrl = siteConfig?.favicon512x512?.url;
   title="MedRent México | Tecnología médica y financiamiento sin enganche"
   description="Equipos médicos para neurodiagnóstico, neuromodulación, rehabilitación y ultrasonido con soporte y asesoría. Agenda tu demo."
   keywords="equipo médico México; financiamiento equipo médico; neurodiagnóstico; neuromodulación; rehabilitación; ultrasonido"
-  ogImage={logoUrl}
 >
 
     <Fragment slot="head">
@@ -149,7 +148,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
     <!--  Sección mosaico de categorías-->
     <section class="max-w-7xl mx-auto py-6 px-4 md:px-6 lg:px-8">
         <div class="text-center p-6 w-full"> 
-            <h3 class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase text-center">ESPECIALISTAS EN TECNOLOGÍA </h3> 
+            <p class="text-[var(--color-accent)] font-bold text-[14px] md:text-[14px] uppercase text-center">ESPECIALISTAS EN TECNOLOGÍA </p> 
             <h2 class="text-[24px] font-bold text-[var(--color-text-default)] tracking-tight">Acercamos tecnología que fortalece los estándares en salud.</h2>
         </div>
         <div class="w-full flex gap-6 justify-center flex-wrap">
@@ -157,7 +156,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
             .filter((marca) => marca.isActive)
             .map((marca) => (
                 <a 
-                    href={marca.isActive && marca.slug ? `/especialidades/${marca.slug}` : '#'}
+                    href={marca.isActive && marca.slug ? `/especialidades/${marca.slug}` : '/especialidades'}
                     class="block text-center p-6 transition-all duration-300 cursor-pointer rounded-[24px] max-w-[380px] mx-auto w-full
                         hover:border-[3px] hover:border-[#006764] 
                         hover:bg-[#F5FAF9] 
@@ -167,7 +166,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                     <div class="flex items-center justify-center p-4">
                         <ImageResponsive
                             src={marca.figure}
-                            alt={marca.name}
+                            alt=""
                             // width={84}
                             height={84}
                             class="object-contain max-w-[130px]"
@@ -175,9 +174,9 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                             decoding="async"
                         />
                     </div>
-                    <h3 class="my-2 text-[22px] font-bold text-[var(--color-primary)]">
+                    <h2 class="my-2 text-[22px] font-bold text-[var(--color-primary)]">
                         {marca.name}
-                    </h3>
+                    </h2>
                 </a>
             ))}
         </div>
@@ -263,11 +262,11 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                         </svg>
                     </div>
                     <a 
-                        id="btnWhatsapp" 
+                        id="btnWhatsappHome" 
                         href={`https://wa.me/${siteConfig?.whatsappNumber}`} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        class="text-[var(--color-secondary)] underline"
+                        class="text-white underline"
                     >
                         {(() => {
                             const num = siteConfig?.whatsappNumber;
@@ -287,7 +286,7 @@ const logoUrl = siteConfig?.favicon512x512?.url;
                         href={`https://mail.google.com/mail/?extsrc=mailto&url=mailto%3A${siteConfig?.email || ''}`} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        class="text-[var(--color-secondary)] underline"
+                        class="text-white underline"
                     >
                         {siteConfig?.email}
                     </a>

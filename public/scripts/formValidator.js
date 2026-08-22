@@ -288,7 +288,7 @@ export function initForm(formId) {
   }
 
 
-  const closeEventPopup = document.querySelector("#close-event-popup");
+  const closeEventPopup = document.querySelector("#close-quote-popup, #close-event-popup");
   if(closeEventPopup){
     closeEventPopup?.addEventListener("click", (e) => {
       setState("form");
@@ -765,20 +765,7 @@ function sendFormEvent({ form, formId, status, formData = {} }) {
     },
     form_submission: {
       form_id: formId,
-      form_data: {
-        full_name: getFormValue("name"),
-        email: getFormValue("email"),
-        phone: getFormValue("phone"),
-        institution: getFormValue("lugar_de_trabajo"),
-        medical_specialty: medicalSpecialty,
-        medical_specialty_other: medicalSpecialtyOther,
-        state: getFormValue("estado_mx"),
-        discovery_channel: getFormValue("por_qu_medio_nos_conociste"),
-        product_interest: valoresStr || getFormValue("multi_equipo__medrent_"),
-        message: getFormValue("message"),
-        eventName,
-        statusResponseHubspot: status || "error",
-      },
+      status: status || "error",
     },
     tracking,
   };

@@ -1,47 +1,85 @@
 import type { APIRoute } from "astro";
 import { getCategories } from "@server/api/categories";
+import { getProducts } from "@server/api/products";
+import { getArticles } from "@server/api/articles";
+import { getBrands } from "@server/api/brands";
+import { SPECIALTIES, STATIC_ROUTES } from "@lib/siteMetadata";
+
+export const prerender = true;
 
 const BASE_URL = "https://www.medrent.mx";
 
-/** Páginas estáticas del sitio (sin `/aplicaciones`: no existe ruta; el hub real es `/especialidades`). */
 const STATIC_PAGES: { path: string; priority: string }[] = [
-  { path: "/", priority: "1.0" },
-  { path: "/especialidades", priority: "0.8" },
-  { path: "/productos", priority: "0.9" },
-  { path: "/blog", priority: "0.85" },
-  { path: "/contacto", priority: "0.75" },
-  { path: "/eventos", priority: "0.7" },
-  { path: "/acerca-de-nosotros", priority: "0.7" },
-  { path: "/nuestras-marcas", priority: "0.7" },
-  { path: "/financiamiento", priority: "0.8" },
+  { path: STATIC_ROUTES.home, priority: "1.0" },
+  { path: STATIC_ROUTES.specialties, priority: "0.8" },
+  { path: STATIC_ROUTES.products, priority: "0.9" },
+  { path: STATIC_ROUTES.blog, priority: "0.85" },
+  { path: STATIC_ROUTES.contact, priority: "0.75" },
+  { path: STATIC_ROUTES.events, priority: "0.7" },
+  { path: STATIC_ROUTES.aboutUs, priority: "0.7" },
+  { path: STATIC_ROUTES.brands, priority: "0.7" },
+  { path: STATIC_ROUTES.financing, priority: "0.8" },
+  { path: STATIC_ROUTES.privacy, priority: "0.3" },
+  { path: STATIC_ROUTES.terms, priority: "0.3" },
 ];
 
-/** Si Strapi no responde en el request del sitemap, no omitir especialidades conocidas. */
-const FALLBACK_ESPECIALIDADES: { path: string; priority: string }[] = [
-  { path: "/especialidades/neurocirugia", priority: "0.8" },
-  { path: "/especialidades/neurofisiologia", priority: "0.8" },
-  { path: "/especialidades/neuromodulacion", priority: "0.8" },
-  { path: "/especialidades/neurovascular", priority: "0.8" },
-  { path: "/especialidades/rehabilitacion", priority: "0.8" },
-];
+const FALLBACK_ESPECIALIDADES: { path: string; priority: string }[] = Object.values(SPECIALTIES).map(
+  (specialty) => ({ path: `/especialidades/${specialty.slug}`, priority: specialty.priority }),
+);
 
-async function getEspecialidadPaths(): Promise<{ path: string; priority: string }[]> {
-  try {
-    const categories = await getCategories();
-    if (!Array.isArray(categories) || categories.length === 0) {
-      return FALLBACK_ESPECIALIDADES;
+function isUsableSlug(slug: unknown): slug is string {
+  return typeof slug === "string" && slug.trim().length > 0 && slug !== "undefined" && slug !== "null";
+}
+
+function entrySlug(entry: { slug?: string; attributes?: { slug?: string } }): string | undefined {
+  return entry?.slug || entry?.attributes?.slug;
+}
+
+async function getDynamicPaths(): Promise<{ path: string; priority: string }[]> {
+  const [categories, products, articles, brands] = await Promise.all([
+    getCategories().catch(() => []),
+    getProducts().catch(() => []),
+    getArticles().catch(() => []),
+    getBrands().catch(() => []),
+  ]);
+
+  const especialidades: { path: string; priority: string }[] = [];
+  if (Array.isArray(categories) && categories.length > 0) {
+    for (const category of categories) {
+      if (!isUsableSlug(category?.slug)) continue;
+      especialidades.push({ path: `/especialidades/${category.slug}`, priority: "0.8" });
+      const subs = Array.isArray(category.subcategories) ? category.subcategories : [];
+      for (const sub of subs) {
+        if (!isUsableSlug(sub?.slug)) continue;
+        especialidades.push({
+          path: `/especialidades/${category.slug}/${sub.slug}`,
+          priority: "0.7",
+        });
+      }
     }
-    const paths = categories
-      .map((c: { slug?: string }) => c?.slug)
-      .filter(
-        (slug): slug is string =>
-          typeof slug === "string" && slug.trim().length > 0 && slug !== "undefined" && slug !== "null",
-      )
-      .map((slug) => ({ path: `/especialidades/${slug}`, priority: "0.8" }));
-    return paths.length > 0 ? paths : FALLBACK_ESPECIALIDADES;
-  } catch {
-    return FALLBACK_ESPECIALIDADES;
   }
+
+  const productPaths = (Array.isArray(products) ? products : [])
+    .map((product) => product?.slug)
+    .filter(isUsableSlug)
+    .map((slug) => ({ path: `/productos/${slug}`, priority: "0.8" }));
+
+  const articlePaths = (Array.isArray(articles) ? articles : [])
+    .map(entrySlug)
+    .filter(isUsableSlug)
+    .map((slug) => ({ path: `/blog/${slug}`, priority: "0.6" }));
+
+  const brandPaths = (Array.isArray(brands) ? brands : [])
+    .map((brand) => brand?.slug)
+    .filter(isUsableSlug)
+    .map((slug) => ({ path: `/nuestras-marcas/${slug}`, priority: "0.65" }));
+
+  return [
+    ...(especialidades.length > 0 ? especialidades : FALLBACK_ESPECIALIDADES),
+    ...productPaths,
+    ...articlePaths,
+    ...brandPaths,
+  ];
 }
 
 function mergePages(
@@ -49,11 +87,11 @@ function mergePages(
   dynamic: { path: string; priority: string }[],
 ): { path: string; priority: string }[] {
   const byPath = new Map<string, { path: string; priority: string }>();
-  for (const p of staticPages) {
-    byPath.set(p.path, p);
+  for (const page of staticPages) {
+    byPath.set(page.path, page);
   }
-  for (const p of dynamic) {
-    byPath.set(p.path, p);
+  for (const page of dynamic) {
+    byPath.set(page.path, page);
   }
   return Array.from(byPath.values()).sort((a, b) => {
     if (a.path === "/") return -1;
@@ -63,8 +101,8 @@ function mergePages(
 }
 
 export const GET: APIRoute = async () => {
-  const especialidades = await getEspecialidadPaths();
-  const pages = mergePages(STATIC_PAGES, especialidades);
+  const dynamic = await getDynamicPaths();
+  const pages = mergePages(STATIC_PAGES, dynamic);
 
   const urls = pages
     .map(

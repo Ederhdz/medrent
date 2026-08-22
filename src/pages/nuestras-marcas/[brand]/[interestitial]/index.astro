@@ -1,5 +1,5 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from "@layouts/Layout.astro";
 import BreadcrumbSchema from "@components/seo/BreadcrumbSchema.astro";
@@ -14,16 +14,37 @@ import { getProducts } from "@server/api/products";
 import { getBrandLandingBySlug, getBrands } from "@server/api/brands";
 import { getCategories } from "@server/api/categories";
 import { getAllSubcategories } from "@server/api/subcategories";
-import { formatSlugAsTitle } from "@lib/utils.js";
+import { formatSlugAsTitle, toSameOriginMediaUrl } from "@lib/utils.js";
 import { isUsableBrandSlug } from "@lib/brandSlug";
 import { localizeRedirect } from "@lib/locale";
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 
 const { brand, interestitial } = Astro.params;
 
+export async function getStaticPaths() {
+  const brands = await getBrands();
+  const paths = [];
+
+  for (const brand of brands) {
+    if (!brand?.slug || !isUsableBrandSlug(brand.slug)) continue;
+    const brandData = await getBrandLandingBySlug(brand.slug);
+    for (const card of brandData?.interestitialCard ?? []) {
+      if (!card?.slug) continue;
+      paths.push({
+        params: {
+          brand: brand.slug,
+          interestitial: card.slug,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
 let heroPLP: any = {};
 try {
-    const response = await strapiFetch("/plp?populate=*");
+    const response = await cms.get("/plp?populate=*");
     const sliderHero = response?.data || {};
     heroPLP = Array.isArray(sliderHero) ? sliderHero[0] || {} : sliderHero;
 } catch (error) {
@@ -42,20 +63,9 @@ if (!brandData || !interestitialCard) {
   return Astro.redirect(localizeRedirect(`/nuestras-marcas/${brand}`, Astro.originPathname ?? Astro.url.pathname), 302);
 }
 
-const url = new URL(Astro.request.url);
-
-const parseFilterParam = (key: string) => {
-  const values = url.searchParams
-    .getAll(key)
-    .flatMap((value) => value.split(","))
-    .map((value) => value.trim())
-    .filter(Boolean);
-  return [...new Set(values)];
-};
-
-const brandQuery = parseFilterParam("brand");
-const categoryQuery = parseFilterParam("category");
-const subcategoryQuery = parseFilterParam("subcategory");
+const brandQuery: string[] = [];
+const categoryQuery: string[] = [];
+const subcategoryQuery: string[] = [];
 
 if (!brandQuery.includes(brand)) {
   brandQuery.push(brand);
@@ -87,7 +97,7 @@ const fallbackPageTitle = `${plpHeadingTitle} | ${brandName} | MedRent`;
 const fallbackPageDescription =
   interestitialCard.description ||
   `Descubre productos y soluciones de ${brandName} para ${plpHeadingTitle} con soporte especializado de MedRent.`;
-const pageTitle = plpHeadingTitle || fallbackPageTitle;
+const pageTitle = fallbackPageTitle;
 const pageDescription = interestitialCard.description || fallbackPageDescription;
 const pageKeywords = `${brandName}; ${plpHeadingTitle}; equipo médico; MedRent`;
 
@@ -97,17 +107,19 @@ const canonicalUrl = new URL(currentPathname, Astro.site).toString();
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = brandData.logoUrl || siteConfig?.favicon512x512?.url;
 const mediaUrl = (value: any) => {
-  if (typeof value === "string") return value;
-  if (typeof value?.url === "string") return value.url;
-  if (typeof value?.data?.attributes?.url === "string") return value.data.attributes.url;
-  if (typeof value?.data?.url === "string") return value.data.url;
-  return "";
+  let url = "";
+  if (typeof value === "string") url = value;
+  else if (typeof value?.url === "string") url = value.url;
+  else if (typeof value?.data?.attributes?.url === "string") url = value.data.attributes.url;
+  else if (typeof value?.data?.url === "string") url = value.data.url;
+  return url ? toSameOriginMediaUrl(url) : "";
 };
 const fallbackHeroImageUrl = "/temp/HeroPLP.png";
-const heroImageDesktop = mediaUrl(heroPLP.heroImageDesktop) || fallbackHeroImageUrl;
-const heroImageMobile = mediaUrl(heroPLP.heroImageMobile) || heroImageDesktop;
+const heroImageDesktopObj = heroPLP.heroImageDesktop ?? null;
+const heroImageMobileObj = heroPLP.heroImageMobile ?? heroImageDesktopObj;
+const heroImageDesktop = mediaUrl(heroImageDesktopObj) || fallbackHeroImageUrl;
+const heroImageMobile = mediaUrl(heroImageMobileObj) || heroImageDesktop;
 const heroImageUrl = new URL(heroImageDesktop, baseUrl).toString();
-const openGraphImageUrl = new URL("/OG_Default_Medrent.jpeg", baseUrl).toString();
 
 const brandUrl = `${baseUrl}/nuestras-marcas/${brand}`;
 const brandId = `${brandUrl}#brand`;
@@ -120,7 +132,6 @@ const seoText = "";
   title={pageTitle}
   description={pageDescription}
   keywords={pageKeywords}
-  ogImage={openGraphImageUrl}
 >
   <Fragment slot="head">
     <BreadcrumbSchema
@@ -202,25 +213,33 @@ const seoText = "";
 
   <section class="relative w-full h-[140px] overflow-hidden">
     <div class="absolute inset-0 heroproductos">
-      <Breadcrumb
-        textColor="text-white"
-        items={[
-          { name: "INICIO", href: "/" },
-          { name: "MARCAS", href: "/nuestras-marcas" },
-          { name: brandName, href: `/nuestras-marcas/${brand}` },
-          { name: plpHeadingTitle },
-        ]}
-      />
-
       <picture>
         <source media="(max-width: 767px)" srcset={heroImageMobile} />
         <img
           src={heroImageDesktop}
           alt={`${brandName} - ${plpHeadingTitle}`}
-          class="w-full h-full object-cover rounded-b-[24px]"
+          width={heroImageDesktopObj?.width ?? 1920}
+          height={heroImageDesktopObj?.height}
+          sizes="100vw"
+          class="absolute inset-0 w-full h-full object-cover object-top rounded-b-[24px]"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
         />
       </picture>
-
+      <div class="relative z-10">
+        <Breadcrumb
+          surface="light"
+          textColor="text-white"
+          navPosition="inline"
+          items={[
+            { name: "INICIO", href: "/" },
+            { name: "MARCAS", href: "/nuestras-marcas" },
+            { name: brandName, href: `/nuestras-marcas/${brand}` },
+            { name: plpHeadingTitle },
+          ]}
+        />
+      </div>
     </div>
   </section>
 
@@ -244,7 +263,9 @@ const seoText = "";
 
   <script is:inline define:vars={{ products, listName: plpHeadingTitle }}>
     setTimeout(() => {
-      window.view_item_list(products, listName)
+      if (typeof window.view_item_list === "function") {
+        window.view_item_list(products, listName);
+      }
     }, 2000);
   </script>
 </Layout>

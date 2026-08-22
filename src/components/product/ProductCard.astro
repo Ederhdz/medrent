@@ -2,6 +2,7 @@
 import type { Product } from "@lib/domain/product/types";
 import { isUsableBrandSlug } from "@lib/brandSlug";
 import { localizePath } from "@lib/locale";
+import { toSameOriginMediaUrl } from "@lib/utils.js";
 
 interface Props {
   product: Product;
@@ -9,9 +10,16 @@ interface Props {
 const { product } = Astro.props;
 const currentPathname = Astro.originPathname ?? Astro.url.pathname;
 const productUrl = localizePath(`/productos/${product.slug}`, currentPathname);
+const rawGallery =
+  typeof product.gallery?.[0] === "string"
+    ? product.gallery[0]
+    : product.gallery?.[0]?.url
+      ? product.gallery[0].url
+      : "/images/default-logo.webp";
+const gallerySrc = toSameOriginMediaUrl(rawGallery);
 ---
 <style>
-    .productCard:hover{ box-shadow: 7px 11px 13px 0 rgba(33, 46, 56, 0.09), 2px 3px 7px 0 rgba(33, 46, 56, 0.10);}
+    .productCard:hover{ box-shadow: 7px 11px 13px 0 rgba(33, 46, 56,.09), 2px 3px 7px 0 rgba(33, 46, 56, 0.10);}
 </style>
 
 <div class="productCard bg-white rounded-[16px] border border-[var(--color-gray)] hover:border-[var(--color-primary)] hover:shadow-md transition-all duration-300 overflow-hidden group flex flex-col h-full">
@@ -27,15 +35,13 @@ const productUrl = localizePath(`/productos/${product.slug}`, currentPathname);
         <div class="h-full relative overflow-hidden shrink-0">
             <a href={productUrl} aria-label={`Ver detalles de ${product.name}`}>
             <img
-                src={
-                    typeof product.gallery?.[0] === 'string'
-                        ? product.gallery[0]
-                        : product.gallery?.[0]?.url
-                            ? product.gallery[0].url
-                            : '/images/default-logo.webp'
-                }
+                src={gallerySrc}
                 alt={product?.name || "Producto"}
                 class="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-700"
+                loading="lazy"
+                decoding="async"
+                width="400"
+                height="260"
             />
             </a>
         </div>
@@ -61,9 +67,9 @@ const productUrl = localizePath(`/productos/${product.slug}`, currentPathname);
                 href={productUrl}
                 class="block hover:underline transition-all duration-300 product-link"
             >
-                <h3 class="text-[15px] sm:text-[16px] font-bold text-[var(--color-text-default)] transition-colors uppercase hover:underline decoration-[var(--color-primary)] line-clamp-2 leading-[1.35]">
+                <h2 class="text-[15px] sm:text-[16px] font-bold text-[var(--color-text-default)] transition-colors uppercase hover:underline decoration-[var(--color-primary)] line-clamp-2 leading-[1.35]">
                     {product.name}
-                </h3>
+                </h2>
             </a>
             {product.shortDescription && (
                 <p

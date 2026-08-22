@@ -12,19 +12,19 @@ const { imagesForHero, productData, aplicacionData, categoriaData } = Astro.prop
 ---
 
 <!-- Popup de Cotización: encima del header (z-100); NO aplicar filter al <main> — borraba el propio modal -->
-<div id="event-popup-overlay" class="fixed inset-0 z-[150] hidden">
+<div id="quote-popup-overlay" class="fixed inset-0 z-[150] hidden">
     <!-- Capa detrás del modal: oscurece y difumina el viewport (backdrop-filter), sin afectar al card -->
     <div
-        id="event-blurred-background"
+        id="quote-blurred-background"
         class="absolute inset-0 transition-all duration-300  bg-black/50 backdrop-blur-sm transition-all duration-300"
         
         aria-hidden="true"
     ></div>
     <!-- Popup Content -->
     <div class="relative z-10 flex items-center justify-center min-h-screen p-4 h-[85%] md:h-[85%] lg:h-auto md:mt-12 overflow-y-auto rounded-2xl pointer-events-none">
-        <div id="PopupContent" class="pointer-events-auto bg-white rounded-xl shadow-2xl border-3 border-[var(--color-primary)] max-w-4xl w-auto overflow-auto relative h-[85%] md:h-[85%] lg:h-auto flex justify-center mx-auto align-center">
+        <div id="quote-popup-content" class="pointer-events-auto bg-white rounded-xl shadow-2xl border-3 border-[var(--color-primary)] max-w-4xl w-auto overflow-auto relative h-[85%] md:h-[85%] lg:h-auto flex justify-center mx-auto align-center">
             <!-- Botón cerrar en esquina superior derecha del popup -->
-            <button id="close-event-popup" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl leading-none border-none cursor-pointer z-10 bg-black p-2 lg:bg-transparent lg:p-0 rounded">
+            <button id="close-quote-popup" type="button" aria-label="Cerrar cotización" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl leading-none border-none cursor-pointer z-10 bg-black p-2 lg:bg-transparent lg:p-0 rounded">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M6.4 19L5 17.6L10.6 12L5 6.4L6.4 5L12 10.6L17.6 5L19 6.4L13.4 12L19 17.6L17.6 19L12 13.4L6.4 19Z" class="fill-white lg:fill-gray-400"/>
                 </svg>
@@ -44,7 +44,7 @@ const { imagesForHero, productData, aplicacionData, categoriaData } = Astro.prop
                   
                   <!-- Desktop: img tag -->
                   <ImageResponsive
-                    id="event-popup-image"
+                    id="quote-popup-image"
                     src={imagesForHero?.[0] || '/images/Productos/default.webp'}
                     alt="Cotización MedRent"
                     class="hidden lg:block w-full h-full object-cover min-h-[500px] lg:static"
@@ -111,12 +111,12 @@ const { imagesForHero, productData, aplicacionData, categoriaData } = Astro.prop
 document.addEventListener('DOMContentLoaded', function() {
   // Elementos principales
   const popupContentContainer = document.getElementById('popup-content-container');
-  const popupOverlay = document.getElementById('event-popup-overlay');
-  const closeBtn = document.getElementById('close-event-popup');
+  const popupOverlay = document.getElementById('quote-popup-overlay');
+  const closeBtn = document.getElementById('close-quote-popup');
   const bodyElement = document.body;
-  const popupImage = document.getElementById('event-popup-image');
+  const popupImage = document.getElementById('quote-popup-image');
   const status = document.getElementById('event-status');
-  const form = document.getElementById('event-benefits-form');
+  const form = document.getElementById('form-pdp');
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
   
   // ===== TODOS LOS INPUTS =====
@@ -128,9 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Elementos del popup - MUY IMPORTANTE: Define estas variables aquí
   const imagenPopup = document.getElementById('ImagenPopup');
-  const popupContent = document.getElementById('PopupContent');
+  const popupContent = document.getElementById('quote-popup-content');
   const contenedor = document.getElementById('ContenidoPopup');
-  const blurBackdrop = document.getElementById('event-blurred-background');
+  const blurBackdrop = document.getElementById('quote-blurred-background');
 
   // Abrir popup
   function openPopup() {
@@ -435,144 +435,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectLabel) selectLabel.style.background = '#171D1C';
   }
 
-  // ===== ENVÍO DEL FORMULARIO =====
-  if (form) {
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        form.style.display = 'none';
+  // Envío: formValidator.js → /api/contact (initForm("form-pdp"))
 
-        showFormMessage('success');
-        setTimeout(() => {
-          if (status) {
-            status.innerHTML = '';
-            status.style.display = 'none';
-          }
-          form.style.display = 'block';
-          form.reset();
-        }, 5000);
-        
-        return;
-
-        // Ocultar el formulario inmediatamente
-        if (form) form.style.display = 'none';
-
-        // Construir los datos manualmente
-      const formData = new FormData(form);
-      const data = {};
-      formData.forEach((value, key) => {
-        if (data.hasOwnProperty(key)) {
-          if (!Array.isArray(data[key])) {
-            data[key] = [data[key]];
-          }
-          data[key].push(value);
-        } else {
-          data[key] = value;
-        }
-      });
-
-      // NORMALIZAR: quitar espacios del teléfono antes de enviar
-      if (phoneInput) {
-        const normalizedPhone = phoneInput.value.replace(/\s/g, '');
-        data.phone = normalizedPhone;
-      }
-
-      try {
-        const jsonBody = JSON.stringify(data);
-
-        const response = await fetch("https://kunz-app.com/hubspot.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: jsonBody,
-        });
-
-        if (response.ok) {
-          // Mostrar mensaje de éxito
-          showFormMessage('success');
-          
-          // Enviar evento al dataLayer
-          sendDataLayerEvent('form_lead_submit', {
-            currency: productAnalytics.currency,
-            value: 1,
-            item_name: productAnalytics.name,
-            item_brand: productAnalytics.brand,
-            item_aplication: productAnalytics.category,
-            item_variant: productAnalytics.variant,
-            quantity: 1
-          }, {
-            category: 'Ecommerce',
-            action: 'Add to Cart',
-            label: productAnalytics.name
-          });
-
-          form.reset();
-          setTimeout(closePopup, 4000);
-          
-        } else {
-          const resData = await response.json();
-          if (resData.category === 'CONFLICT') {
-            // Tratar como éxito si ya existía
-            showFormMessage('success');
-            form.reset();
-            setTimeout(closePopup, 4000);
-          } else {
-            // Mostrar mensaje de error
-            showFormMessage('error');
-            console.error("Error response:", resData);
-          }
-        }
-
-      } catch (error) {
-        console.error("Network error:", error);
-        showFormMessage('error');
-      }
-    });
-  }
-
-
-  // Función para enviar evento al dataLayer
-  function sendDataLayerEvent(eventName, ecommerceData, eventClassification) {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const utmData = {
-        source: urlParams.get('utm_source') || '(direct)',
-        medium: urlParams.get('utm_medium') || '(direct)',
-        campaign: urlParams.get('utm_campaign') || '(not set)',
-        term: urlParams.get('utm_term') || '(not set)',
-        content: urlParams.get('utm_content') || '(not set)'
-      };
-
-      const pageData = {
-        url: window.location.href,
-        path: window.location.pathname,
-        title: document.title,
-        referrer: document.referrer || '(direct)'
-      };
-
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        'event': eventName,
-        'ecommerce': ecommerceData,
-        'event_data': eventClassification,
-        'tracking': {
-          'utm': utmData,
-          'page': pageData
-        }
-      });
-
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        // console.log(`🔍 Data Layer - ${eventName} Event:`, {
-        //   event: eventName,
-        //   ecommerce: ecommerceData,
-        //   event_data: eventClassification,
-        //   tracking: { utm: utmData, page: pageData }
-        // });
-      }
-    } catch (error) {
-      console.error(`Error enviando evento ${eventName} al data layer:`, error);
-    }
-  }
-
-  // ===== TRANSICIONES DE COLOR PARA LOS LABELS =====
   const style = document.createElement('style');
   style.innerHTML = `
     .relative label {
