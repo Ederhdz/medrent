@@ -1,12 +1,7 @@
 import type { APIRoute } from "astro";
+import { isSnapshotMode } from "@server/cms";
 
-/**
- * Same-origin image proxy for Strapi Cloud media.
- * Strips Set-Cookie so Lighthouse Best Practices is not penalized by Cloudflare __cf_bm.
- */
-const ALLOWED_HOST =
-  /^(?:[a-z0-9-]+\.)?(?:media\.)?strapiapp\.com$/i;
-
+const ALLOWED_HOST = /^(?:[a-z0-9-]+\.)?(?:media\.)?strapiapp\.com$/i;
 const MAX_BYTES = 15 * 1024 * 1024;
 
 function isAllowedMediaUrl(raw: string): URL | null {
@@ -21,6 +16,10 @@ function isAllowedMediaUrl(raw: string): URL | null {
 }
 
 export const GET: APIRoute = async ({ url }) => {
+  if (isSnapshotMode()) {
+    return new Response(null, { status: 404 });
+  }
+
   const target = url.searchParams.get("u");
   if (!target) {
     return new Response("Missing u", { status: 400 });
@@ -51,18 +50,13 @@ export const GET: APIRoute = async ({ url }) => {
   }
 
   const headers = new Headers();
-  const contentType = upstream.headers.get("content-type") || "application/octet-stream";
-  headers.set("Content-Type", contentType);
+  headers.set("Content-Type", upstream.headers.get("content-type") || "application/octet-stream");
   headers.set(
     "Cache-Control",
     "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400",
   );
   headers.set("Cross-Origin-Resource-Policy", "same-origin");
-  // Never forward third-party cookies to the browser.
   headers.delete("set-cookie");
 
-  return new Response(upstream.body, {
-    status: 200,
-    headers,
-  });
+  return new Response(upstream.body, { status: 200, headers });
 };

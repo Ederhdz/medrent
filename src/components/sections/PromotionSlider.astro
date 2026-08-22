@@ -1,7 +1,7 @@
 ---
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import { toSameOriginMediaUrl } from "@lib/utils.js";
-const response = await strapiFetch(
+const response = await cms.get(
   "/promo-sliders?populate[desktopImage]=true&populate[mobileImage]=true&sort=displayOrder:asc"
 );
 

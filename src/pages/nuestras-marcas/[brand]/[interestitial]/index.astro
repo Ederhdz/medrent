@@ -17,7 +17,7 @@ import { getAllSubcategories } from "@server/api/subcategories";
 import { formatSlugAsTitle, toSameOriginMediaUrl } from "@lib/utils.js";
 import { isUsableBrandSlug } from "@lib/brandSlug";
 import { localizeRedirect } from "@lib/locale";
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 
 const { brand, interestitial } = Astro.params;
 
@@ -44,7 +44,7 @@ export async function getStaticPaths() {
 
 let heroPLP: any = {};
 try {
-    const response = await strapiFetch("/plp?populate=*");
+    const response = await cms.get("/plp?populate=*");
     const sliderHero = response?.data || {};
     heroPLP = Array.isArray(sliderHero) ? sliderHero[0] || {} : sliderHero;
 } catch (error) {

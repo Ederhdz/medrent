@@ -1,37 +1,12 @@
-const STRAPI_API_TOKEN = import.meta.env.STRAPI_API_TOKEN;
-import { buildStrapiRequestUrl } from "./strapiClient";
-let siteConfigPromise: Promise<any> | null = null;
+import { cms } from "./cms";
 
-const fetchWithCache = async (endpoint: string) => {
-  const res = await fetch(buildStrapiRequestUrl(endpoint), {
-    headers: {
-      Authorization: `Bearer ${STRAPI_API_TOKEN}`,
-    },
-    next: {
-      revalidate: 300, // ⏱️ cache 5 min
-    },
-  });
-
-  if (!res.ok) {
-    throw new Error("Strapi fetch error");
-  }
-
-  return res.json();
-};
-
-export const getSiteConfig = async () => {
-  if (siteConfigPromise) return siteConfigPromise;
-
-  siteConfigPromise = getSiteConfigFromStrapi();
-  return siteConfigPromise;
-};
-
-const getSiteConfigFromStrapi = async () => {
+export async function getSiteConfig() {
   try {
-    const response = await fetchWithCache("/site-setting?populate=*");
-    
+    const response = await cms.get<{ data?: Record<string, unknown> }>(
+      "/site-setting?populate=*",
+    );
     return response?.data || {};
   } catch {
     return {};
   }
-};
+}

@@ -4,7 +4,7 @@ export const prerender = true;
 import Layout from '@layouts/Layout.astro';
 import ArticleCard from '@components/blog/articleCard.astro';
 import { formatDate, toSameOriginMediaUrl } from '@lib/utils.js';
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import Newsletter from '@components/seo/Newsletter.astro';
 import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
@@ -25,7 +25,7 @@ let clasificacionesCms: any[] = [];
 
 /** Populate mínimo válido; tags de clasificación vienen de `/article-classifications` abajo. */
 try {
-  const articulosAPI = await strapiFetch(
+  const articulosAPI = await cms.get(
     "/blog-articles?populate[heroImage]=true&populate[writer][populate][avatar]=true&sort=publishedAt:desc",
   );
   const raw = articulosAPI?.data ?? articulosAPI ?? [];
@@ -35,7 +35,7 @@ try {
 } catch (e) {
   console.error("Error blog-articles (índice, primario):", e);
   try {
-    const fallback = await strapiFetch("/blog-articles?populate=*&sort=publishedAt:desc");
+    const fallback = await cms.get("/blog-articles?populate=*&sort=publishedAt:desc");
     const raw = fallback?.data ?? [];
     articulosActivos = Array.isArray(raw)
       ? raw.filter((articulo: any) => articulo.isActive === true)
@@ -54,13 +54,13 @@ articulosActivos.sort((a: any, b: any) => {
 });
 
 try {
-  const clsRes = await strapiFetch(
+  const clsRes = await cms.get(
     '/article-classifications?pagination[pageSize]=100&sort=tag:asc&populate[articles]=true',
   );
   clasificacionesCms = Array.isArray(clsRes?.data) ? clsRes.data : [];
 } catch {
   try {
-    const clsRes = await strapiFetch('/article-classifications?pagination[pageSize]=100&sort=tag:asc');
+    const clsRes = await cms.get('/article-classifications?pagination[pageSize]=100&sort=tag:asc');
     clasificacionesCms = Array.isArray(clsRes?.data) ? clsRes.data : [];
   } catch {
     clasificacionesCms = [];

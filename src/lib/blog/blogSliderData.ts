@@ -1,4 +1,4 @@
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import {
     isBlogArticleListed,
     normalizeBlogArticleFromApi,
@@ -43,8 +43,8 @@ export async function fetchBlogSliderData(): Promise<BlogSliderData> {
 
   try {
     const [articulosAPI, clsRes] = await Promise.all([
-      strapiFetch(BLOG_SLIDER_LIST_QUERY),
-      strapiFetch(
+      cms.get(BLOG_SLIDER_LIST_QUERY),
+      cms.get(
         "/article-classifications?pagination[pageSize]=100&sort=tag:asc&populate[articles]=true",
       ).catch(() => ({ data: [] })),
     ]);
@@ -60,7 +60,7 @@ export async function fetchBlogSliderData(): Promise<BlogSliderData> {
   } catch (e) {
     console.error("Error blog-articles (slider, primario):", e);
     try {
-      const fallback = await strapiFetch(
+      const fallback = await cms.get(
         "/blog-articles?populate=*&sort=publishedAt:desc&pagination[pageSize]=50",
       );
       const raw = fallback?.data ?? [];

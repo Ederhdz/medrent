@@ -107,7 +107,6 @@ const isLocalEnv = import.meta.env.DEV;
     <link rel="preload" href="/fonts/Lato-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/fonts/Lato-Bold.woff2" as="font" type="font/woff2" crossorigin>
     {!isLocalEnv && <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>}
-    <link rel="dns-prefetch" href="//media.strapiapp.com">
 
     <!-- 5. Metas dinámicos (OG, description, etc.) -->
     <meta name="description" content={resolvedDescription} />

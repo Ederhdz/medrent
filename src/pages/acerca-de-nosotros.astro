@@ -12,8 +12,8 @@ const canonicalUrl = new URL(Astro.originPathname ?? Astro.url.pathname, Astro.s
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
 const logoUrl = siteConfig?.favicon512x512?.url;
 
-import { strapiFetch } from "@server/strapiClient";
-const about = await strapiFetch(
+import { cms } from "@server/cms";
+const about = await cms.get(
   "/about?populate=*"
 );
 

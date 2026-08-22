@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import Layout from '@layouts/Layout.astro';
-import { strapiFetch } from "@server/strapiClient";
+import { cms } from "@server/cms";
 import ArticleCard from '@components/blog/articleCard.astro';
 import { BlocksRenderer } from '@strapi/blocks-react-renderer';
 import Breadcrumb from '@components/navigation/Breadcrumb.astro';
@@ -25,7 +25,7 @@ export async function getStaticPaths() {
   const slugs = new Set<string>(["team-medrent"]);
 
   try {
-    const writers = await strapiFetch(
+    const writers = await cms.get(
       "/writers?fields[0]=slug&pagination[pageSize]=1000",
     );
     for (const entry of writers?.data ?? []) {
@@ -37,7 +37,7 @@ export async function getStaticPaths() {
   }
 
   try {
-    const articles = await strapiFetch(
+    const articles = await cms.get(
       "/blog-articles?fields[0]=slug&populate[writer][fields][0]=slug&pagination[pageSize]=1000",
     );
     for (const entry of articles?.data ?? []) {
@@ -67,12 +67,12 @@ if (!autorParam) {
 
 let articlesResponse: { data?: unknown[] } = { data: [] };
 try {
-  articlesResponse = await strapiFetch(
+  articlesResponse = await cms.get(
     "/blog-articles?populate[heroImage]=true&populate[speciality]=true&populate[writer][populate]=*&sort=publishedAt:desc&pagination[pageSize]=2000",
   );
 } catch {
   try {
-    articlesResponse = await strapiFetch(
+    articlesResponse = await cms.get(
       "/blog-articles?populate=*&sort=publishedAt:desc&pagination[pageSize]=2000",
     );
   } catch {
@@ -151,7 +151,7 @@ if (autorParam === TEAM_MEDRENT_SLUG) {
   } else {
     // EL AUTOR NO TIENE ARTÍCULOS - Buscar en endpoint /writers
     try {
-      const writerRes = await strapiFetch(
+      const writerRes = await cms.get(
         `/writers?filters[slug][$eq]=${encodeURIComponent(autorParam)}&populate=*`
       );
       const rows = writerRes?.data;
@@ -247,7 +247,7 @@ function withQuery(overrides: Record<string, string | null>) {
 
 let classificationTagByArticleKey = new Map<string, string>();
 try {
-  const clsRes = await strapiFetch(
+  const clsRes = await cms.get(
     "/article-classifications?pagination[pageSize]=100&sort=tag:asc&populate[articles]=true",
   );
   if (Array.isArray(clsRes?.data)) {
@@ -255,7 +255,7 @@ try {
   }
 } catch {
   try {
-    const clsRes = await strapiFetch(
+    const clsRes = await cms.get(
       "/article-classifications?pagination[pageSize]=100&sort=tag:asc",
     );
     if (Array.isArray(clsRes?.data)) {
@@ -298,7 +298,7 @@ if (autorParam === TEAM_MEDRENT_SLUG) {
  */
 if (!authorPortraitUrl) {
   try {
-    const wRes = await strapiFetch(
+    const wRes = await cms.get(
       `/writers?filters[slug][$eq]=${encodeURIComponent(autorParam)}&populate=*`,
     );
     const rows = wRes?.data;
@@ -336,7 +336,7 @@ const initialAuthorArticlesShown = Math.min(AUTHOR_GRID_PAGE_SIZE, totalAuthorAr
 let todosEscritores: any[] = [];
 
 try {
-  const response = await strapiFetch('/writers?populate[avatar]=true');
+  const response = await cms.get('/writers?populate[avatar]=true');
   todosEscritores = Array.isArray(response?.data) ? response.data : [];
 } catch (error) {
   // console.error('Error fetching writers:', error);
